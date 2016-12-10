@@ -47,25 +47,107 @@ class GeneticAlgorithms:
         return not bit_value
 
     def _mutate(self, individ):
+        """
+        This function mutates (inverse bits) the given population individual
+        with the specified mutation probability.
+
+        Args:
+            individ (list): binary encoded combination of input data.
+        Returns:
+             mutated individual (with inverted bits)
+        """
         if random.uniform(0, 100) > self.mutation_prob:
             # don't mutate
             return individ
 
-        random_bit = random.randrange(len(individ))
-        individ[random_bit] = self._invert_bit(individ[random_bit])
-
-        inverted_bits = [random_bit]
-        for i in range(1, self.mut_type):
-            while random_bit in inverted_bits:
-                random_bit = random.randrange(len(individ))
-
-            inverted_bits.append(random_bit)
+        if len(individ) == self.mut_type:
+            # it is necessary to mutate all bits
+            for i in range(len(individ)):
+                individ[i] = self._invert_bit(individ[i])
+        else:
+            # mutate some bits (not all)
+            random_bit = random.randrange(len(individ))
             individ[random_bit] = self._invert_bit(individ[random_bit])
+
+            inverted_bits = [random_bit]
+            for i in range(1, self.mut_type):
+                while random_bit in inverted_bits:
+                    random_bit = random.randrange(len(individ))
+
+                inverted_bits.append(random_bit)
+                individ[random_bit] = self._invert_bit(individ[random_bit])
 
         return individ
 
-    def _cross(self, individ1, individ2):
-        pass
+    def _replace_bits(self, source, target, start, stop):
+        """
+        Replace target bits with source bits in interval (start, stop) (both included).
+
+        Args:
+            source (list): Values in source are used as replacement for target.
+            target (list): Values in target are replaced with values in source.
+            start (int): Start point of interval (included).
+            stop (int): End point of interval (included).
+        Returns:
+             target with replaced bits with source one in the interval (start, stop) (both included)
+        """
+        if start < 0 or start >= len(source) or \
+                stop < 0 or stop < start or stop >= len(source):
+            raise ValueError
+
+        for i in range(start, stop + 1):
+            target[i] = source[i]
+
+        return target
+
+    def _cross(self, parent1, parent2):
+        """
+        This function crosses the two given population individuals (parents)
+        with the specified crossover probability.
+
+        Args:
+            parent1 (list): binary encoded combination of input data of the first parent.
+            parent2 (list): binary encoded combination of input data of the second parent.
+        Returns:
+             TODO
+        """
+        if random.uniform(0, 100) > self.crossover_prob:
+            # don't cross individuals
+            return None
+
+        new_individ = list(parent1)
+
+        if self.cross_type == len(parent1):
+            # it is necessary to replace all bits, e.g. we get exactly parent2
+            return parent2
+        elif self.cross_type == 1:
+            # combine two parts of parents
+            random_bit = random.randrange(1, len(parent2) - 1)  # we want to do useful replacements
+            new_individ = self._replace_bits(parent2, new_individ, random_bit + 1, len(parent2))
+        elif self.cross_type == 2:
+            # replace bits within  an interval of two random generated points
+            random_bit1 = random.randrange(1, len(parent1) - 1)  # we want to do useful replacements
+            while random_bit2 == random_bit1:
+                random_bit2 = random.randrange(1, len(parent1) - 1)
+
+            if random_bit1 < random_bit2:
+                new_individ = self._replace_bits(parent2, new_individ, random_bit1, random_bit2)
+            else:
+                new_individ = self._replace_bits(parent2, new_individ, random_bit2, random_bit1)
+        else:
+            # cross some bits exactly (not replacement within an interval)
+            random_bit = random.randrange(len(parent2))
+            new_individ = self._replace_bits(parent2, new_individ, random_bit, random_bit)
+
+            cross_bits = [random_bit]
+            for i in range(1, self.cross_type):
+                while random_bit in cross_bits:
+                    random_bit = random.randrange(len(parent2))
+
+                cross_bits.append(random_bit)
+                new_individ = self._replace_bits(parent2, new_individ, random_bit, random_bit)
+
+        return  new_individ
 
     def _select_parents(self, population):
         pass
