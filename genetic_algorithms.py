@@ -1,13 +1,30 @@
 import random
 
 
+class IndividualGA:
+    """
+    The class represents an element of population in GA.
+    """
+    def __init__(self, individ, fitness_val):
+        """
+
+        Args:
+            fitness_val (int): Fitness value of the given chromosome.
+        """
+        self.individ = individ
+        self.fitness_val = fitness_val
+
+
 class GeneticAlgorithms:
-    def __init__(self, data, selection="rank", mut_prob=0.5, mut_type=1, cross_prob=0.95, cross_type=1, elitism=False):
+    def __init__(self, data, selection="rank", mut_prob=0.5, mut_type=1, cross_prob=0.95, cross_type=1, elitism=False,
+                 tournament_size=None):
         """
         Args:
             data (list): A list with elements of the original population. This list will be binary encoded
                 (with True, False) later in order to indicate currently evaluated combination of elements.
-            selection (str): Parent selection type. May be "rank" (Rank selection) or "roulette" (Roulette Wheel Selection).
+            selection (str): Parent selection type. May be "rank" (Rank Wheel Selection),
+                "roulette" (Roulette Wheel Selection) or "tournament".
+            tournament_size (int): Defines the size of tournament in case of 'selection' == 'tournament'.
             mut_prob (float): Probability of mutation. Recommended values are 0.5-1%.
             mut_type (int): This parameter defines how many random bits of individual are inverted (mutated).
             cross_prob (float): Probability of crossover. Recommended values are 80-95%.
@@ -19,6 +36,7 @@ class GeneticAlgorithms:
         """
         self.data = data
         self.selection = selection
+        self.tournament_size = tournament_size
         self.mutation_prob = mut_prob
         self.mut_type = mut_type
         self.crossover_prob = cross_prob
@@ -33,8 +51,10 @@ class GeneticAlgorithms:
                 self.mut_type < 1 or self.mut_type > len(self.data) or \
                 self.crossover_prob < 0 or self.crossover_prob > 100 or \
                 self.cross_type < 1 or self.cross_type > len(self.data) or \
-                self.selection not in ["rank", "roulette"] or \
+                self.selection not in ["rank", "roulette", "tournament"] or \
+                (self.selection == 'tournament' and self.tournament_size is None) or \
                 self.elitism not in [True, False]:
+            print('Wrong value of input parameter.')
             raise ValueError
 
     def _invert_bit(self, bit_value):
@@ -95,6 +115,7 @@ class GeneticAlgorithms:
         """
         if start < 0 or start >= len(source) or \
                 stop < 0 or stop < start or stop >= len(source):
+            print('Interval error:', '(' + str(start) + ', ' + str(stop) + ')')
             raise ValueError
 
         if random.uniform(0, 100) <= self.crossover_prob:
@@ -146,13 +167,87 @@ class GeneticAlgorithms:
                 cross_bits.append(random_bit)
                 new_individ = self._replace_bits(parent2, new_individ, random_bit, random_bit)
 
-        return  new_individ
+        return new_individ
 
-    def _select_parents(self, population):
-        if self.selection == 'roulette':
-            pass
-        elif self.selection == 'rank':
-            pass
+    def _conduct_tournament(self, population, size):
+        """
+        Conducts a tournament of the given size within the specified population.
+
+        Args:
+            population (list): All possible competitors. Population element is an IndividualGA object.
+            size (int): Size of a tournament.
+        Returns:
+            winners (tuple): winner of current tournament and the second best participant
+        """
+        if size > len(population) or size < 1:
+            print('Tournament size is greater than the whole population.')
+            raise ValueError
+
+        participant = random.randrange(len(population))
+        competitors = [participant]
+
+        for i in range(1, size):
+            while participant in competitors:
+                participant = random.randrange(len(population))
+
+            competitors.append(participant)
+
+        # sort by fitness value in the ascending order
+        # and get the last two elements (winner and the second best participant)
+        competitors.sort(key=lambda x: population[x].fitness_val)
+
+        return competitors[-1], competitors[-2]
+
+    def _select_parents(self, population, wheel_sum=None):
+        """
+        Selects parents from the given population.
+
+        Args:
+            population (list): Current population from which parents will be selected.
+                Population element is an IndividualGA object.
+            wheel_sum (int): Sum of values on a wheel (different for "roulette" and "rank").
+        Returns:
+            parents (tuple): selected parents
+        """
+        if self.selection == 'roulette' or self.selection == 'rank':
+            if wheel_sum is None:
+                print('Wheel sum is unknown: cannot continue')
+                raise ValueError
+
+            parent1 = None
+            parent2 = None
+            random1 = random.randrange(wheel_sum)
+            random2 = random.randrange(wheel_sum)
+
+            wheel = 0
+            for ind in population:
+                wheel += ind.fitness_val
+
+                if random1 < wheel:
+                    parent1 = ind
+                if random2 < wheel:
+                    parent2 = ind
+
+                if parent1 and parent2:
+                    break
+
+            return parent1, parent2
+        elif self.selection == 'tournament':
+            best1, second1 = self._conduct_tournament(population, self.tournament_size)
+            best2, second2 = self._conduct_tournament(population, self.tournament_size)
+
+            if best1.individ == best2.individ:
+                return best1, second2
+            else:
+                return best1, best2
         else:
             print('Unknown selection type:', self.selection)
+            raise ValueError
+
+    def _init_population(self):
+        pass
+
+    def run(self):
+        # fitness_sum = sum(ind.fitness_val for ind in population)
+        pass
 
