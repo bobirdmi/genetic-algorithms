@@ -9,6 +9,7 @@ class IndividualGA:
         """
 
         Args:
+            individ (list): A chromosome represented a solution. This chromosome is binary encoded (True, False).
             fitness_val (int): Fitness value of the given chromosome.
         """
         self.individ = individ
@@ -42,6 +43,7 @@ class GeneticAlgorithms:
         self.crossover_prob = cross_prob
         self.cross_type = cross_type
         self.elitism = elitism
+        self.population = None
 
         self._check_parameters()
 
@@ -56,6 +58,28 @@ class GeneticAlgorithms:
                 self.elitism not in [True, False]:
             print('Wrong value of input parameter.')
             raise ValueError
+
+    def _random_diff(self, stop, n, start=0):
+        """
+        Creates a list of 'n' different random numbers within the interval (start, stop) ('start' included).
+
+        Args:
+            start (int): Start value of an interval (included). Default is 0.
+            stop (int): End value of an interval (excluded).
+            n (int): How many different random numbers generate.
+        Returns:
+             list of different random values from the given interval ('start' included)
+        """
+        random_number = random.randrange(start, stop)
+        used_values = [random_number]
+
+        for i in range(1, n):
+            while random_number in used_values:
+                random_number = random.randrange(start, stop)
+
+            used_values.append(random_number)
+
+        return used_values
 
     def _invert_bit(self, bit_value):
         """
@@ -87,16 +111,10 @@ class GeneticAlgorithms:
                 individ[i] = self._invert_bit(individ[i])
         else:
             # mutate some bits (not all)
-            random_bit = random.randrange(len(individ))
-            individ[random_bit] = self._invert_bit(individ[random_bit])
+            inverted_bits = self._random_diff(len(individ), self.mut_type)
 
-            inverted_bits = [random_bit]
-            for i in range(1, self.mut_type):
-                while random_bit in inverted_bits:
-                    random_bit = random.randrange(len(individ))
-
-                inverted_bits.append(random_bit)
-                individ[random_bit] = self._invert_bit(individ[random_bit])
+            for bit in inverted_bits:
+                individ[bit] = self._invert_bit(individ[bit])
 
         return individ
 
@@ -156,16 +174,10 @@ class GeneticAlgorithms:
                 new_individ = self._replace_bits(parent2, new_individ, random_bit2, random_bit1)
         else:
             # cross some bits exactly (not replacement within an interval)
-            random_bit = random.randrange(len(parent2))
-            new_individ = self._replace_bits(parent2, new_individ, random_bit, random_bit)
+            cross_bits = self._random_diff(len(parent2), self.cross_type)
 
-            cross_bits = [random_bit]
-            for i in range(1, self.cross_type):
-                while random_bit in cross_bits:
-                    random_bit = random.randrange(len(parent2))
-
-                cross_bits.append(random_bit)
-                new_individ = self._replace_bits(parent2, new_individ, random_bit, random_bit)
+            for bit in cross_bits:
+                new_individ = self._replace_bits(parent2, new_individ, bit, bit)
 
         return new_individ
 
@@ -183,15 +195,7 @@ class GeneticAlgorithms:
             print('Tournament size is greater than the whole population.')
             raise ValueError
 
-        participant = random.randrange(len(population))
-        competitors = [participant]
-
-        for i in range(1, size):
-            while participant in competitors:
-                participant = random.randrange(len(population))
-
-            competitors.append(participant)
-
+        competitors = self._random_diff(len(population), size)
         # sort by fitness value in the ascending order
         # and get the last two elements (winner and the second best participant)
         competitors.sort(key=lambda x: population[x].fitness_val)
@@ -210,8 +214,8 @@ class GeneticAlgorithms:
             parents (tuple): selected parents
         """
         if self.selection == 'roulette' or self.selection == 'rank':
-            if wheel_sum is None:
-                print('Wheel sum is unknown: cannot continue')
+            if wheel_sum is None or wheel_sum < 2:
+                print('Wrong value of wheel sum:', wheel_sum)
                 raise ValueError
 
             parent1 = None
@@ -244,10 +248,36 @@ class GeneticAlgorithms:
             print('Unknown selection type:', self.selection)
             raise ValueError
 
-    def _init_population(self):
+    def init_population(self, new_population):
+        """
+        Initializes population with the value of 'new_population'.
+
+        Args:
+            new_population (list): New initial population of IndividualGA objects.
+        """
+        self.population = list(new_population)
+
+    def init_random_population(self, size=None):
+        """
+        Initializes a new random population of the given size.
+
+        Args:
+            size (int): Size of a new random population. If None, the size is set to len(self.data).
+        """
+        if size is None:
+            size = len(self.data)
+        elif 2 > size > len(self.data):
+            print('Wrong size of population:', size)
+            raise ValueError
+
+        # generate population
+        max_num = 2**len(self.data) - 1
+        self.population = self._random_diff(max_num + 1, size, start=1)
+
+    def run(self, population=None):
+        # fitness_sum = sum(ind.fitness_val for ind in population)
+        # TODO
         pass
 
-    def run(self):
-        # fitness_sum = sum(ind.fitness_val for ind in population)
-        pass
+
 
