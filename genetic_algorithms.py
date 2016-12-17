@@ -7,12 +7,14 @@ class GeneticAlgorithms:
         Args:
             data (list): A list with elements of the original population. This list will be binary encoded
                 (with True, False) later in order to indicate currently evaluated combination of elements.
-            selection (str): Parent selection type. May be "rank" (Rank selection), "roulette" (Roulette Wheel Selection)
+            selection (str): Parent selection type. May be "rank" (Rank selection) or "roulette" (Roulette Wheel Selection).
             mut_prob (float): Probability of mutation. Recommended values are 0.5-1%.
-            mut_type (int): This parameter defines how many bits of individual are inverted (mutated).
+            mut_type (int): This parameter defines how many random bits of individual are inverted (mutated).
             cross_prob (float): Probability of crossover. Recommended values are 80-95%.
-            cross_type (int): The following types of crossover are allowed: single point (1),
-                two point (2) and uniform (3).
+            cross_type (int): This parameter defines crossover type. The following types are allowed:
+                single point (1), two point (2) and multiple point (2 < cross_type <= len(data)).
+                The extreme case of multiple point crossover is uniform one (cross_type == len(data)).
+                The specified number of bits (cross_type) are crossed in case of multiple point crossover.
             elitism (True, False): Elitism on/off.
         """
         self.data = data
@@ -37,31 +39,30 @@ class GeneticAlgorithms:
 
     def _invert_bit(self, bit_value):
         """
-        This function inverts the given boolean value.
+        This function inverts the given boolean value with the specified mutation probability.
 
         Args:
             bit_value (True, False): The value to invert.
         Returns:
             inverted value: True for False, False for True
         """
-        return not bit_value
+        if random.uniform(0, 100) <= self.mutation_prob:
+            return not bit_value
+        else:
+            # don't mutate
+            return bit_value
 
     def _mutate(self, individ):
         """
-        This function mutates (inverse bits) the given population individual
-        with the specified mutation probability.
+        This function mutates (inverse bits) the given population individual.
 
         Args:
             individ (list): binary encoded combination of input data.
         Returns:
              mutated individual (with inverted bits)
         """
-        if random.uniform(0, 100) > self.mutation_prob:
-            # don't mutate
-            return individ
-
         if len(individ) == self.mut_type:
-            # it is necessary to mutate all bits
+            # it is necessary to mutate all bits with the specified mutation probability
             for i in range(len(individ)):
                 individ[i] = self._invert_bit(individ[i])
         else:
@@ -81,7 +82,8 @@ class GeneticAlgorithms:
 
     def _replace_bits(self, source, target, start, stop):
         """
-        Replace target bits with source bits in interval (start, stop) (both included).
+        Replace target bits with source bits in interval (start, stop) (both included)
+        with the specified crossover probability.
 
         Args:
             source (list): Values in source are used as replacement for target.
@@ -95,40 +97,37 @@ class GeneticAlgorithms:
                 stop < 0 or stop < start or stop >= len(source):
             raise ValueError
 
-        for i in range(start, stop + 1):
-            target[i] = source[i]
+        if random.uniform(0, 100) <= self.crossover_prob:
+            for i in range(start, stop + 1):
+                target[i] = source[i]
 
         return target
 
     def _cross(self, parent1, parent2):
         """
-        This function crosses the two given population individuals (parents)
-        with the specified crossover probability.
+        This function crosses the two given population individuals (parents).
 
         Args:
             parent1 (list): binary encoded combination of input data of the first parent.
             parent2 (list): binary encoded combination of input data of the second parent.
         Returns:
-             TODO
+             list: individual created by crossover of two parents
         """
-        if random.uniform(0, 100) > self.crossover_prob:
-            # don't cross individuals
-            return None
-
         new_individ = list(parent1)
 
         if self.cross_type == len(parent1):
-            # it is necessary to replace all bits, e.g. we get exactly parent2
-            return parent2
+            # it is necessary to replace all bits with the specified crossover probability
+            for bit in range(len(parent1)):
+                new_individ = self._replace_bits(parent2, new_individ, bit, bit)
         elif self.cross_type == 1:
             # combine two parts of parents
             random_bit = random.randrange(1, len(parent2) - 1)  # we want to do useful replacements
-            new_individ = self._replace_bits(parent2, new_individ, random_bit + 1, len(parent2))
+            new_individ = self._replace_bits(parent2, new_individ, random_bit + 1, len(parent2) - 1)
         elif self.cross_type == 2:
             # replace bits within  an interval of two random generated points
-            random_bit1 = random.randrange(1, len(parent1) - 1)  # we want to do useful replacements
+            random_bit1 = random.randrange(len(parent1))  # we want to do useful replacements
             while random_bit2 == random_bit1:
-                random_bit2 = random.randrange(1, len(parent1) - 1)
+                random_bit2 = random.randrange(len(parent1))
 
             if random_bit1 < random_bit2:
                 new_individ = self._replace_bits(parent2, new_individ, random_bit1, random_bit2)
@@ -150,5 +149,10 @@ class GeneticAlgorithms:
         return  new_individ
 
     def _select_parents(self, population):
-        pass
+        if self.selection == 'roulette':
+            pass
+        elif self.selection == 'rank':
+            pass
+        else:
+            print('Unknown selection type:', self.selection)
 
