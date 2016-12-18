@@ -11,6 +11,7 @@ class IndividualGA:
 
         Args:
             individ (list): A chromosome represented a solution. The solution is binary encoded in chromosome.
+                This list contains only positions of bit 1 (according to self.data list).
             fitness_val (int): Fitness value of the given chromosome.
         """
         self.individ = list(individ)
@@ -48,16 +49,17 @@ class GeneticAlgorithms:
         self.cross_type = cross_type
         self.elitism = elitism
         self.population = None
+        self.bin_length = len(self.data)
 
         self._check_parameters()
 
     def _check_parameters(self):
-        if self.data is None or len(self.data) < 4 or \
+        if self.data is None or self.bin_length < 4 or \
                 self.fitness_func is None or \
                 self.mutation_prob < 0 or self.mutation_prob > 100 or \
-                self.mut_type < 1 or self.mut_type > len(self.data) or \
+                self.mut_type < 1 or self.mut_type > self.bin_length or \
                 self.crossover_prob < 0 or self.crossover_prob > 100 or \
-                self.cross_type < 1 or self.cross_type > len(self.data) or \
+                self.cross_type < 1 or self.cross_type > self.bin_length or \
                 self.selection not in ["rank", "roulette", "tournament"] or \
                 (self.selection == 'tournament' and self.tournament_size is None) or \
                 self.elitism not in [True, False]:
@@ -75,51 +77,66 @@ class GeneticAlgorithms:
         Returns:
              list of different random values from the given interval ('start' included)
         """
-        random_number = random.randrange(start, stop)
-        used_values = [random_number]
+        if stop - start < n:
+            # there is not enough numbers in the given interval
+            print('There is not enough numbers in the given interval')
+            raise ValueError
+        elif stop - start == n:
+            # interval size == requested amount of numbers
+            return list(range(start, stop))
+        else:
+            # requested amount of numbers is lower than the interval size
+            random_number = random.randrange(start, stop)
+            used_values = [random_number]
 
-        for i in range(1, n):
-            while random_number in used_values:
-                random_number = random.randrange(start, stop)
+            for i in range(1, n):
+                while random_number in used_values:
+                    random_number = random.randrange(start, stop)
 
-            used_values.append(random_number)
+                used_values.append(random_number)
 
-        return used_values
+            return used_values
 
-    def _invert_bit(self, bit_value):
+    def _invert_bit(self, individ, bit_num):
         """
-        This function inverts the given boolean value with the specified mutation probability.
+        This function mutates the appropriate bits from bit_num of the individual
+        with the specified mutation probability.
 
         Args:
-            bit_value (True, False): The value to invert.
+            individ (list): Binary encoded individual (it contains positions of bit 1 according to self.data).
+            bit_num (list): List of bits' numbers to invert.
         Returns:
-            inverted value: True for False, False for True
+            mutated individual as binary representation (list)
         """
-        if random.uniform(0, 100) <= self.mutation_prob:
-            return not bit_value
-        else:
-            # don't mutate
-            return bit_value
+        for bit in bit_num:
+            if random.uniform(0, 100) <= self.mutation_prob:
+                # mutate
+                if bit in individ:
+                    # 1 -> 0
+                    individ.remove(bit)
+                else:
+                    # 0 -> 1
+                    individ.append(bit)
+
+        return individ
 
     def _mutate(self, individ):
         """
         This function mutates (inverse bits) the given population individual.
 
         Args:
-            individ (list): binary encoded combination of input data.
+            individ (list): Binary encoded combination of the original data list
+                (it contains positions of bit 1 according to self.data).
         Returns:
-             mutated individual (with inverted bits)
+             mutated individual as binary representation (with inverted bits)
         """
-        if len(individ) == self.mut_type:
+        if self.bin_length == self.mut_type:
             # it is necessary to mutate all bits with the specified mutation probability
-            for i in range(len(individ)):
-                individ[i] = self._invert_bit(individ[i])
+            individ = self._invert_bit(individ, list(range(self.bin_length)))
         else:
             # mutate some bits (not all)
-            inverted_bits = self._random_diff(len(individ), self.mut_type)
-
-            for bit in inverted_bits:
-                individ[bit] = self._invert_bit(individ[bit])
+            inverted_bits = self._random_diff(self.bin_length, self.mut_type)
+            individ = self._invert_bit(individ, inverted_bits)
 
         return individ
 
@@ -131,19 +148,45 @@ class GeneticAlgorithms:
         Args:
             source (list): Values in source are used as replacement for target.
             target (list): Values in target are replaced with values in source.
-            start (int): Start point of interval (included).
-            stop (int): End point of interval (included).
+            start (int): Start point of an interval (included).
+            stop (int): End point of an interval (included).
         Returns:
              target with replaced bits with source one in the interval (start, stop) (both included)
         """
-        if start < 0 or start >= len(source) or \
-                stop < 0 or stop < start or stop >= len(source):
+        if start < 0 or start >= self.bin_length or \
+                stop < 0 or stop < start or stop >= self.bin_length:
             print('Interval error:', '(' + str(start) + ', ' + str(stop) + ')')
             raise ValueError
 
-        if random.uniform(0, 100) <= self.crossover_prob:
-            for i in range(start, stop + 1):
-                target[i] = source[i]
+        if start == stop:
+            if random.uniform(0, 100) <= self.crossover_prob:
+                # crossover
+                if start in source:
+                    # bit 'start' is 1 in source
+                    if start not in target:
+                        # bit 'start' is 0 in target
+                        target.append(start)
+                else:
+                    # bit 'start' is 0 in source
+                    if start in target:
+                        # bit 'start' is 1 in target
+                        target.remove(start)
+        else:
+            tmp_target = [0] * self.bin_length
+            tmp_source = [0] * self.bin_length
+            for index in target:
+                tmp_target[index] = 1
+            for index in source:
+                tmp_source[index] = 1
+
+            if random.uniform(0, 100) <= self.crossover_prob:
+                # crossover
+                tmp_target[start : stop+1] = tmp_source[start : stop+1]
+
+            target = []
+            for i in range(self.bin_length):
+                if tmp_target[i] == 1:
+                    target.append(i)
 
         return target
 
@@ -152,26 +195,28 @@ class GeneticAlgorithms:
         This function crosses the two given population individuals (parents).
 
         Args:
-            parent1 (list): binary encoded combination of input data of the first parent.
-            parent2 (list): binary encoded combination of input data of the second parent.
+            parent1 (list): binary encoded combination of the original data list (self.data) of the first parent.
+            parent2 (list): binary encoded combination of the original data list (self.data) of the second parent.
         Returns:
-             list: individual created by crossover of two parents
+             list: an individual (binary representation) created by crossover of two parents
         """
         new_individ = list(parent1)
 
-        if self.cross_type == len(parent1):
+        if self.cross_type == self.bin_length:
             # it is necessary to replace all bits with the specified crossover probability
-            for bit in range(len(parent1)):
+            for bit in range(self.bin_length):
                 new_individ = self._replace_bits(parent2, new_individ, bit, bit)
         elif self.cross_type == 1:
             # combine two parts of parents
-            random_bit = random.randrange(1, len(parent2) - 1)  # we want to do useful replacements
-            new_individ = self._replace_bits(parent2, new_individ, random_bit + 1, len(parent2) - 1)
+            random_bit = random.randrange(1, self.bin_length - 1)  # we want to do useful replacements
+            new_individ = self._replace_bits(parent2, new_individ, random_bit + 1, self.bin_length - 1)
         elif self.cross_type == 2:
             # replace bits within  an interval of two random generated points
-            random_bit1 = random.randrange(len(parent1))  # we want to do useful replacements
+            random_bit1 = random.randrange(self.bin_length)  # we want to do useful replacements
+            random_bit2 = random_bit1
+
             while random_bit2 == random_bit1:
-                random_bit2 = random.randrange(len(parent1))
+                random_bit2 = random.randrange(self.bin_length)
 
             if random_bit1 < random_bit2:
                 new_individ = self._replace_bits(parent2, new_individ, random_bit1, random_bit2)
@@ -179,7 +224,7 @@ class GeneticAlgorithms:
                 new_individ = self._replace_bits(parent2, new_individ, random_bit2, random_bit1)
         else:
             # cross some bits exactly (not replacement within an interval)
-            cross_bits = self._random_diff(len(parent2), self.cross_type)
+            cross_bits = self._random_diff(self.bin_length, self.cross_type)
 
             for bit in cross_bits:
                 new_individ = self._replace_bits(parent2, new_individ, bit, bit)
@@ -194,10 +239,10 @@ class GeneticAlgorithms:
             population (list): All possible competitors. Population element is an IndividualGA object.
             size (int): Size of a tournament.
         Returns:
-            winners (tuple): winner of current tournament and the second best participant
+            winners (tuple of IndividualGA): winner of current tournament and the second best participant
         """
         if size > len(population) or size < 1:
-            print('Tournament size is greater than the whole population.')
+            print('Wrong tournament size:', size)
             raise ValueError
 
         competitors = self._random_diff(len(population), size)
@@ -209,14 +254,14 @@ class GeneticAlgorithms:
 
     def _select_parents(self, population, wheel_sum=None):
         """
-        Selects parents from the given population.
+        Selects parents from the given population (sorted in ascending order).
 
         Args:
-            population (list): Current population from which parents will be selected.
+            population (list): Current population, sorted in ascending order, from which parents will be selected.
                 Population element is an IndividualGA object.
             wheel_sum (int): Sum of values on a wheel (different for "roulette" and "rank").
         Returns:
-            parents (tuple): selected parents
+            parents (tuple of IndividualGA): selected parents
         """
         if self.selection == 'roulette' or self.selection == 'rank':
             if wheel_sum is None or wheel_sum < 2:
@@ -230,7 +275,12 @@ class GeneticAlgorithms:
 
             wheel = 0
             for ind in population:
-                wheel += ind.fitness_val
+                # population is sorted in ascending order
+                if self.selection == 'roulette':
+                    wheel += ind.fitness_val
+                else:
+                    # each rank is greater by 1 than the previous one
+                    wheel += wheel + 1
 
                 if random1 < wheel:
                     parent1 = ind
@@ -258,21 +308,20 @@ class GeneticAlgorithms:
         This function gets a decimal integer number and returns positions of bit 1 in
         its binary representation. However, these positions are transformed the following way: they
         are mapped on the data list (self.data) "as is". It means that LSB (least significant bit) is
-        mapped on the last position of the data list (e.g. len(self.data) - 1), MSB is mapped on
+        mapped on the last position of the data list (e.g. self.bin_length - 1), MSB is mapped on
         the first position of the data list (e.g. 0) and so on.
 
         Args:
             number (int): This decimal number represents binary encoded combination of the input data (self.data).
         Returns:
              list of positions with bit 1 (these positions are mapped on the input data list "as is" and thus,
-             LSB is equal to index (len(self.data) - 1) of the input data list).
+             LSB is equal to index (self.bin_length - 1) of the input data list).
         """
         binary_list = []
-        number_of_bits = len(self.data)
 
-        for i in range(number_of_bits):
+        for i in range(self.bin_length):
             if number & (1 << i):
-                binary_list.append(number_of_bits - 1 - i)
+                binary_list.append(self.bin_length - 1 - i)
 
         return binary_list
 
@@ -292,16 +341,18 @@ class GeneticAlgorithms:
             fit_val = self.fitness_func(individ, self.data)
             self.population.append(IndividualGA(individ, fit_val))
 
+        self.population.sort(key=lambda x: x.fitness_val)
+
     def init_random_population(self, size=None):
         """
         Initializes a new random population of the given size.
 
         Args:
-            size (int): Size of a new random population. If None, the size is set to (2**len(self.data)) / 10, because
-                len(self.data) is a number of bits. Thus, a new population of size 10% of all possible solutions
-                (or of size 4 in case of len(self.data) < 5) will be created.
+            size (int): Size of a new random population. If None, the size is set to (2**self.bin_length) / 10, because
+                self.bin_length is a number of bits. Thus, a new population of size 10% of all possible solutions
+                (or of size 4 in case of self.bin_length < 5) will be created.
         """
-        max_num = 2 ** len(self.data)
+        max_num = 2 ** self.bin_length
 
         if size is None:
             if max_num < 20:
@@ -309,7 +360,7 @@ class GeneticAlgorithms:
             else:
                 # 10% of all possible solutions
                 size = max_num // 10
-        elif 2 > size > len(self.data):
+        elif 2 > size > self.bin_length:
             print('Wrong size of population:', size)
             raise ValueError
 
@@ -322,6 +373,8 @@ class GeneticAlgorithms:
             fit_val = self.fitness_func(individ, self.data)
 
             self.population.append(IndividualGA(individ, fit_val))
+
+        self.population.sort(key=lambda x: x.fitness_val)
 
     def run(self):
         # fitness_sum = sum(ind.fitness_val for ind in population)
