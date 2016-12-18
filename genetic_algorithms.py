@@ -1,4 +1,5 @@
 import random
+import numpy
 
 
 class IndividualGA:
@@ -296,9 +297,9 @@ class GeneticAlgorithms:
             best2, second2 = self._conduct_tournament(population, self.tournament_size)
 
             if best1.individ == best2.individ:
-                return best1, second2
+                return population[best1], population[second2]
             else:
-                return best1, best2
+                return population[best1], population[best2]
         else:
             print('Unknown selection type:', self.selection)
             raise ValueError
@@ -325,6 +326,9 @@ class GeneticAlgorithms:
 
         return binary_list
 
+    def _sort_population(self):
+        self.population.sort(key=lambda x: x.fitness_val)
+
     def init_population(self, new_population):
         """
         Initializes population with the value of 'new_population'.
@@ -341,7 +345,7 @@ class GeneticAlgorithms:
             fit_val = self.fitness_func(individ, self.data)
             self.population.append(IndividualGA(individ, fit_val))
 
-        self.population.sort(key=lambda x: x.fitness_val)
+        self._sort_population()
 
     def init_random_population(self, size=None):
         """
@@ -374,12 +378,42 @@ class GeneticAlgorithms:
 
             self.population.append(IndividualGA(individ, fit_val))
 
-        self.population.sort(key=lambda x: x.fitness_val)
+        self._sort_population()
 
-    def run(self):
-        # fitness_sum = sum(ind.fitness_val for ind in population)
-        # TODO
-        pass
+    def run(self, max_generation):
+        """
+        Starts GA. The algorithm does 'max_generation' generations and then stops.
+
+        Args:
+            max_generation (int): Maximum number of GA generations.
+        """
+        for generation_num in range(max_generation):
+            fitness_sum = sum(ind.fitness_val for ind in self.population)
+            population_size = len(self.population)
+            next_population = []
+
+            for i in range(population_size):
+                if self.selection == 'roulette':
+                    parent1, parent2 = self._select_parents(self.population, fitness_sum)
+                elif self.selection == 'rank':
+                    parent1, parent2 = self._select_parents(self.population,
+                                                            numpy.cumsum(range(1, population_size + 1))[-1]
+                                                            )
+                else:
+                    # tournament
+                    parent1, parent2 = self._select_parents(self.population)
+
+                new_individ = self._mutate(self._cross(parent1.individ, parent2.individ))
+                fit_val = self.fitness_func(new_individ, self.data)
+
+                next_population.append(IndividualGA(new_individ, fit_val))
+
+            if self.elitism:
+                # copy the best individual to a new generation
+                next_population.append(self.population[-1])
+
+            self.population = next_population
+            self._sort_population()
 
 
 
