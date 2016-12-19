@@ -278,11 +278,11 @@ class GeneticAlgorithms:
 
     def _select_parents(self, population, wheel_sum=None):
         """
-        Selects parents from the given population (sorted in ascending order).
+        Selects parents from the given population (sorted in ascending or descending order).
 
         Args:
-            population (list): Current population, sorted in ascending order, from which parents will be selected.
-                Population element is an IndividualGA object.
+            population (list): Current population, sorted in ascending or descending order,
+                from which parents will be selected. Population element is an IndividualGA object.
             wheel_sum (int): Sum of values on a wheel (different for "roulette" and "rank").
 
         Returns:
@@ -295,23 +295,20 @@ class GeneticAlgorithms:
 
             parent1 = None
             parent2 = None
-            # random1 = random.randrange(wheel_sum)
-            # random2 = random.randrange(wheel_sum)
-            random1 = random.uniform(0, wheel_sum)
-            random2 = random.uniform(0, wheel_sum)
+            wheel1 = random.uniform(0, wheel_sum)
+            wheel2 = random.uniform(0, wheel_sum)
 
-            wheel = 0
-            for ind in population:
-                # population is sorted in ascending order
+            sum_val = 0
+            for ind, rank in zip(population, range(1, len(population) + 1)):
+                # population is sorted in ascending or descending order by fitness values
                 if self.selection == 'roulette':
-                    wheel += ind.fitness_val
+                    sum_val += ind.fitness_val
                 else:
-                    # each rank is greater by 1 than the previous one
-                    wheel += wheel + 1
+                    sum_val += rank
 
-                if parent1 is None and random1 < wheel:
+                if parent1 is None and sum_val > wheel1:
                     parent1 = ind
-                if parent2 is None and random2 < wheel:
+                if parent2 is None and sum_val > wheel2:
                     parent2 = ind
 
                 if (parent1 is not None) and (parent2 is not None):
@@ -398,7 +395,7 @@ class GeneticAlgorithms:
             else:
                 # 10% of all possible solutions
                 size = max_num // 10
-        elif 2 > size > self.bin_length:
+        elif size < 2 or size >= max_num:
             print('Wrong size of population:', size)
             raise ValueError
 
@@ -423,7 +420,7 @@ class GeneticAlgorithms:
             max_generation (int): Maximum number of GA generations.
 
         Returns:
-            list of average fitness values for each generation
+            list of average fitness values for each generation (including original population)
         """
         fitness_progress = []
         fitness_sum = -1
