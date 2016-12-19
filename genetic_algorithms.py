@@ -20,7 +20,7 @@ class IndividualGA:
 
 
 class GeneticAlgorithms:
-    def __init__(self, data=None, fitness_func=None, optim='max', selection="rank", mut_prob=0.5, mut_type=1,
+    def __init__(self, data=None, fitness_func=None, optim='max', selection="rank", mut_prob=0.05, mut_type=1,
                  cross_prob=0.95, cross_type=1, elitism=False, tournament_size=None):
         """
         Args:
@@ -115,7 +115,7 @@ class GeneticAlgorithms:
             mutated individual as binary representation (list)
         """
         for bit in bit_num:
-            if random.uniform(0, 100) <= self.mutation_prob:
+            if random.uniform(0, 1) <= self.mutation_prob:
                 # mutate
                 if bit in individ:
                     # 1 -> 0
@@ -167,7 +167,7 @@ class GeneticAlgorithms:
             raise ValueError
 
         if start == stop:
-            if random.uniform(0, 100) <= self.crossover_prob:
+            if random.uniform(0, 1) <= self.crossover_prob:
                 # crossover
                 if start in source:
                     # bit 'start' is 1 in source
@@ -187,9 +187,9 @@ class GeneticAlgorithms:
             for index in source:
                 tmp_source[index] = 1
 
-            if random.uniform(0, 100) <= self.crossover_prob:
+            if random.uniform(0, 1) <= self.crossover_prob:
                 # crossover
-                tmp_target[start : stop+1] = tmp_source[start : stop+1]
+                tmp_target[start: stop+1] = tmp_source[start: stop+1]
 
             target = []
             for i in range(self.bin_length):
@@ -251,20 +251,29 @@ class GeneticAlgorithms:
         Returns:
             winners (tuple of IndividualGA): winner of current tournament and the second best participant
         """
-        if size > len(population) or size < 1:
+        population_size = len(population)
+
+        if size > population_size or size < 1:
             print('Wrong tournament size:', size)
             raise ValueError
 
-        competitors = self._random_diff(len(population), size)
-        # sort by fitness value in the ascending order (maximization) or descending order (minimization)
-        # and get the last two elements (winner and the second best participant)
-        if self.optim == 'max':
-            # ascending order (maximization)
-            competitors.sort(key=lambda x: population[x].fitness_val)
+        if size == population_size:
+            # sort by fitness value in the ascending order (maximization) or descending order (minimization)
+            if self.optim == 'max':
+                competitors = list(range(population_size))
+            else:
+                competitors = list(range(population_size - 1, 0, -1))
         else:
-            # descending order (minimization)
-            competitors.sort(key=lambda x: population[x].fitness_val, reverse=True)
+            competitors = self._random_diff(population_size, size)
+            # sort by fitness value in the ascending order (maximization) or descending order (minimization)
+            if self.optim == 'max':
+                # ascending order (maximization)
+                competitors.sort(key=lambda x: population[x].fitness_val)
+            else:
+                # descending order (minimization)
+                competitors.sort(key=lambda x: population[x].fitness_val, reverse=True)
 
+        # get the last two elements (winner and the second best participant)
         return competitors[-1], competitors[-2]
 
     def _select_parents(self, population, wheel_sum=None):
@@ -286,8 +295,10 @@ class GeneticAlgorithms:
 
             parent1 = None
             parent2 = None
-            random1 = random.randrange(wheel_sum)
-            random2 = random.randrange(wheel_sum)
+            # random1 = random.randrange(wheel_sum)
+            # random2 = random.randrange(wheel_sum)
+            random1 = random.uniform(0, wheel_sum)
+            random2 = random.uniform(0, wheel_sum)
 
             wheel = 0
             for ind in population:
@@ -298,12 +309,12 @@ class GeneticAlgorithms:
                     # each rank is greater by 1 than the previous one
                     wheel += wheel + 1
 
-                if random1 < wheel:
+                if parent1 is None and random1 < wheel:
                     parent1 = ind
-                if random2 < wheel:
+                if parent2 is None and random2 < wheel:
                     parent2 = ind
 
-                if parent1 and parent2:
+                if (parent1 is not None) and (parent2 is not None):
                     break
 
             return parent1, parent2
@@ -311,7 +322,7 @@ class GeneticAlgorithms:
             best1, second1 = self._conduct_tournament(population, self.tournament_size)
             best2, second2 = self._conduct_tournament(population, self.tournament_size)
 
-            if best1.individ == best2.individ:
+            if population[best1].individ == population[best2].individ:
                 return population[best1], population[second2]
             else:
                 return population[best1], population[best2]
@@ -412,14 +423,17 @@ class GeneticAlgorithms:
             max_generation (int): Maximum number of GA generations.
 
         Returns:
-            list of lists of fitness values by generation
+            list of average fitness values for each generation
         """
-        fitness_progress = [[ind.fitness_val for ind in self.population]]
+        fitness_progress = []
+        fitness_sum = -1
+        population_size = None
 
         for generation_num in range(max_generation):
             fitness_sum = sum(ind.fitness_val for ind in self.population)
             population_size = len(self.population)
             next_population = []
+            fitness_progress.append(fitness_sum / population_size)
 
             for i in range(population_size):
                 if self.selection == 'roulette':
@@ -446,7 +460,7 @@ class GeneticAlgorithms:
             self.population = next_population
             self._sort_population()
 
-            fitness_progress.append([ind.fitness_val for ind in self.population])
+        fitness_progress.append(fitness_sum / population_size)
 
         return fitness_progress
 
