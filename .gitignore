@@ -89,7 +89,10 @@ ENV/
 .ropeproject
 
 # tools for benchmark testing
-benchmark/*
+2.7/benchmark/*
+2.7/3to2
+2.7/*.bak
+2.7/hello_world.py
 
 # IDE folders
 .idea/

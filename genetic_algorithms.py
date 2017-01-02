@@ -362,10 +362,13 @@ class GeneticAlgorithms:
 
     def init_population(self, new_population):
         """
-        Initializes population with the value of 'new_population'.
+        Initializes population with the given binary encoded individuals of 'new_population'. The fitness values 
+        of these individuals will be computed by a specified fitness function.
 
         Args:
-            new_population (list): New initial population of IndividualGA objects.
+            new_population (list): New initial population of binary encoded individuals. A single individual is represented
+                as a list of bits' positions with value 1 in the following way: LSB (least significant bit)
+                has position (len(self.data) - 1) and MSB (most significant bit) has position 0.
         """
         if not new_population:
             print('New population is empty')
