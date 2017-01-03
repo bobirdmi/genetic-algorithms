@@ -92,7 +92,6 @@ ENV/
 2.7/benchmark/*
 2.7/3to2
 2.7/*.bak
-2.7/hello_world.py
 
 # ga test
 tests/data/
