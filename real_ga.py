@@ -2,7 +2,7 @@ from bitstring import BitArray
 import random
 import numpy
 
-from .genetic_algorithms import GeneticAlgorithms, IndividualGA
+from genetic_algorithms import GeneticAlgorithms, IndividualGA
 
 
 class RealGeneticAlgorithms(GeneticAlgorithms):

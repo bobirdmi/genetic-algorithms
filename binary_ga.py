@@ -1,6 +1,6 @@
 import random
 
-from .genetic_algorithms import GeneticAlgorithms, IndividualGA
+from genetic_algorithms import GeneticAlgorithms, IndividualGA
 
 
 class BinaryGeneticAlgorithms(GeneticAlgorithms):

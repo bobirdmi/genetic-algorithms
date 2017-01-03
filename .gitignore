@@ -94,5 +94,9 @@ ENV/
 2.7/*.bak
 2.7/hello_world.py
 
+# ga test
+tests/data/
+tests/ga_test.ipynb
+
 # IDE folders
 .idea/
