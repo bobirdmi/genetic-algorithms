@@ -11,8 +11,10 @@ class IndividualGA:
         A constructor.
 
         Args:
-            individ (list): A chromosome represented a solution. The solution is binary encoded in chromosome.
-                This list contains only positions of bit 1 (according to self.data list).
+            individ (float, list): A chromosome represented a solution. The solution
+                may be binary encoded in chromosome or be a float or a list of floats
+                in case of dealing with real value solutions. The list contains
+                only positions of bit 1 (according to self.data list) in case of binary encoded solution.
             fitness_val (int): Fitness value of the given chromosome.
         """
         self.individ = list(individ)
@@ -20,28 +22,35 @@ class IndividualGA:
 
 
 class GeneticAlgorithms:
-    def __init__(self, data=None, fitness_func=None, optim='max', selection="rank", mut_prob=0.05, mut_type=1,
-                 cross_prob=0.95, cross_type=1, elitism=False, tournament_size=None):
+    # def __init__(self):
+    #     """
+    #     A constructor. TO BE REIMPLEMENTED IN SUBCLASSES.
+    #     """
+    #     raise NotImplementedError
+
+    def __init__(self, fitness_func=None, optim='max', selection="rank", mut_prob=0.05, mut_type=1,
+                 cross_prob=0.95, cross_type=1, elitism=True, tournament_size=None):
         """
         Args:
-            data (list): A list with elements whose combination will be binary encoded and
-                evaluated by a fitness function. Minimum amount of elements is 4.
-            fitness_func (function): This function must compute fitness value of an input combination of the given data.
-                Function parameters must be: list of used indices of the given data (from 0), list of data itself.
+            fitness_func (function): This function must compute fitness value of a single individual.
+                Function parameters must be: see subclasses.
             optim (str): What an algorithm must do with fitness value: maximize or minimize. May be 'min' or 'max'.
+                Default is "max".
             selection (str): Parent selection type. May be "rank" (Rank Wheel Selection),
-                "roulette" (Roulette Wheel Selection) or "tournament".
+                "roulette" (Roulette Wheel Selection) or "tournament". Default is "rank".
             tournament_size (int): Defines the size of tournament in case of 'selection' == 'tournament'.
-            mut_prob (float): Probability of mutation. Recommended values are 0.5-1%.
+                Default is None.
+            mut_prob (float): Probability of mutation. Recommended values are 0.5-1%. Default is 0.05.
             mut_type (int): This parameter defines how many random bits of individual are inverted (mutated).
-            cross_prob (float): Probability of crossover. Recommended values are 80-95%.
+                Default is 1.
+            cross_prob (float): Probability of crossover. Recommended values are 80-95%. Default is 0.95.
             cross_type (int): This parameter defines crossover type. The following types are allowed:
                 single point (1), two point (2) and multiple point (2 < cross_type <= len(data)).
                 The extreme case of multiple point crossover is uniform one (cross_type == len(data)).
                 The specified number of bits (cross_type) are crossed in case of multiple point crossover.
-            elitism (True, False): Elitism on/off.
+                Default is 1.
+            elitism (True, False): Elitism on/off. Default is True.
         """
-        self.data = data
         self.fitness_func = fitness_func
         self.optim = optim
         self.selection = selection
@@ -52,27 +61,81 @@ class GeneticAlgorithms:
         self.cross_type = cross_type
         self.elitism = elitism
         self.population = None
-        self.bin_length = len(self.data)
 
         self._check_parameters()
 
     def _check_parameters(self):
-        if self.data is None or self.bin_length < 4 or \
-                self.fitness_func is None or \
+        if self.fitness_func is None or \
                 self.optim not in ['min', 'max'] or \
                 self.mutation_prob < 0 or self.mutation_prob > 100 or \
-                self.mut_type < 1 or self.mut_type > self.bin_length or \
+                self.mut_type < 1 or \
                 self.crossover_prob < 0 or self.crossover_prob > 100 or \
-                self.cross_type < 1 or self.cross_type > self.bin_length or \
+                self.cross_type < 1 or \
                 self.selection not in ["rank", "roulette", "tournament"] or \
                 (self.selection == 'tournament' and self.tournament_size is None) or \
                 self.elitism not in [True, False]:
             print('Wrong value of input parameter.')
             raise ValueError
 
+    # def __init__(self, data=None, fitness_func=None, optim='max', selection="rank", mut_prob=0.05, mut_type=1,
+    #              cross_prob=0.95, cross_type=1, elitism=True, tournament_size=None):
+    #     """
+    #     Args:
+    #         data (list): A list with elements whose combination will be binary encoded and
+    #             evaluated by a fitness function. Minimum amount of elements is 4.
+    #         fitness_func (function): This function must compute fitness value of an input combination of the given data.
+    #             Function parameters must be: list of used indices of the given data (from 0), list of data itself.
+    #         optim (str): What an algorithm must do with fitness value: maximize or minimize. May be 'min' or 'max'.
+    #             Default is "max".
+    #         selection (str): Parent selection type. May be "rank" (Rank Wheel Selection),
+    #             "roulette" (Roulette Wheel Selection) or "tournament". Default is "rank".
+    #         tournament_size (int): Defines the size of tournament in case of 'selection' == 'tournament'.
+    #             Default is None.
+    #         mut_prob (float): Probability of mutation. Recommended values are 0.5-1%. Default is 0.05.
+    #         mut_type (int): This parameter defines how many random bits of individual are inverted (mutated).
+    #             Default is 1.
+    #         cross_prob (float): Probability of crossover. Recommended values are 80-95%. Default is 0.95.
+    #         cross_type (int): This parameter defines crossover type. The following types are allowed:
+    #             single point (1), two point (2) and multiple point (2 < cross_type <= len(data)).
+    #             The extreme case of multiple point crossover is uniform one (cross_type == len(data)).
+    #             The specified number of bits (cross_type) are crossed in case of multiple point crossover.
+    #             Default is 1.
+    #         elitism (True, False): Elitism on/off. Default is True.
+    #     """
+    #     self._data = data
+    #     self.fitness_func = fitness_func
+    #     self.optim = optim
+    #     self.selection = selection
+    #     self.tournament_size = tournament_size
+    #     self.mutation_prob = mut_prob
+    #     self.mut_type = mut_type
+    #     self.crossover_prob = cross_prob
+    #     self.cross_type = cross_type
+    #     self.elitism = elitism
+    #     self.population = None
+    #
+    #     if self._data is not None:
+    #         self._bin_length = len(self._data)
+    #
+    #     self._check_parameters()
+    #
+    # def _check_parameters(self):
+    #     if self._data is None or self._bin_length < 4 or \
+    #             self.fitness_func is None or \
+    #             self.optim not in ['min', 'max'] or \
+    #             self.mutation_prob < 0 or self.mutation_prob > 100 or \
+    #             self.mut_type < 1 or self.mut_type > self._bin_length or \
+    #             self.crossover_prob < 0 or self.crossover_prob > 100 or \
+    #             self.cross_type < 1 or self.cross_type > self._bin_length or \
+    #             self.selection not in ["rank", "roulette", "tournament"] or \
+    #             (self.selection == 'tournament' and self.tournament_size is None) or \
+    #             self.elitism not in [True, False]:
+    #         print('Wrong value of input parameter.')
+    #         raise ValueError
+
     def _random_diff(self, stop, n, start=0):
         """
-        Creates a list of 'n' different random numbers within the interval (start, stop) ('start' included).
+        Creates a list of 'n' different random integer numbers within the interval (start, stop) ('start' included).
 
         Args:
             start (int): Start value of an interval (included). Default is 0.
@@ -104,27 +167,42 @@ class GeneticAlgorithms:
 
     def _invert_bit(self, individ, bit_num):
         """
+        TO BE REIMPLEMENTED IN SUBCLASSES.
         This function mutates the appropriate bits from bit_num of the individual
         with the specified mutation probability.
 
         Args:
-            individ (list): Binary encoded individual (it contains positions of bit 1 according to self.data).
+            individ (list): An individual of population.
             bit_num (list): List of bits' numbers to invert.
 
         Returns:
-            mutated individual as binary representation (list)
+            mutated individual
         """
-        for bit in bit_num:
-            if random.uniform(0, 1) <= self.mutation_prob:
-                # mutate
-                if bit in individ:
-                    # 1 -> 0
-                    individ.remove(bit)
-                else:
-                    # 0 -> 1
-                    individ.append(bit)
+        raise NotImplementedError
 
-        return individ
+    # def _invert_bit(self, individ, bit_num):
+    #     """
+    #     This function mutates the appropriate bits from bit_num of the individual
+    #     with the specified mutation probability.
+    #
+    #     Args:
+    #         individ (list): Binary encoded individual (it contains positions of bit 1 according to self.data).
+    #         bit_num (list): List of bits' numbers to invert.
+    #
+    #     Returns:
+    #         mutated individual as binary representation (list)
+    #     """
+    #     for bit in bit_num:
+    #         if random.uniform(0, 1) <= self.mutation_prob:
+    #             # mutate
+    #             if bit in individ:
+    #                 # 1 -> 0
+    #                 individ.remove(bit)
+    #             else:
+    #                 # 0 -> 1
+    #                 individ.append(bit)
+    #
+    #     return individ
 
     def _mutate(self, individ):
         """
@@ -137,18 +215,19 @@ class GeneticAlgorithms:
         Returns:
              mutated individual as binary representation (with inverted bits)
         """
-        if self.bin_length == self.mut_type:
+        if self._bin_length == self.mut_type:
             # it is necessary to mutate all bits with the specified mutation probability
-            individ = self._invert_bit(individ, list(range(self.bin_length)))
+            individ = self._invert_bit(individ, list(range(self._bin_length)))
         else:
             # mutate some bits (not all)
-            inverted_bits = self._random_diff(self.bin_length, self.mut_type)
+            inverted_bits = self._random_diff(self._bin_length, self.mut_type)
             individ = self._invert_bit(individ, inverted_bits)
 
         return individ
 
     def _replace_bits(self, source, target, start, stop):
         """
+        TO BE REIMPLEMENTED IN SUBCLASSES.
         Replace target bits with source bits in interval (start, stop) (both included)
         with the specified crossover probability.
 
@@ -161,42 +240,58 @@ class GeneticAlgorithms:
         Returns:
              target with replaced bits with source one in the interval (start, stop) (both included)
         """
-        if start < 0 or start >= self.bin_length or \
-                stop < 0 or stop < start or stop >= self.bin_length:
-            print('Interval error:', '(' + str(start) + ', ' + str(stop) + ')')
-            raise ValueError
+        raise NotImplementedError
 
-        if start == stop:
-            if random.uniform(0, 1) <= self.crossover_prob:
-                # crossover
-                if start in source:
-                    # bit 'start' is 1 in source
-                    if start not in target:
-                        # bit 'start' is 0 in target
-                        target.append(start)
-                else:
-                    # bit 'start' is 0 in source
-                    if start in target:
-                        # bit 'start' is 1 in target
-                        target.remove(start)
-        else:
-            tmp_target = [0] * self.bin_length
-            tmp_source = [0] * self.bin_length
-            for index in target:
-                tmp_target[index] = 1
-            for index in source:
-                tmp_source[index] = 1
-
-            if random.uniform(0, 1) <= self.crossover_prob:
-                # crossover
-                tmp_target[start: stop+1] = tmp_source[start: stop+1]
-
-            target = []
-            for i in range(self.bin_length):
-                if tmp_target[i] == 1:
-                    target.append(i)
-
-        return target
+    # def _replace_bits(self, source, target, start, stop):
+    #     """
+    #     Replace target bits with source bits in interval (start, stop) (both included)
+    #     with the specified crossover probability.
+    #
+    #     Args:
+    #         source (list): Values in source are used as replacement for target.
+    #         target (list): Values in target are replaced with values in source.
+    #         start (int): Start point of an interval (included).
+    #         stop (int): End point of an interval (included).
+    #
+    #     Returns:
+    #          target with replaced bits with source one in the interval (start, stop) (both included)
+    #     """
+    #     if start < 0 or start >= self._bin_length or \
+    #             stop < 0 or stop < start or stop >= self._bin_length:
+    #         print('Interval error:', '(' + str(start) + ', ' + str(stop) + ')')
+    #         raise ValueError
+    #
+    #     if start == stop:
+    #         if random.uniform(0, 1) <= self.crossover_prob:
+    #             # crossover
+    #             if start in source:
+    #                 # bit 'start' is 1 in source
+    #                 if start not in target:
+    #                     # bit 'start' is 0 in target
+    #                     target.append(start)
+    #             else:
+    #                 # bit 'start' is 0 in source
+    #                 if start in target:
+    #                     # bit 'start' is 1 in target
+    #                     target.remove(start)
+    #     else:
+    #         tmp_target = [0] * self._bin_length
+    #         tmp_source = [0] * self._bin_length
+    #         for index in target:
+    #             tmp_target[index] = 1
+    #         for index in source:
+    #             tmp_source[index] = 1
+    #
+    #         if random.uniform(0, 1) <= self.crossover_prob:
+    #             # crossover
+    #             tmp_target[start: stop+1] = tmp_source[start: stop+1]
+    #
+    #         target = []
+    #         for i in range(self._bin_length):
+    #             if tmp_target[i] == 1:
+    #                 target.append(i)
+    #
+    #     return target
 
     def _cross(self, parent1, parent2):
         """
@@ -211,21 +306,21 @@ class GeneticAlgorithms:
         """
         new_individ = list(parent1)
 
-        if self.cross_type == self.bin_length:
+        if self.cross_type == self._bin_length:
             # it is necessary to replace all bits with the specified crossover probability
-            for bit in range(self.bin_length):
+            for bit in range(self._bin_length):
                 new_individ = self._replace_bits(parent2, new_individ, bit, bit)
         elif self.cross_type == 1:
             # combine two parts of parents
-            random_bit = random.randrange(1, self.bin_length - 1)  # we want to do useful replacements
-            new_individ = self._replace_bits(parent2, new_individ, random_bit + 1, self.bin_length - 1)
+            random_bit = random.randrange(1, self._bin_length - 1)  # we want to do useful replacements
+            new_individ = self._replace_bits(parent2, new_individ, random_bit + 1, self._bin_length - 1)
         elif self.cross_type == 2:
             # replace bits within  an interval of two random generated points
-            random_bit1 = random.randrange(self.bin_length)  # we want to do useful replacements
+            random_bit1 = random.randrange(self._bin_length)  # we want to do useful replacements
             random_bit2 = random_bit1
 
             while random_bit2 == random_bit1:
-                random_bit2 = random.randrange(self.bin_length)
+                random_bit2 = random.randrange(self._bin_length)
 
             if random_bit1 < random_bit2:
                 new_individ = self._replace_bits(parent2, new_individ, random_bit1, random_bit2)
@@ -233,7 +328,7 @@ class GeneticAlgorithms:
                 new_individ = self._replace_bits(parent2, new_individ, random_bit2, random_bit1)
         else:
             # cross some bits exactly (not replacement within an interval)
-            cross_bits = self._random_diff(self.bin_length, self.cross_type)
+            cross_bits = self._random_diff(self._bin_length, self.cross_type)
 
             for bit in cross_bits:
                 new_individ = self._replace_bits(parent2, new_individ, bit, bit)
@@ -327,28 +422,28 @@ class GeneticAlgorithms:
             print('Unknown selection type:', self.selection)
             raise ValueError
 
-    def _get_bit_positions(self, number):
-        """
-        This function gets a decimal integer number and returns positions of bit 1 in
-        its binary representation. However, these positions are transformed the following way: they
-        are mapped on the data list (self.data) "as is". It means that LSB (least significant bit) is
-        mapped on the last position of the data list (e.g. self.bin_length - 1), MSB is mapped on
-        the first position of the data list (e.g. 0) and so on.
-
-        Args:
-            number (int): This decimal number represents binary encoded combination of the input data (self.data).
-
-        Returns:
-             list of positions with bit 1 (these positions are mapped on the input data list "as is" and thus,
-             LSB is equal to index (self.bin_length - 1) of the input data list).
-        """
-        binary_list = []
-
-        for i in range(self.bin_length):
-            if number & (1 << i):
-                binary_list.append(self.bin_length - 1 - i)
-
-        return binary_list
+    # def _get_bit_positions(self, number):
+    #     """
+    #     This function gets a decimal integer number and returns positions of bit 1 in
+    #     its binary representation. However, these positions are transformed the following way: they
+    #     are mapped on the data list (self.data) "as is". It means that LSB (least significant bit) is
+    #     mapped on the last position of the data list (e.g. self._bin_length - 1), MSB is mapped on
+    #     the first position of the data list (e.g. 0) and so on.
+    #
+    #     Args:
+    #         number (int): This decimal number represents binary encoded combination of the input data (self.data).
+    #
+    #     Returns:
+    #          list of positions with bit 1 (these positions are mapped on the input data list "as is" and thus,
+    #          LSB is equal to index (self._bin_length - 1) of the input data list).
+    #     """
+    #     binary_list = []
+    #
+    #     for i in range(self._bin_length):
+    #         if number & (1 << i):
+    #             binary_list.append(self._bin_length - 1 - i)
+    #
+    #     return binary_list
 
     def _sort_population(self):
         if self.optim == 'max':
@@ -359,6 +454,20 @@ class GeneticAlgorithms:
             # an algorithm minimizes a fitness value
             # descending order
             self.population.sort(key=lambda x: x.fitness_val, reverse=True)
+
+    def _compute_fitness(self, individ):
+        """
+        TO BE REIMPLEMENTED IN SUBCLASSES.
+        This function computes fitness value of the given individual.
+
+        Args:
+            individ (float, list): An individual of genetic algorithm.
+                Defined fitness function (self.fitness_func) must deal with this individual.
+
+        Returns:
+            fitness value of the given individual
+        """
+        raise NotImplementedError
 
     def init_population(self, new_population):
         """
@@ -376,43 +485,44 @@ class GeneticAlgorithms:
 
         self.population = []
         for individ in new_population:
-            fit_val = self.fitness_func(individ, self.data)
+            # fit_val = self.fitness_func(individ, self._data)
+            fit_val = self._compute_fitness(individ)
             self.population.append(IndividualGA(individ, fit_val))
 
         self._sort_population()
 
-    def init_random_population(self, size=None):
-        """
-        Initializes a new random population of the given size.
-
-        Args:
-            size (int): Size of a new random population. If None, the size is set to (2**self.bin_length) / 10, because
-                self.bin_length is a number of bits. Thus, a new population of size 10% of all possible solutions
-                (or of size 4 in case of self.bin_length < 5) will be created.
-        """
-        max_num = 2 ** self.bin_length
-
-        if size is None:
-            if max_num < 20:
-                size = 4
-            else:
-                # 10% of all possible solutions
-                size = max_num // 10
-        elif size < 2 or size >= max_num:
-            print('Wrong size of population:', size)
-            raise ValueError
-
-        # generate population
-        number_list = self._random_diff(max_num, size, start=1)
-
-        self.population = []
-        for num in number_list:
-            individ = self._get_bit_positions(num)
-            fit_val = self.fitness_func(individ, self.data)
-
-            self.population.append(IndividualGA(individ, fit_val))
-
-        self._sort_population()
+    # def init_random_population(self, size=None):
+    #     """
+    #     Initializes a new random population of the given size.
+    #
+    #     Args:
+    #         size (int): Size of a new random population. If None, the size is set to (2**self._bin_length) / 10, because
+    #             self._bin_length is a number of bits. Thus, a new population of size 10% of all possible solutions
+    #             (or of size 4 in case of self._bin_length < 5) will be created.
+    #     """
+    #     max_num = 2 ** self._bin_length
+    #
+    #     if size is None:
+    #         if max_num < 20:
+    #             size = 4
+    #         else:
+    #             # 10% of all possible solutions
+    #             size = max_num // 10
+    #     elif size < 2 or size >= max_num:
+    #         print('Wrong size of population:', size)
+    #         raise ValueError
+    #
+    #     # generate population
+    #     number_list = self._random_diff(max_num, size, start=1)
+    #
+    #     self.population = []
+    #     for num in number_list:
+    #         individ = self._get_bit_positions(num)
+    #         fit_val = self.fitness_func(individ, self._data)
+    #
+    #         self.population.append(IndividualGA(individ, fit_val))
+    #
+    #     self._sort_population()
 
     def run(self, max_generation):
         """
@@ -449,7 +559,8 @@ class GeneticAlgorithms:
                 # cross parents and mutate a child
                 new_individ = self._mutate(self._cross(parent1.individ, parent2.individ))
                 # compute fitness value of a child
-                fit_val = self.fitness_func(new_individ, self.data)
+                # fit_val = self.fitness_func(new_individ, self._data)
+                fit_val = self._compute_fitness(new_individ)
 
                 next_population.append(IndividualGA(new_individ, fit_val))
 
