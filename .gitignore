@@ -89,7 +89,7 @@ ENV/
 .ropeproject
 
 # tools for benchmark testing
-2.7/benchmark/*
+2.7/benchmark/bbob*
 2.7/3to2
 2.7/*.bak
 
