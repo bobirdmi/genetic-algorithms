@@ -50,7 +50,7 @@ def run_optimizer(fun, dim, maxfunevals, ftarget=-np.Inf):
 
      # initialize random population of GA
     popsize = min(maxfunevals, 200)
-    alg.init_random_population(popsize, dim, (-5, 5))
+    gen_alg.init_random_population(popsize, dim, (-5, 5))
 
     # run GA
     STANDARD_GA(gen_alg, maxfunevals, popsize, ftarget)

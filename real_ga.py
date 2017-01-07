@@ -42,7 +42,7 @@ class RealGeneticAlgorithms(GeneticAlgorithms):
         """
         Returns bit number (from left to the right) in 32- or 64-bit big-endian floating point 
         binary representation (IEEE 754) from which a mantissa begins. It is necessary because this real GA implementation 
-        mutate only mantissa bits (mutation of exponent changes a float number the undesired fast way).
+        mutate only mantissa bits (mutation of exponent changes a float number the undesired fast and unexpected way).
         """
         # IEEE 754
         # big-endian floating point binary representation
@@ -200,8 +200,9 @@ class RealGeneticAlgorithms(GeneticAlgorithms):
         Args:
             size (int): Size of a new random population.
             dim (int): Amount of space dimensions.
-            interval (tuple): The generated numbers of each dimension
-                will be within this interval (start point included, end point excluded).
+            interval (tuple): The generated numbers of each dimension will be 
+                within this interval (start point included, end point excluded).
+                Both end points must be integer values.
         """
         if size < 2 or dim < 1 or interval[0] >= interval[1]:
             print('Wrong value of input parameter.')
@@ -211,7 +212,7 @@ class RealGeneticAlgorithms(GeneticAlgorithms):
             self._is_vector = True
 
         # generate population
-        individs = numpy.random.uniform(interval[0], interval[1], (size, dim))
+        individs = numpy.random.uniform(int(interval[0]), int(interval[1]), (size, dim))
 
         self.population = []
         for ind in individs:
