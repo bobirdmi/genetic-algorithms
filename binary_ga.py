@@ -178,6 +178,8 @@ class BinaryGeneticAlgorithms(GeneticAlgorithms):
             print('Wrong size of population:', size)
             raise ValueError
 
+        # TODO diffusion model
+
         # generate population
         number_list = self._random_diff(max_num, size, start=1)
 

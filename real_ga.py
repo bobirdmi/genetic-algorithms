@@ -211,6 +211,8 @@ class RealGeneticAlgorithms(GeneticAlgorithms):
         if dim > 1:
             self._is_vector = True
 
+        # TODO diffusion model
+
         # generate population
         individs = numpy.random.uniform(int(interval[0]), int(interval[1]), (size, dim))
 
