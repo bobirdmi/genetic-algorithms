@@ -36,6 +36,27 @@ class RealGeneticAlgorithms(GeneticAlgorithms):
 
         self._check_parameters()
 
+        self._mut_bit_offset = self._get_mut_bit_offset()
+
+    def _get_mut_bit_offset(self):
+        """
+        Returns bit number (from left to the right) in 32- or 64-bit big-endian floating point 
+        binary representation (IEEE 754) from which a mantissa begins. It is necessary because this real GA implementation 
+        mutate only mantissa bits (mutation of exponent changes a float number the undesired fast way).
+        """
+        # IEEE 754
+        # big-endian floating point binary representation
+        # | sign | exponent | mantissa |
+        # | 1 | 8 | 23 | in 32-bit floating point
+        # | 1 | 11 | 52 | in 64-bit floating point
+        if self._bin_length == 32:
+            return 1 + 8
+        elif self._bin_length == 64:
+            return 1 + 11
+        else:
+            print('Wrong floating point binary length: may be only 32 or 64.')
+            raise ValueError
+
     def _check_parameters(self):
         if self._bin_length not in [32, 64] or \
                 self.mut_type > self._bin_length or \
@@ -99,14 +120,14 @@ class RealGeneticAlgorithms(GeneticAlgorithms):
             origin_individ = [individ]
 
         for ind in origin_individ:
-            bstr = BitArray(floatne=ind, length=self._bin_length)
+            bstr = BitArray(floatbe=ind, length=self._bin_length)
 
             for bit in bit_num:
                 if random.uniform(0, 1) <= self.mutation_prob:
                     # mutate
                     bstr[bit] = not bstr[bit]
 
-            mutated_individ.append(bstr.floatne)
+            mutated_individ.append(bstr.floatbe)
 
         return self._get_individ_return_value(mutated_individ)
 
@@ -142,8 +163,8 @@ class RealGeneticAlgorithms(GeneticAlgorithms):
 
         child = []
         for source_ind, target_ind in zip(origin_source, origin_target):
-            bstr_source = BitArray(floatne=source_ind, length=self._bin_length)
-            bstr_target = BitArray(floatne=target_ind, length=self._bin_length)
+            bstr_source = BitArray(floatbe=source_ind, length=self._bin_length)
+            bstr_target = BitArray(floatbe=target_ind, length=self._bin_length)
 
             if random.uniform(0, 1) <= self.crossover_prob:
                 # crossover
@@ -152,7 +173,7 @@ class RealGeneticAlgorithms(GeneticAlgorithms):
                 else:
                     bstr_target[start: stop + 1] = bstr_source[start: stop + 1]
 
-            child.append(bstr_target.floatne)
+            child.append(bstr_target.floatbe)
 
         return self._get_individ_return_value(child)
 
@@ -196,6 +217,8 @@ class RealGeneticAlgorithms(GeneticAlgorithms):
         for ind in individs:
             if dim == 1:
                 individ = ind[0]
+            else:
+                individ = ind
 
             fit_val = self._compute_fitness(individ)
 

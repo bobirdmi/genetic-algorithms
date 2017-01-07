@@ -58,6 +58,10 @@ class GeneticAlgorithms:
 
         self._check_common_parameters()
 
+        # mutation bit offset
+        # default is 0
+        self._mut_bit_offset = 0
+
     def _check_common_parameters(self):
         if self.fitness_func is None or \
                 self.optim not in ['min', 'max'] or \
@@ -78,10 +82,10 @@ class GeneticAlgorithms:
         Args:
             start (int): Start value of an interval (included). Default is 0.
             stop (int): End value of an interval (excluded).
-            n (int): How many different random numbers generate.
+            n (int): How many different random numbers must be generated.
 
         Returns:
-             list of different random values from the given interval ('start' included)
+             list of different random integer values from the given interval ('start' included)
         """
         if stop - start < n:
             # there is not enough numbers in the given interval
@@ -134,7 +138,7 @@ class GeneticAlgorithms:
             individ = self._invert_bit(individ, list(range(self._bin_length)))
         else:
             # mutate some bits (not all)
-            inverted_bits = self._random_diff(self._bin_length, self.mut_type)
+            inverted_bits = self._random_diff(self._bin_length, self.mut_type, start=self._mut_bit_offset)
             individ = self._invert_bit(individ, inverted_bits)
 
         return individ
