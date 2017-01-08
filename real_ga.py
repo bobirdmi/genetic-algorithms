@@ -2,11 +2,11 @@ from bitstring import BitArray
 import random
 import numpy
 
-from genetic_algorithms import GeneticAlgorithms, IndividualGA
+from standard_ga import StandardGA, IndividualGA
 
 
-class RealGeneticAlgorithms(GeneticAlgorithms):
-    def __init__(self, fitness_func=None, optim='max', type='standard', selection="rank", mut_prob=0.05, mut_type=1,
+class RealGA(StandardGA):
+    def __init__(self, fitness_func=None, optim='max', selection="rank", mut_prob=0.05, mut_type=1,
                  cross_prob=0.95, cross_type=1, elitism=True, tournament_size=None):
         """
         Args:
@@ -14,7 +14,6 @@ class RealGeneticAlgorithms(GeneticAlgorithms):
                 Function parameter must be: a single individual.
             optim (str): What an algorithm must do with fitness value: maximize or minimize. May be 'min' or 'max'.
                 Default is "max".
-            type (str): Type of genetic algorithm. May be 'standard', 'diffusion' or 'migration'.
             selection (str): Parent selection type. May be "rank" (Rank Wheel Selection),
                 "roulette" (Roulette Wheel Selection) or "tournament". Default is "rank".
             tournament_size (int): Defines the size of tournament in case of 'selection' == 'tournament'.
@@ -30,7 +29,7 @@ class RealGeneticAlgorithms(GeneticAlgorithms):
                 Default is 1.
             elitism (True, False): Elitism on/off. Default is True.
         """
-        super().__init__(fitness_func, optim, type, selection,
+        super().__init__(fitness_func, optim, selection,
                          mut_prob, mut_type, cross_prob, cross_type,
                          elitism, tournament_size)
         self._bin_length = 64
@@ -192,6 +191,39 @@ class RealGeneticAlgorithms(GeneticAlgorithms):
         """
         return self.fitness_func(individ)
 
+    def _check_init_random_population(self, size, dim, interval):
+        """
+        This function verifies the input parameters of a random initialization.
+
+        Args:
+            size (int): Size of a new population to verify.
+            dim (int): Amount of space dimensions.
+            interval (tuple): The generated numbers of each dimension will be
+                within this interval (start point included, end point excluded).
+                Both end points must be integer values.
+        """
+        if size is None or dim is None or interval is None or \
+                        size < 2 or dim < 1 or interval[0] >= interval[1]:
+            print('Wrong value of input parameter.')
+            raise ValueError
+
+    def _generate_random_population(self, size, dim, interval):
+        """
+        This function generates new random population by the given input parameters.
+
+        Args:
+            size (int): Size of a new population.
+            dim (int): Amount of space dimensions.
+            interval (tuple): The generated numbers of each dimension will be
+                within this interval (start point included, end point excluded).
+                Both end points must be integer values.
+
+        Returns:
+            array (numpy.array): Array rows represents individuals. Number of columns is specified
+                with *dim* parameter.
+        """
+        return numpy.random.uniform(int(interval[0]), int(interval[1]), (size, dim))
+
     def init_random_population(self, size, dim, interval):
         """
         Initializes a new random population of the given size with individual's values
@@ -205,37 +237,21 @@ class RealGeneticAlgorithms(GeneticAlgorithms):
                 within this interval (start point included, end point excluded).
                 Both end points must be integer values.
         """
-        if size < 2 or dim < 1 or interval[0] >= interval[1]:
-            print('Wrong value of input parameter.')
-            raise ValueError
-
-        if dim > 1:
-            self._is_vector = True
+        self._check_init_random_population(size, dim, interval)
 
         # generate population
-        individs = numpy.random.uniform(int(interval[0]), int(interval[1]), (size, dim))
+        individs = self._generate_random_population(size, dim, interval)
 
-        if self.type == 'standard':
-            self._population = []
-            for ind in individs:
-                if dim == 1:
-                    individ = ind[0]
-                else:
-                    individ = ind
-
-                fit_val = self._compute_fitness(individ)
-
-                self._population.append(IndividualGA(individ, fit_val))
-
-            self._sort_population()
-            self._update_solution(self._population[-1].individ, self._population[-1].fitness_val)
-        elif self.type == 'diffusion':
+        self.population = []
+        for ind in individs:
             if dim == 1:
-                population = [ind[0] for ind in individs]
+                individ = ind[0]
             else:
-                population = individs
+                individ = ind
 
-            self._init_diffusion_model(population)
-        elif self.type == 'migration':
-            # TODO migration model
-            pass
+            fit_val = self._compute_fitness(individ)
+
+            self.population.append(IndividualGA(individ, fit_val))
+
+        self._sort_population()
+        self._update_solution(self.population[-1].individ, self.population[-1].fitness_val)

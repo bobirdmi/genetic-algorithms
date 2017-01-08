@@ -1,10 +1,10 @@
 import random
 
-from genetic_algorithms import GeneticAlgorithms, IndividualGA
+from standard_ga import StandardGA, IndividualGA
 
 
-class BinaryGeneticAlgorithms(GeneticAlgorithms):
-    def __init__(self, data=None, fitness_func=None, optim='max', type='standard', selection="rank", mut_prob=0.05, mut_type=1,
+class BinaryGA(StandardGA):
+    def __init__(self, data=None, fitness_func=None, optim='max', selection="rank", mut_prob=0.05, mut_type=1,
                  cross_prob=0.95, cross_type=1, elitism=True, tournament_size=None):
         """
         Args:
@@ -14,7 +14,6 @@ class BinaryGeneticAlgorithms(GeneticAlgorithms):
                 Function parameters must be: list of used indices of the given data (from 0), list of data itself.
             optim (str): What an algorithm must do with fitness value: maximize or minimize. May be 'min' or 'max'.
                 Default is "max".
-            type (str): Type of genetic algorithm. May be 'standard', 'diffusion' or 'migration'.
             selection (str): Parent selection type. May be "rank" (Rank Wheel Selection),
                 "roulette" (Roulette Wheel Selection) or "tournament". Default is "rank".
             tournament_size (int): Defines the size of tournament in case of 'selection' == 'tournament'.
@@ -30,7 +29,7 @@ class BinaryGeneticAlgorithms(GeneticAlgorithms):
                 Default is 1.
             elitism (True, False): Elitism on/off. Default is True.
         """
-        super().__init__(fitness_func, optim, type, selection,
+        super().__init__(fitness_func, optim, selection,
                          mut_prob, mut_type, cross_prob, cross_type,
                          elitism, tournament_size)
         self._data = data
@@ -158,46 +157,59 @@ class BinaryGeneticAlgorithms(GeneticAlgorithms):
 
         return binary_list
 
-    def init_random_population(self, size=None):
+    def _check_init_random_population(self, size):
+        """
+        This function verifies the input parameters of a random initialization.
+
+        Args:
+            size (int): Size of a new population to verify.
+
+        Returns:
+            max_num (int): Maximum amount of the input data combinations.
+        """
+        max_num = 2 ** self._bin_length
+
+        if size is None or size < 2 or size >= max_num:
+            print('Wrong size of population:', size)
+            raise ValueError
+
+        return max_num
+
+    def _generate_random_population(self, max_num, size):
+        """
+        This function generates new random population by the given input parameters.
+
+        Args:
+            max_num (int): Maximum amount of input data combinations.
+            size (int): Size of a new population.
+
+        Returns:
+            population (list): list if integers in interval [1, maxnum) that represents binary encoded
+                combination.
+        """
+        return self._random_diff(max_num, size, start=1)
+
+    def init_random_population(self, size):
         """
         Initializes a new random population of the given size.
 
         Args:
-            size (int): Size of a new random population. If None, the size is set to (2**self._bin_length) / 10, because
-                self._bin_length is a number of bits. Thus, a new population of size 10% of all possible solutions
-                (or of size 4 in case of self._bin_length < 5) will be created.
+            size (int): Size of a new random population. Must be greater than 2 and less than the amount
+                of all possible combinations of input data.
         """
-        max_num = 2 ** self._bin_length
-
-        if size is None:
-            if max_num < 20:
-                size = 4
-            else:
-                # 10% of all possible solutions
-                size = max_num // 10
-        elif size < 2 or size >= max_num:
-            print('Wrong size of population:', size)
-            raise ValueError
+        max_num = self._check_init_random_population(size)
 
         # generate population
-        number_list = self._random_diff(max_num, size, start=1)
+        number_list = self._generate_random_population(max_num, size)
 
-        if self.type == 'standard':
-            self._population = []
-            for num in number_list:
-                individ = self._get_bit_positions(num)
-                fit_val = self._compute_fitness(individ)
+        self.population = []
+        for num in number_list:
+            individ = self._get_bit_positions(num)
+            fit_val = self._compute_fitness(individ)
 
-                self._population.append(IndividualGA(individ, fit_val))
+            self.population.append(IndividualGA(individ, fit_val))
 
-            self._sort_population()
-            self._update_solution(self._population[-1].individ, self._population[-1].fitness_val)
-        elif self.type == 'diffusion':
-            population = [self._get_bit_positions(num) for num in number_list]
-
-            self._init_diffusion_model(population)
-        elif self.type == 'migration':
-            # TODO migration model
-            pass
+        self._sort_population()
+        self._update_solution(self.population[-1].individ, self.population[-1].fitness_val)
 
 
