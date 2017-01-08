@@ -59,8 +59,6 @@ class StandardGA:
 
         # population in standard model of GA
         self.population = None
-        # population in migration model of GA
-        # TODO migration model
 
         # mutation bit offset
         # default is 0
@@ -392,6 +390,20 @@ class StandardGA:
         for individ in new_population:
             fit_val = self._compute_fitness(individ)
             self.population.append(IndividualGA(individ, fit_val))
+
+        self._sort_population()
+        self._update_solution(self.population[-1].individ, self.population[-1].fitness_val)
+
+    def extend_population(self, elem_list):
+        """
+        Extends a current population with new elements. Be careful with type of elements
+        in *elem_list*: they must have the same type as elements
+        of a current population (IndividualGA for BinaryGA, a float or a list of floats for RealGA).
+
+        Args:
+            elem_list (list): New elements of the same type as in the population to be extended.
+        """
+        self.population.extend(elem_list)
 
         self._sort_population()
         self._update_solution(self.population[-1].individ, self.population[-1].fitness_val)
