@@ -6,7 +6,7 @@ from genetic_algorithms import GeneticAlgorithms, IndividualGA
 
 
 class RealGeneticAlgorithms(GeneticAlgorithms):
-    def __init__(self, fitness_func=None, optim='max', selection="rank", mut_prob=0.05, mut_type=1,
+    def __init__(self, fitness_func=None, optim='max', type='standard', selection="rank", mut_prob=0.05, mut_type=1,
                  cross_prob=0.95, cross_type=1, elitism=True, tournament_size=None):
         """
         Args:
@@ -14,6 +14,7 @@ class RealGeneticAlgorithms(GeneticAlgorithms):
                 Function parameter must be: a single individual.
             optim (str): What an algorithm must do with fitness value: maximize or minimize. May be 'min' or 'max'.
                 Default is "max".
+            type (str): Type of genetic algorithm. May be 'standard', 'diffusion' or 'migration'.
             selection (str): Parent selection type. May be "rank" (Rank Wheel Selection),
                 "roulette" (Roulette Wheel Selection) or "tournament". Default is "rank".
             tournament_size (int): Defines the size of tournament in case of 'selection' == 'tournament'.
@@ -29,7 +30,7 @@ class RealGeneticAlgorithms(GeneticAlgorithms):
                 Default is 1.
             elitism (True, False): Elitism on/off. Default is True.
         """
-        super().__init__(fitness_func, optim, selection,
+        super().__init__(fitness_func, optim, type, selection,
                          mut_prob, mut_type, cross_prob, cross_type,
                          elitism, tournament_size)
         self._bin_length = 64
@@ -211,20 +212,30 @@ class RealGeneticAlgorithms(GeneticAlgorithms):
         if dim > 1:
             self._is_vector = True
 
-        # TODO diffusion model
-
         # generate population
         individs = numpy.random.uniform(int(interval[0]), int(interval[1]), (size, dim))
 
-        self.population = []
-        for ind in individs:
+        if self.type == 'standard':
+            self._population = []
+            for ind in individs:
+                if dim == 1:
+                    individ = ind[0]
+                else:
+                    individ = ind
+
+                fit_val = self._compute_fitness(individ)
+
+                self._population.append(IndividualGA(individ, fit_val))
+
+            self._sort_population()
+            self._update_solution(self._population[-1].individ, self._population[-1].fitness_val)
+        elif self.type == 'diffusion':
             if dim == 1:
-                individ = ind[0]
+                population = [ind[0] for ind in individs]
             else:
-                individ = ind
+                population = individs
 
-            fit_val = self._compute_fitness(individ)
-
-            self.population.append(IndividualGA(individ, fit_val))
-
-        self._sort_population()
+            self._init_diffusion_model(population)
+        elif self.type == 'migration':
+            # TODO migration model
+            pass

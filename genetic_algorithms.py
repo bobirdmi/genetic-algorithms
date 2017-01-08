@@ -1,5 +1,6 @@
 import random
 import numpy
+import math
 
 
 class IndividualGA:
@@ -56,13 +57,33 @@ class GeneticAlgorithms:
         self.crossover_prob = cross_prob
         self.cross_type = cross_type
         self.elitism = elitism
-        self.population = None
 
         self._check_common_parameters()
+
+        # population in standard model of GA
+        self._population = None
+        # population in diffusion model of GA
+        self._fitness_arr = None
+        self._individ_arr = None
+        # population in migration model of GA
+        # TODO migration model
 
         # mutation bit offset
         # default is 0
         self._mut_bit_offset = 0
+
+        self.best_individ = None
+        self.best_fitness = numpy.inf
+
+    @property
+    def population(self):
+        if self.type == 'standard':
+            return self._population
+        elif self.type == 'diffusion':
+            return self._individ_arr, self._fitness_arr
+        elif self.type == 'migration':
+            # TODO migration model
+            pass
 
     def _check_common_parameters(self):
         if self.fitness_func is None or \
@@ -271,33 +292,48 @@ class GeneticAlgorithms:
 
         return DIRS[random.randrange(4)]
 
-    def _compute_diffusion_generation(self, array):
+    def _compute_diffusion_generation(self, individ_arr):
         """
         This function computes a new generation of the diffusion model of GA.
 
         Args:
-            array (array of IndividualGA): Diffusion array of the current generation.
+            individ_arr (numpy.array): Diffusion array of individuals (binary encoded, float or a list of floats)
+                of the current generation.
 
         Returns:
-            new_array (array of IndividualGA): Computed diffusion array of the next generation.
+            new_individ_array, new_fitness_arr (tuple of numpy.array): New diffusion arrays of individuals
+                and fitness values of the next generation.
         """
-        shape = array.shape
-        new_array = numpy.zeros(shape)
+        shape = individ_arr.shape
+        new_individ_arr = numpy.zeros(shape)
+        new_fitness_arr = numpy.zeros(shape)
 
         for row in range(shape[0]):
             for column in range(shape[1]):
                 neighbour_coords = self._get_neighbour_coords((row, column), shape)
-                parent1 = array[row, column]
-                parent2 = array[neighbour_coords]
+                parent1 = individ_arr[row, column]
+                parent2 = individ_arr[neighbour_coords]
 
                 # cross parents and mutate a child
-                new_individ = self._mutate(self._cross(parent1.individ, parent2.individ))
+                new_individ = self._mutate(self._cross(parent1, parent2))
                 # compute fitness value of the child
                 fit_val = self._compute_fitness(new_individ)
 
-                new_array[row, column] = IndividualGA(new_individ, fit_val)
+                new_individ_arr[row, column] = new_individ
+                new_fitness_arr[row, column] = fit_val
 
-        return new_array
+        coords_best, coords_worst = self._find_critical_diffusion_solutions(new_fitness_arr)
+
+        if self.elitism:
+            # replace the worst solution in the new generation
+            # with the best one from the previous generation
+            new_individ_arr[coords_worst] = self.best_individ
+            new_fitness_arr[coords_worst] = self.best_fitness
+
+        # update the best solution taking into account a new generation
+        self._update_solution(new_individ_arr[coords_best], new_fitness_arr[coords_best])
+
+        return new_individ_arr, new_fitness_arr
 
     def _select_parents(self, population, wheel_sum=None):
         """
@@ -354,11 +390,51 @@ class GeneticAlgorithms:
         if self.optim == 'max':
             # an algorithm maximizes a fitness value
             # ascending order
-            self.population.sort(key=lambda x: x.fitness_val)
+            self._population.sort(key=lambda x: x.fitness_val)
         else:
             # an algorithm minimizes a fitness value
             # descending order
-            self.population.sort(key=lambda x: x.fitness_val, reverse=True)
+            self._population.sort(key=lambda x: x.fitness_val, reverse=True)
+
+    def _find_critical_diffusion_solutions(self, fitness_arr):
+        """
+        Finds array coordinates of the best and the worst fitness values in the given array.
+        Returns coordinates of the first occurrence of these critical values.
+
+        Args:
+            fitness_arr (numpy.array): Array of fitness values.
+
+        Returns:
+            coords_best, coords_worst (tuple of two tuples): Coordinates of the best and the worst
+                fitness values as ((row, column), (row, column)).
+        """
+        # get indices of the best and the worst solutions in new generation
+        # actually indices of ALL solutions with the best and the worst fitness values
+        indices_max = numpy.where(fitness_arr == fitness_arr.max())
+        indices_min = numpy.where(fitness_arr == fitness_arr.min())
+
+        if self.optim == 'min':
+            # fitness minimization
+            coords_worst = (indices_max[0][0], indices_max[1][0])
+            coords_best = (indices_min[0][0], indices_min[1][0])
+        else:
+            # fitness maximization
+            coords_worst = (indices_min[0][0], indices_min[1][0])
+            coords_best = (indices_max[0][0], indices_max[1][0])
+
+        return coords_best, coords_worst
+
+    def _update_solution(self, individ, fitness_val):
+        """
+        Updates current best solution if the given one is better.
+
+        Args:
+            individ (float, list): Individual of a population (binary encoded, float or list of floats).
+            fitness_val (float, int): Fitness value of the given individual.
+        """
+        if fitness_val < self.best_fitness:
+            self.best_individ = individ
+            self.best_fitness = fitness_val
 
     def _compute_fitness(self, individ):
         """
@@ -374,27 +450,76 @@ class GeneticAlgorithms:
         """
         raise NotImplementedError
 
-    def init_population(self, new_population):
+    def _construct_diffusion_model(self, population):
         """
-        Initializes population with the given binary encoded individuals of 'new_population'. The fitness values 
-        of these individuals will be computed by a specified fitness function.
+        Constructs two arrays: first for individuals of GA, second for their fitness values.
+        The current implementation supports construction of only square arrays. Thus, an array side is
+        a square root of the given population length. If the calculated square root is a fractional number,
+        it will be truncated. That means the last individuals in population will not be
+        presented in the constructed arrays.
 
         Args:
-            new_population (list): New initial population of binary encoded individuals. A single individual is represented
-                as a list of bits' positions with value 1 in the following way: LSB (least significant bit)
-                has position (len(self.data) - 1) and MSB (most significant bit) has position 0.
+            population (list): An individual of GA. Same as in self.init_population(new_population).
+        """
+        size = int(math.sqrt(len(population)))
+
+        self._individ_arr = numpy.zeros((size, size))
+        self._fitness_arr = numpy.zeros((size, size))
+
+        index = 0
+        for row in range(size):
+            for column in range(size):
+                self._individ_arr[row, column] = population[index]
+                self._fitness_arr[row, column] = self._compute_fitness(population[index])
+
+                index += 1
+
+    def _init_diffusion_model(self, population):
+        """
+        This function constructs diffusion model from the given population
+        and then updates the currently best found solution.
+
+        Args:
+            population (list): List of GA individuals.
+        """
+        self._construct_diffusion_model(population)
+
+        coords_best, _ = self._find_critical_diffusion_solutions(self._fitness_arr)
+        self._update_solution(self._individ_arr[coords_best], self._fitness_arr[coords_best])
+
+    def init_population(self, new_population):
+        """
+        Initializes population with the given individuals (individual as binary encoded, float or a list of floats)
+        of 'new_population'. The fitness values of these individuals will be computed by a specified fitness function.
+
+        It is recommended to have new_population size equal to some squared number (9, 16, 100, 625 etc.)
+        in case of diffusion model of GA. Otherwise some last individuals in the given population will be lost
+        as the current implementation works only with square arrays of diffusion model.
+
+        Args:
+            new_population (list): New initial population of individuals. A single individual in case of binary GA
+                is represented as a list of bits' positions with value 1 in the following way:
+                LSB (least significant bit) has position (len(self.data) - 1) and
+                MSB (most significant bit) has position 0. If it is a GA on real values, an individual is represented
+                as a float or a list of floats in case of multiple dimensions.
         """
         if not new_population:
             print('New population is empty')
             raise ValueError
 
-        # TODO diffusion model
-        self.population = []
-        for individ in new_population:
-            fit_val = self._compute_fitness(individ)
-            self.population.append(IndividualGA(individ, fit_val))
+        if self.type == 'standard':
+            self._population = []
+            for individ in new_population:
+                fit_val = self._compute_fitness(individ)
+                self._population.append(IndividualGA(individ, fit_val))
 
-        self._sort_population()
+            self._sort_population()
+            self._update_solution(self._population[-1].individ, self._population[-1].fitness_val)
+        elif self.type == 'diffusion':
+            self._init_diffusion_model(new_population)
+        elif self.type == 'migration':
+            # TODO migration model
+            pass
 
     def _run_standard(self, max_generation):
         """
@@ -412,21 +537,21 @@ class GeneticAlgorithms:
         population_size = None
 
         for generation_num in range(max_generation):
-            fitness_sum = sum(ind.fitness_val for ind in self.population)
-            population_size = len(self.population)
+            fitness_sum = sum(ind.fitness_val for ind in self._population)
+            population_size = len(self._population)
             next_population = []
             fitness_progress.append(fitness_sum / population_size)
 
             for i in range(population_size):
                 if self.selection == 'roulette':
-                    parent1, parent2 = self._select_parents(self.population, fitness_sum)
+                    parent1, parent2 = self._select_parents(self._population, fitness_sum)
                 elif self.selection == 'rank':
-                    parent1, parent2 = self._select_parents(self.population,
+                    parent1, parent2 = self._select_parents(self._population,
                                                             numpy.cumsum(range(1, population_size + 1))[-1]
                                                             )
                 else:
                     # tournament
-                    parent1, parent2 = self._select_parents(self.population)
+                    parent1, parent2 = self._select_parents(self._population)
 
                 # cross parents and mutate a child
                 new_individ = self._mutate(self._cross(parent1.individ, parent2.individ))
@@ -437,10 +562,11 @@ class GeneticAlgorithms:
 
             if self.elitism:
                 # copy the best individual to a new generation
-                next_population.append(self.population[-1])
+                next_population.append(self._population[-1])
 
-            self.population = next_population
+            self._population = next_population
             self._sort_population()
+            self._update_solution(self._population[-1].individ, self._population[-1].fitness_val)
 
         fitness_progress.append(fitness_sum / population_size)
 
@@ -457,26 +583,16 @@ class GeneticAlgorithms:
         Returns:
             list of average fitness values for each generation (including original population)
         """
-        # TODO
         fitness_progress = []
-        # self.population is numpy array in case of diffusion model
-        population_size = self.population.size
-        shape = self.population.shape
+        # we works with numpy arrays in case of diffusion model
+        population_size = self._individ_arr.size
 
         for generation_num in range(max_generation):
-            fitness_sum = 0
-            for row in range(shape[0]):
-                for column in range(shape[1]):
-                    fitness_sum += self.population[row, column].fitness_val
+            fitness_sum = numpy.sum(self._fitness_arr)
 
-            next_population = []
             fitness_progress.append(fitness_sum / population_size)
 
-            if self.elitism:
-                # copy the best individual to a new generation
-                next_population.append(self.population[-1])
-
-            self.population = next_population
+            self._individ_arr, self._fitness_arr = self._compute_diffusion_generation(self._individ_arr)
 
         fitness_progress.append(fitness_sum / population_size)
 
@@ -503,7 +619,7 @@ class GeneticAlgorithms:
             fitness_progress = self._run_standard(max_generation)
         else:
             # migration model of GA
-            # TODO
+            # TODO migration model
             fitness_progress = []
 
         return fitness_progress

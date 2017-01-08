@@ -4,7 +4,7 @@ from genetic_algorithms import GeneticAlgorithms, IndividualGA
 
 
 class BinaryGeneticAlgorithms(GeneticAlgorithms):
-    def __init__(self, data=None, fitness_func=None, optim='max', selection="rank", mut_prob=0.05, mut_type=1,
+    def __init__(self, data=None, fitness_func=None, optim='max', type='standard', selection="rank", mut_prob=0.05, mut_type=1,
                  cross_prob=0.95, cross_type=1, elitism=True, tournament_size=None):
         """
         Args:
@@ -14,6 +14,7 @@ class BinaryGeneticAlgorithms(GeneticAlgorithms):
                 Function parameters must be: list of used indices of the given data (from 0), list of data itself.
             optim (str): What an algorithm must do with fitness value: maximize or minimize. May be 'min' or 'max'.
                 Default is "max".
+            type (str): Type of genetic algorithm. May be 'standard', 'diffusion' or 'migration'.
             selection (str): Parent selection type. May be "rank" (Rank Wheel Selection),
                 "roulette" (Roulette Wheel Selection) or "tournament". Default is "rank".
             tournament_size (int): Defines the size of tournament in case of 'selection' == 'tournament'.
@@ -29,7 +30,7 @@ class BinaryGeneticAlgorithms(GeneticAlgorithms):
                 Default is 1.
             elitism (True, False): Elitism on/off. Default is True.
         """
-        super().__init__(fitness_func, optim, selection,
+        super().__init__(fitness_func, optim, type, selection,
                          mut_prob, mut_type, cross_prob, cross_type,
                          elitism, tournament_size)
         self._data = data
@@ -178,18 +179,25 @@ class BinaryGeneticAlgorithms(GeneticAlgorithms):
             print('Wrong size of population:', size)
             raise ValueError
 
-        # TODO diffusion model
-
         # generate population
         number_list = self._random_diff(max_num, size, start=1)
 
-        self.population = []
-        for num in number_list:
-            individ = self._get_bit_positions(num)
-            fit_val = self._compute_fitness(individ)
+        if self.type == 'standard':
+            self._population = []
+            for num in number_list:
+                individ = self._get_bit_positions(num)
+                fit_val = self._compute_fitness(individ)
 
-            self.population.append(IndividualGA(individ, fit_val))
+                self._population.append(IndividualGA(individ, fit_val))
 
-        self._sort_population()
+            self._sort_population()
+            self._update_solution(self._population[-1].individ, self._population[-1].fitness_val)
+        elif self.type == 'diffusion':
+            population = [self._get_bit_positions(num) for num in number_list]
+
+            self._init_diffusion_model(population)
+        elif self.type == 'migration':
+            # TODO migration model
+            pass
 
 
