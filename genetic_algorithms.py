@@ -305,8 +305,8 @@ class GeneticAlgorithms:
                 and fitness values of the next generation.
         """
         shape = individ_arr.shape
-        new_individ_arr = numpy.zeros(shape)
-        new_fitness_arr = numpy.zeros(shape)
+        new_individ_arr = numpy.empty(shape, dtype=object)
+        new_fitness_arr = numpy.empty(shape)
 
         for row in range(shape[0]):
             for column in range(shape[1]):
@@ -463,8 +463,8 @@ class GeneticAlgorithms:
         """
         size = int(math.sqrt(len(population)))
 
-        self._individ_arr = numpy.zeros((size, size))
-        self._fitness_arr = numpy.zeros((size, size))
+        self._individ_arr = numpy.empty((size, size), dtype=object)
+        self._fitness_arr = numpy.empty((size, size))
 
         index = 0
         for row in range(size):
@@ -503,8 +503,8 @@ class GeneticAlgorithms:
                 MSB (most significant bit) has position 0. If it is a GA on real values, an individual is represented
                 as a float or a list of floats in case of multiple dimensions.
         """
-        if not new_population:
-            print('New population is empty')
+        if not new_population or len(new_population) < 4:
+            print('New population is too few.')
             raise ValueError
 
         if self.type == 'standard':
