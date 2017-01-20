@@ -315,6 +315,10 @@ class StandardGA:
             raise ValueError
 
     def _sort_population(self):
+        """
+        Sorts self.population according to self.optim ("min" or "max") in such way
+        that the last element of the population in both cases is an individual with the best fitness value.
+        """
         if self.optim == 'max':
             # an algorithm maximizes a fitness value
             # ascending order
@@ -335,6 +339,19 @@ class StandardGA:
         if fitness_val < self.best_fitness:
             self.best_individ = individ
             self.best_fitness = fitness_val
+
+    def _compute_rank_wheel_sum(self, population_size):
+        """
+        The function returns sum of a wheel that is necessary in parent selection process
+        in case of "rank" selection type.
+
+        Args:
+            population_size (int): Size of a population.
+
+        Returns:
+            sum of a wheel for the given population size
+        """
+        return numpy.cumsum(range(1, population_size + 1))[-1]
 
     def _compute_fitness(self, individ):
         """
@@ -438,7 +455,7 @@ class StandardGA:
                     parent1, parent2 = self._select_parents(self.population, fitness_sum)
                 elif self.selection == 'rank':
                     parent1, parent2 = self._select_parents(self.population,
-                                                            numpy.cumsum(range(1, population_size + 1))[-1]
+                                                            self._compute_rank_wheel_sum(population_size)
                                                             )
                 else:
                     # tournament

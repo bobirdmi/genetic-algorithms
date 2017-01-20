@@ -37,6 +37,7 @@ class RealGA(StandardGA):
         self._check_parameters()
 
         self._mut_bit_offset = self._get_mut_bit_offset()
+        self.interval = None
 
     def _get_mut_bit_offset(self):
         """
@@ -97,6 +98,30 @@ class RealGA(StandardGA):
         else:
             return individ[0]
 
+    def _adjust_to_interval(self, var):
+        """
+        This function checks if *var* is NaN, inf, -inf by numpy.nan_to_num() and then
+        returns *var* if it is within the interval. Otherwise returns lower bound of the interval
+        if *var* < lower bound or upper bound of the interval if *var* > upper bound.
+
+        Args:
+            var (list, float): Float or list of floats to adjust to the specified interval.
+
+        Returns:
+            adjusted input parameter
+        """
+        var = numpy.nan_to_num(var)
+
+        try:
+            dim = len(var)
+
+            for num, d in zip(var, range(dim)):
+                var[d] = max(min(self.interval[1], num), self.interval[0])
+        except TypeError:
+            var = max(min(self.interval[1], var), self.interval[0])
+
+        return var
+
     def _invert_bit(self, individ, bit_num):
         """
         This function mutates the appropriate bits from bit_num of the individual
@@ -129,7 +154,7 @@ class RealGA(StandardGA):
 
             mutated_individ.append(bstr.floatbe)
 
-        return self._get_individ_return_value(mutated_individ)
+        return self._adjust_to_interval(self._get_individ_return_value(mutated_individ))
 
     def _replace_bits(self, source, target, start, stop):
         """
@@ -175,7 +200,7 @@ class RealGA(StandardGA):
 
             child.append(bstr_target.floatbe)
 
-        return self._get_individ_return_value(child)
+        return self._adjust_to_interval(self._get_individ_return_value(child))
 
     def _compute_fitness(self, individ):
         """
@@ -200,7 +225,7 @@ class RealGA(StandardGA):
             dim (int): Amount of space dimensions.
             interval (tuple): The generated numbers of each dimension will be
                 within this interval (start point included, end point excluded).
-                Both end points must be integer values.
+                Both end points must be *different* integer values.
         """
         if size is None or dim is None or interval is None or \
                         size < 2 or dim < 1 or interval[0] >= interval[1]:
@@ -222,6 +247,7 @@ class RealGA(StandardGA):
             array (numpy.array): Array rows represents individuals. Number of columns is specified
                 with *dim* parameter.
         """
+        self.interval = interval
         return numpy.random.uniform(int(interval[0]), int(interval[1]), (size, dim))
 
     def init_random_population(self, size, dim, interval):

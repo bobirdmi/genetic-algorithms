@@ -1,6 +1,5 @@
 import numpy
 import math
-import random
 
 
 TYPE_BINARY = 0
@@ -9,7 +8,10 @@ TYPE_REAL = 1
 
 class DiffusionGA:
     """
-    This class implements diffusion model of genetic algorithms.
+    This class implements diffusion model of genetic algorithms. The current implementation supports
+    four neighbours (up, down, left, right) of an evaluated cell. The standard selection types aren't
+    supported (e.g. "rank", "roulette", "tournament"). The currently supported selection type
+    is "select a neighbour with the best fitness value".
     """
     def __init__(self, instance):
         """
@@ -50,28 +52,26 @@ class DiffusionGA:
         """
         return self._ga.best_solution
 
-    def _get_neighbour_coords(self, loc, shape):
-        """
-        This function randomly selects neighbour of the given individual in diffusion array
-        and returns coordinates of this neighbour.
-
-        Args:
-            loc (tuple): Coordinates of a current individual as (row, column).
-            shape (tuple): Shape of an array of all population individuals (row, column). The array elements are
-                IndividualGA objects.
-
-        Returns:
-            coordinates (tuple): coordinates of a randomly selected neighbour as (row, column).
-        """
+    def _get_neighbour(self, row, column):
+        shape = self._individ_arr.shape
         up, down, left, right = (0, 1, 2, 3)
         DIRS = {
-            up: ((loc[0] - 1) % shape[0], loc[1]),
-            down: ((loc[0] + 1) % shape[0], loc[1]),
-            left: (loc[0], (loc[1] - 1) % shape[1]),
-            right: (loc[0], (loc[1] + 1) % shape[1])
+            up: ((row - 1) % shape[0], column),
+            down: ((row + 1) % shape[0], column),
+            left: (row, (column - 1) % shape[1]),
+            right: (row, (column + 1) % shape[1])
         }
 
-        return DIRS[random.randrange(4)]
+        arr_size = len(DIRS)
+        fit_arr = numpy.empty(arr_size)
+        ind_arr = numpy.empty(arr_size)
+        for d, i in zip(list(DIRS.keys()), range(arr_size)):
+            fit_arr[i] = self._fitness_arr[DIRS[d]]
+            ind_arr[i] = self._individ_arr[DIRS[d]]
+
+        coords_best, _ = self._find_critical_values(fit_arr)
+
+        return ind_arr[coords_best]
 
     def _compute_diffusion_generation(self, individ_arr):
         """
@@ -91,19 +91,34 @@ class DiffusionGA:
 
         for row in range(shape[0]):
             for column in range(shape[1]):
-                neighbour_coords = self._get_neighbour_coords((row, column), shape)
                 parent1 = individ_arr[row, column]
-                parent2 = individ_arr[neighbour_coords]
+                parent2 = self._get_neighbour(row, column)
 
                 # cross parents and mutate a child
-                new_individ = self._ga._mutate(self._ga._cross(parent1, parent2))
+                # TODO
+                new_individ = numpy.nan_to_num(self._ga._mutate(self._ga._cross(parent1, parent2)))
+
+                # try:
+                #     dim = len(new_individ)
+                #
+                #     for num, d in zip(new_individ, range(dim)):
+                #         if num < 0:
+                #             new_individ[d] = num % -5
+                #         else:
+                #             new_individ[d] = num % 5
+                # except:
+                #     if new_individ < 0:
+                #         new_individ %= -5
+                #     else:
+                #         new_individ %= 5
+                        
                 # compute fitness value of the child
                 fit_val = self._ga._compute_fitness(new_individ)
 
                 new_individ_arr[row, column] = new_individ
                 new_fitness_arr[row, column] = fit_val
 
-        coords_best, coords_worst = self._find_critical_diffusion_solutions(new_fitness_arr)
+        coords_best, coords_worst = self._find_critical_values(new_fitness_arr)
 
         if self._ga.elitism:
             # replace the worst solution in the new generation
@@ -116,31 +131,45 @@ class DiffusionGA:
 
         return new_individ_arr, new_fitness_arr
 
-    def _find_critical_diffusion_solutions(self, fitness_arr):
+    def _find_critical_values(self, fitness_arr):
         """
-        Finds array coordinates of the best and the worst fitness values in the given array.
+        Finds 1D or 2D array coordinates of the best and the worst fitness values in the given array.
         Returns coordinates of the first occurrence of these critical values.
 
         Args:
             fitness_arr (numpy.array): Array of fitness values.
 
         Returns:
-            coords_best, coords_worst (tuple of two tuples): Coordinates of the best and the worst
-                fitness values as ((row, column), (row, column)).
+            coords_best, coords_worst (tuple): Coordinates of the best and the worst
+                fitness values as (index_best, index_worst) in 1D or
+                ((row, column), (row, column)) in 2D.
         """
         # get indices of the best and the worst solutions in new generation
         # actually indices of ALL solutions with the best and the worst fitness values
         indices_max = numpy.where(fitness_arr == fitness_arr.max())
         indices_min = numpy.where(fitness_arr == fitness_arr.min())
+        dim = len(fitness_arr.shape)
+
+        if dim > 2:
+            print('Only 1D or 2D arrays are supported.')
+            raise ValueError
 
         if self._ga.optim == 'min':
             # fitness minimization
-            coords_worst = (indices_max[0][0], indices_max[1][0])
-            coords_best = (indices_min[0][0], indices_min[1][0])
+            if dim == 1:
+                coords_worst = indices_max[0][0]
+                coords_best = indices_min[0][0]
+            else:
+                coords_worst = (indices_max[0][0], indices_max[1][0])
+                coords_best = (indices_min[0][0], indices_min[1][0])
         else:
             # fitness maximization
-            coords_worst = (indices_min[0][0], indices_min[1][0])
-            coords_best = (indices_max[0][0], indices_max[1][0])
+            if dim == 1:
+                coords_worst = indices_min[0][0]
+                coords_best = indices_max[0][0]
+            else:
+                coords_worst = (indices_min[0][0], indices_min[1][0])
+                coords_best = (indices_max[0][0], indices_max[1][0])
 
         return coords_best, coords_worst
 
@@ -178,7 +207,7 @@ class DiffusionGA:
         """
         self._construct_diffusion_model(population)
 
-        coords_best, _ = self._find_critical_diffusion_solutions(self._fitness_arr)
+        coords_best, _ = self._find_critical_values(self._fitness_arr)
         self._ga._update_solution(self._individ_arr[coords_best], self._fitness_arr[coords_best])
 
     def init_population(self, new_population):

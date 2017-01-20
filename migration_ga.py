@@ -13,7 +13,7 @@ class MigrationGA:
         """
         self.type = type
         self.population_list = None
-        self._population_num = None
+        self._population_size = None
         self._optim = None
 
         self._check_parameters()
@@ -32,12 +32,13 @@ class MigrationGA:
             population_list (list): List of BinaryGA (or RealGA) instances with already initialized
                 populations.
         """
-        self._population_num = len(population_list)
+        self._population_size = len(population_list)
 
-        if self._population_num < 2:
+        if self._population_size < 2:
             print('Too few populations.')
             raise ValueError
 
+        # TODO select the right way of copying
         self.population_list = copy.deepcopy(population_list)
         # self._population_list = list(population_list)
         self._optim = population_list[0].optim
@@ -88,12 +89,12 @@ class MigrationGA:
             raise ValueError
 
         cycle = max_generation // period
-        fitness_progress = [[] for i in range(self._population_num)]
+        fitness_progress = [[] for i in range(self._population_size)]
 
         for c in range(cycle):
-            migrant_list = [[] for i in range(self._population_num)]
+            migrant_list = [[] for i in range(self._population_size)]
 
-            for ga_inst, index in zip(self.population_list, range(self._population_num)):
+            for ga_inst, index in zip(self.population_list, range(self._population_size)):
                 # run standard GA and store average fitness progress
                 fit_prog = ga_inst.run(period)
                 fitness_progress[index].extend(fit_prog)
@@ -106,8 +107,8 @@ class MigrationGA:
                     del ga_inst.population[-migrant_num:]
 
             # perform migration
-            for ga_inst, index in zip(self.population_list, range(self._population_num)):
-                for idx in range(self._population_num):
+            for ga_inst, index in zip(self.population_list, range(self._population_size)):
+                for idx in range(self._population_size):
                     if idx != index:
                         ga_inst.extend_population(migrant_list[idx])
 
