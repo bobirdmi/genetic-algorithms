@@ -6,6 +6,10 @@ from standard_ga import StandardGA, IndividualGA
 
 
 class RealGA(StandardGA):
+    """
+    This class realizes GA over the real values. In other words, it tries to find global minimum or
+    global maximum (depends on the settings) of a given fitness function.
+    """
     def __init__(self, fitness_func=None, optim='max', selection="rank", mut_prob=0.05, mut_type=1,
                  cross_prob=0.95, cross_type=1, elitism=True, tournament_size=None):
         """
@@ -241,14 +245,13 @@ class RealGA(StandardGA):
             dim (int): Amount of space dimensions.
             interval (tuple): The generated numbers of each dimension will be
                 within this interval (start point included, end point excluded).
-                Both end points must be integer values.
 
         Returns:
             array (numpy.array): Array rows represents individuals. Number of columns is specified
                 with *dim* parameter.
         """
         self.interval = interval
-        return numpy.random.uniform(int(interval[0]), int(interval[1]), (size, dim))
+        return numpy.random.uniform(interval[0], interval[1], (int(size), int(dim)))
 
     def init_random_population(self, size, dim, interval):
         """
@@ -261,7 +264,6 @@ class RealGA(StandardGA):
             dim (int): Amount of space dimensions.
             interval (tuple): The generated numbers of each dimension will be 
                 within this interval (start point included, end point excluded).
-                Both end points must be integer values.
         """
         self._check_init_random_population(size, dim, interval)
 

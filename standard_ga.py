@@ -22,6 +22,11 @@ class IndividualGA:
 
 
 class StandardGA:
+    """
+    This class implements the base functionality of genetic algorithms and must be inherited.
+    In other words, the class doesn't provide functionality of genetic algorithms by itself.
+    This class is inherited by RealGA and BinaryGA classes in the current implementation.
+    """
     def __init__(self, fitness_func=None, optim='max', selection="rank", mut_prob=0.05, mut_type=1,
                  cross_prob=0.95, cross_type=1, elitism=True, tournament_size=None):
         """
@@ -276,7 +281,7 @@ class StandardGA:
             parents (tuple of IndividualGA): selected parents
         """
         if self.selection in ['roulette', 'rank']:
-            if wheel_sum is None or wheel_sum < 2:
+            if wheel_sum is None or wheel_sum < 0:
                 print('Wrong value of wheel sum:', wheel_sum)
                 raise ValueError
 
@@ -287,7 +292,6 @@ class StandardGA:
 
             sum_val = 0
             for ind, rank in zip(population, range(1, len(population) + 1)):
-                # population is sorted in ascending or descending order by fitness values
                 if self.selection == 'roulette':
                     sum_val += ind.fitness_val
                 else:

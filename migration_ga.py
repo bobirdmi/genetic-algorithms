@@ -1,12 +1,15 @@
 import numpy
 import copy
 
+
 class MigrationGA:
     """
     This class implements migration model of GA, namely island model (not stepping-stone).
+    It can work with binary or real GA.
     """
     def __init__(self, type='binary'):
         """
+        A constructor.
 
         Args:
             type (str): Type of genetic algorithm: may be 'binary' or 'real'.
@@ -38,9 +41,7 @@ class MigrationGA:
             print('Too few populations.')
             raise ValueError
 
-        # TODO select the right way of copying
         self.population_list = copy.deepcopy(population_list)
-        # self._population_list = list(population_list)
         self._optim = population_list[0].optim
 
     def _compare_solutions(self):
@@ -75,7 +76,7 @@ class MigrationGA:
             period (int): How often performs migration. Must be less than *max_generation*.
             migrant_num (int): How many best migrants will travel to all another populations.
             cloning (True, False): Can migrants clone? If False, an original population will not have
-                its migrants after the migration. Otherwise, clones of migrants will remain
+                its migrants after a migration. Otherwise, clones of migrants will remain
                 in their original population after the migration of originals.
 
         Returns:

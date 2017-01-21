@@ -1,6 +1,8 @@
 import numpy
 import math
 
+from standard_ga import IndividualGA
+
 
 TYPE_BINARY = 0
 TYPE_REAL = 1
@@ -9,9 +11,8 @@ TYPE_REAL = 1
 class DiffusionGA:
     """
     This class implements diffusion model of genetic algorithms. The current implementation supports
-    four neighbours (up, down, left, right) of an evaluated cell. The standard selection types aren't
-    supported (e.g. "rank", "roulette", "tournament"). The currently supported selection type
-    is "select a neighbour with the best fitness value".
+    four neighbours (up, down, left, right) of an evaluated cell. Supports the standard selection types
+    (e.g. "rank", "roulette", "tournament"). It's evident that the maximum tournament size is 4.
     """
     def __init__(self, instance):
         """
@@ -45,7 +46,7 @@ class DiffusionGA:
     @property
     def best_solution(self):
         """
-        Returns tuple in the following form: (best individual, best fitness value).
+        Returns tuple in the following form: (best individual, its fitness value).
 
         Returns:
             tuple with the currently best found individual and its fitness value.
@@ -53,6 +54,18 @@ class DiffusionGA:
         return self._ga.best_solution
 
     def _get_neighbour(self, row, column):
+        """
+        The function returns an individual selected from neighbours of the cell (specified with
+        the given row and column) according to the selection type ("rank", "roulette" or "tournament").
+
+        Args:
+            row (int): Row of a current cell.
+            column (int): Columns of a current cell.
+
+        Returns:
+            individual (float, list of floats): An individual selected from neighbours
+                according to the specified selection type ("rank", "roulette", "tournament").
+        """
         shape = self._individ_arr.shape
         up, down, left, right = (0, 1, 2, 3)
         DIRS = {
@@ -64,14 +77,20 @@ class DiffusionGA:
 
         arr_size = len(DIRS)
         fit_arr = numpy.empty(arr_size)
-        ind_arr = numpy.empty(arr_size)
+        population = []
+
         for d, i in zip(list(DIRS.keys()), range(arr_size)):
             fit_arr[i] = self._fitness_arr[DIRS[d]]
-            ind_arr[i] = self._individ_arr[DIRS[d]]
+            population.append(IndividualGA(self._individ_arr[DIRS[d]], fit_arr[i]))
 
-        coords_best, _ = self._find_critical_values(fit_arr)
+        wheel_sum = 0
+        if self._ga.selection == 'rank':
+            wheel_sum = self._ga._compute_rank_wheel_sum(arr_size)
+        elif self._ga.selection == 'roulette':
+            wheel_sum = sum(fit_arr)
 
-        return ind_arr[coords_best]
+        # we need only one parent not two
+        return self._ga._select_parents(population, wheel_sum)[0].individ
 
     def _compute_diffusion_generation(self, individ_arr):
         """
@@ -95,23 +114,8 @@ class DiffusionGA:
                 parent2 = self._get_neighbour(row, column)
 
                 # cross parents and mutate a child
-                # TODO
-                new_individ = numpy.nan_to_num(self._ga._mutate(self._ga._cross(parent1, parent2)))
+                new_individ = self._ga._mutate(self._ga._cross(parent1, parent2))
 
-                # try:
-                #     dim = len(new_individ)
-                #
-                #     for num, d in zip(new_individ, range(dim)):
-                #         if num < 0:
-                #             new_individ[d] = num % -5
-                #         else:
-                #             new_individ[d] = num % 5
-                # except:
-                #     if new_individ < 0:
-                #         new_individ %= -5
-                #     else:
-                #         new_individ %= 5
-                        
                 # compute fitness value of the child
                 fit_val = self._ga._compute_fitness(new_individ)
 
@@ -178,7 +182,7 @@ class DiffusionGA:
         Constructs two arrays: first for individuals of GA, second for their fitness values.
         The current implementation supports construction of only square arrays. Thus, an array side is
         a square root of the given population length. If the calculated square root is a fractional number,
-        it will be truncated. That means the last individuals in population will not be
+        it will be truncated. That means the last individuals in population may not be
         presented in the constructed arrays.
 
         Args:

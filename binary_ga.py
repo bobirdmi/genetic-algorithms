@@ -4,6 +4,10 @@ from standard_ga import StandardGA, IndividualGA
 
 
 class BinaryGA(StandardGA):
+    """
+    This class realizes GA over a binary encoded input data. In other words,
+    the algorithm tries to find a combination of the input data with the best fitness value.
+    """
     def __init__(self, data=None, fitness_func=None, optim='max', selection="rank", mut_prob=0.05, mut_type=1,
                  cross_prob=0.95, cross_type=1, elitism=True, tournament_size=None):
         """
