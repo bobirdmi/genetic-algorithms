@@ -67,7 +67,7 @@ class MigrationGA:
 
         return best_solution
 
-    def run(self, max_generation, period=1, migrant_num=1, cloning=True):
+    def run(self, max_generation, period=1, migrant_num=1, cloning=True, migrate=True):
         """
         Runs a migration model of GA.
 
@@ -100,18 +100,23 @@ class MigrationGA:
                 fit_prog = ga_inst.run(period)
                 fitness_progress[index].extend(fit_prog)
 
-                for m in range(-migrant_num, 0, 1):
-                    migrant_list[index].append(ga_inst.population[m])
+		if migrate:
+                    for m in range(-migrant_num, 0, 1):
+                        migrant_list[index].append(ga_inst.population[m])
 
-                if not cloning:
-                    # no clones: remove the best *migrant_num* migrants
-                    del ga_inst.population[-migrant_num:]
+                    if not cloning:
+                        # no clones: remove the best *migrant_num* migrants
+                        del ga_inst.population[-migrant_num:]
 
             # perform migration
-            for ga_inst, index in zip(self.population_list, range(self._population_size)):
-                for idx in range(self._population_size):
-                    if idx != index:
-                        ga_inst.extend_population(migrant_list[idx])
+	    if migrate:
+                for ga_inst, index in zip(self.population_list, range(self._population_size)):
+		    # TODO
+		    # del ga_inst.population[:migrant_num]  # uncomment for benchmarking on 2 populations
+
+                    for idx in range(self._population_size):
+                        if idx != index:
+                            ga_inst.extend_population(migrant_list[idx])
 
         return fitness_progress, self._compare_solutions()
 
