@@ -3,11 +3,15 @@ from bitstring import BitArray
 import random
 import numpy
 
-from genetic_algorithms import GeneticAlgorithms, IndividualGA
+from standard_ga import StandardGA, IndividualGA
 from itertools import izip
 
 
-class RealGeneticAlgorithms(GeneticAlgorithms):
+class RealGA(StandardGA):
+    u"""
+    This class realizes GA over the real values. In other words, it tries to find global minimum or
+    global maximum (depends on the settings) of a given fitness function.
+    """
     def __init__(self, fitness_func=None, optim=u'max', selection=u"rank", mut_prob=0.05, mut_type=1,
                  cross_prob=0.95, cross_type=1, elitism=True, tournament_size=None):
         u"""
@@ -31,7 +35,7 @@ class RealGeneticAlgorithms(GeneticAlgorithms):
                 Default is 1.
             elitism (True, False): Elitism on/off. Default is True.
         """
-        super(RealGeneticAlgorithms, self).__init__(fitness_func, optim, selection,
+        super(RealGA, self).__init__(fitness_func, optim, selection,
                          mut_prob, mut_type, cross_prob, cross_type,
                          elitism, tournament_size)
         self._bin_length = 64
@@ -39,12 +43,13 @@ class RealGeneticAlgorithms(GeneticAlgorithms):
         self._check_parameters()
 
         self._mut_bit_offset = self._get_mut_bit_offset()
+        self.interval = None
 
     def _get_mut_bit_offset(self):
         u"""
         Returns bit number (from left to the right) in 32- or 64-bit big-endian floating point 
         binary representation (IEEE 754) from which a mantissa begins. It is necessary because this real GA implementation 
-        mutate only mantissa bits (mutation of exponent changes a float number the undesired fast way).
+        mutate only mantissa bits (mutation of exponent changes a float number the undesired fast and unexpected way).
         """
         # IEEE 754
         # big-endian floating point binary representation
@@ -99,6 +104,30 @@ class RealGeneticAlgorithms(GeneticAlgorithms):
         else:
             return individ[0]
 
+    def _adjust_to_interval(self, var):
+        u"""
+        This function checks if *var* is NaN, inf, -inf by numpy.nan_to_num() and then
+        returns *var* if it is within the interval. Otherwise returns lower bound of the interval
+        if *var* < lower bound or upper bound of the interval if *var* > upper bound.
+
+        Args:
+            var (list, float): Float or list of floats to adjust to the specified interval.
+
+        Returns:
+            adjusted input parameter
+        """
+        var = numpy.nan_to_num(var)
+
+        try:
+            dim = len(var)
+
+            for num, d in izip(var, xrange(dim)):
+                var[d] = max(min(self.interval[1], num), self.interval[0])
+        except TypeError:
+            var = max(min(self.interval[1], var), self.interval[0])
+
+        return var
+
     def _invert_bit(self, individ, bit_num):
         u"""
         This function mutates the appropriate bits from bit_num of the individual
@@ -131,7 +160,7 @@ class RealGeneticAlgorithms(GeneticAlgorithms):
 
             mutated_individ.append(bstr.floatbe)
 
-        return self._get_individ_return_value(mutated_individ)
+        return self._adjust_to_interval(self._get_individ_return_value(mutated_individ))
 
     def _replace_bits(self, source, target, start, stop):
         u"""
@@ -177,7 +206,7 @@ class RealGeneticAlgorithms(GeneticAlgorithms):
 
             child.append(bstr_target.floatbe)
 
-        return self._get_individ_return_value(child)
+        return self._adjust_to_interval(self._get_individ_return_value(child))
 
     def _compute_fitness(self, individ):
         u"""
@@ -193,6 +222,39 @@ class RealGeneticAlgorithms(GeneticAlgorithms):
         """
         return self.fitness_func(individ)
 
+    def _check_init_random_population(self, size, dim, interval):
+        u"""
+        This function verifies the input parameters of a random initialization.
+
+        Args:
+            size (int): Size of a new population to verify.
+            dim (int): Amount of space dimensions.
+            interval (tuple): The generated numbers of each dimension will be
+                within this interval (start point included, end point excluded).
+                Both end points must be *different* integer values.
+        """
+        if size is None or dim is None or interval is None or \
+                        size < 2 or dim < 1 or interval[0] >= interval[1]:
+            print u'Wrong value of input parameter.'
+            raise ValueError
+
+    def _generate_random_population(self, size, dim, interval):
+        u"""
+        This function generates new random population by the given input parameters.
+
+        Args:
+            size (int): Size of a new population.
+            dim (int): Amount of space dimensions.
+            interval (tuple): The generated numbers of each dimension will be
+                within this interval (start point included, end point excluded).
+
+        Returns:
+            array (numpy.array): Array rows represents individuals. Number of columns is specified
+                with *dim* parameter.
+        """
+        self.interval = interval
+        return numpy.random.uniform(interval[0], interval[1], (int(size), int(dim)))
+
     def init_random_population(self, size, dim, interval):
         u"""
         Initializes a new random population of the given size with individual's values
@@ -202,18 +264,13 @@ class RealGeneticAlgorithms(GeneticAlgorithms):
         Args:
             size (int): Size of a new random population.
             dim (int): Amount of space dimensions.
-            interval (tuple): The generated numbers of each dimension
-                will be within this interval (start point included, end point excluded).
+            interval (tuple): The generated numbers of each dimension will be 
+                within this interval (start point included, end point excluded).
         """
-        if size < 2 or dim < 1 or interval[0] >= interval[1]:
-            print u'Wrong value of input parameter.'
-            raise ValueError
-
-        if dim > 1:
-            self._is_vector = True
+        self._check_init_random_population(size, dim, interval)
 
         # generate population
-        individs = numpy.random.uniform(interval[0], interval[1], (size, dim))
+        individs = self._generate_random_population(size, dim, interval)
 
         self.population = []
         for ind in individs:
@@ -227,3 +284,4 @@ class RealGeneticAlgorithms(GeneticAlgorithms):
             self.population.append(IndividualGA(individ, fit_val))
 
         self._sort_population()
+        self._update_solution(self.population[-1].individ, self.population[-1].fitness_val)

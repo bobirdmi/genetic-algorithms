@@ -17,7 +17,9 @@ import numpy as np
 import fgeneric
 import bbobbenchmarks
 
-from real_ga import RealGeneticAlgorithms
+from real_ga import RealGA
+from diffusion_ga import DiffusionGA
+from migration_ga import MigrationGA
 
 
 argv = sys.argv[1:] # shortcut for input arguments
@@ -29,10 +31,14 @@ function_ids = bbobbenchmarks.nfreeIDs if len(argv) < 3 else eval(argv[2])
 # function_ids = bbobbenchmarks.noisyIDs if len(argv) < 3 else eval(argv[2])
 instances = range(1, 6) + range(41, 51) if len(argv) < 4 else eval(argv[3])
 
-opts = dict(algid='Standard GA',
-            comments='Standard genetic algorithm with 1-point mutation and crossover, mutation probability 0.05, crossover probability 0.95, \
-            "rank" selection type and elitism=True')
-maxfunevals = '10 * dim' # 10*dim is a short test-experiment taking a few minutes 
+#alg_name = 'Standard'
+#alg_name = 'Diffusion'
+alg_name = 'Migration'
+opts = dict(algid=alg_name + ' GA',
+            comments=alg_name + ' genetic algorithm with 1-point mutation and crossover, mutation probability 0.05, crossover probability 0.95, \
+"rank" selection type and elitism=True on 2 different migrations with migration period = 5, \
+3 migrants and cloning of migrants is turned on.')
+maxfunevals = '50 * dim' # 10*dim is a short test-experiment taking a few minutes 
 # INCREMENT maxfunevals SUCCESSIVELY to larger value(s)
 minfunevals = 'dim + 2'  # PUT MINIMAL sensible number of EVALUATIONS before to restart
 maxrestarts = 10      # SET to zero if algorithm is entirely deterministic 
@@ -43,25 +49,68 @@ def run_optimizer(fun, dim, maxfunevals, ftarget=-np.Inf):
     This implementation is an empty template to be filled 
     
     """
-    # create GA instance
-    gen_alg = RealGeneticAlgorithms(fun, optim='min')
+    # uncomment for run a standard GA
+    #gen_alg = RealGA(fun, optim='min')
+
+    # uncomment the code below and the previous one for run a diffusion GA
+    #gen_alg = DiffusionGA(gen_alg)
+
+    # uncomment for run a migration GA
+    gen_alg1 = RealGA(fun, optim='min')
+    gen_alg2 = RealGA(fun, optim='min')    
 
     maxfunevals = min(1e8 * dim, maxfunevals)
 
      # initialize random population of GA
     popsize = min(maxfunevals, 200)
-    gen_alg.init_random_population(popsize, dim, (-5, 5))
+
+    # uncomment for standard or diffusion GA
+    #gen_alg.init_random_population(popsize, dim, (-5, 5))
+
+    # uncomment for run a migration GA
+    one_part = popsize // 2
+    gen_alg1.init_random_population(one_part, dim, (-5, 5))
+    gen_alg2.init_random_population(popsize - one_part, dim, (-5, 5))
+    mga = MigrationGA()
+    mga.init_populations([gen_alg1, gen_alg2])
 
     # run GA
-    STANDARD_GA(gen_alg, maxfunevals, popsize, ftarget)
+    # uncomment for run standard and diffusion GA
+    #RUN_GA(gen_alg, maxfunevals, popsize, ftarget)
 
-def STANDARD_GA(alg, maxfunevals, popsize, ftarget):
+    # run Migration GA
+    # uncomment for run a migration GA
+    RUN_MGA(mga, maxfunevals, popsize, ftarget)
+
+def RUN_MGA(alg, maxfunevals, popsize, ftarget):
+    fbest = np.inf
+
+    for i in range(0, int(np.ceil(maxfunevals / popsize))):
+	# compute the next population
+	if i % 4 == 0 and i > 0:  # performs migration every 5 generations
+	    migrate = True
+        else:
+	    migrate = False
+
+        _, solution = alg.run(1, period=1, migrant_num=3, cloning=True, migrate=migrate)
+
+        if fbest > solution[1]:
+            fbest = solution[1]
+            xbest = solution[0]
+
+        if fbest < ftarget:  # task achieved 
+            break
+
+    return xbest
+
+def RUN_GA(alg, maxfunevals, popsize, ftarget):
     fbest = np.inf
 
     for _ in range(0, int(np.ceil(maxfunevals / popsize))):
-        if fbest > alg.population[-1].fitness_val:
-            fbest = alg.population[-1].fitness_val
-            xbest = alg.population[-1].individ
+        if fbest > alg.best_solution[1]:
+            fbest = alg.best_solution[1]
+            xbest = alg.best_solution[0]
+
         if fbest < ftarget:  # task achieved 
             break
 

@@ -1,0 +1,1477 @@
+<HTML>
+<HEAD>
+   <META NAME="description" CONTENT="COCO/BBOB figures by function">
+   <META NAME="keywords" CONTENT="COCO, BBOB">
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <TITLE> Migration, GA, templateBBOBarticle </TITLE>
+   <SCRIPT SRC="sorttable.js"></SCRIPT>
+</HEAD>
+<BODY>
+<H1> Migration GA
+</H1>
+<H2 style="color:red">  </H2>
+<H2> Expected number of <i>f</i>-evaluations to reach target </H2>
+<IMG SRC="ppfigdim_f001.svg"><IMG SRC="ppfigdim_f002.svg"><IMG SRC="ppfigdim_f003.svg"><IMG SRC="ppfigdim_f004.svg"><IMG SRC="ppfigdim_f005.svg"><IMG SRC="ppfigdim_f006.svg"><IMG SRC="ppfigdim_f007.svg"><IMG SRC="ppfigdim_f008.svg"><IMG SRC="ppfigdim_f009.svg"><IMG SRC="ppfigdim_f010.svg"><IMG SRC="ppfigdim_f011.svg"><IMG SRC="ppfigdim_f012.svg"><IMG SRC="ppfigdim_f013.svg"><IMG SRC="ppfigdim_f014.svg"><IMG SRC="ppfigdim_f015.svg"><IMG SRC="ppfigdim_f016.svg"><IMG SRC="ppfigdim_f017.svg"><IMG SRC="ppfigdim_f018.svg"><IMG SRC="ppfigdim_f019.svg"><IMG SRC="ppfigdim_f020.svg"><IMG SRC="ppfigdim_f021.svg"><IMG SRC="ppfigdim_f022.svg"><IMG SRC="ppfigdim_f023.svg"><IMG SRC="ppfigdim_f024.svg"><p/>
+ Expected number of f-evaluations (<span class="roman">ERT</span>, lines) to reach f<sub><span class="roman">opt</span></sub>+&#8710;f; median number of f-evaluations (+) to reach the most difficult target that was reached not always but at least once; maximum number of f-evaluations in any trial (<span style="color:#FF0000">&times;</span>); interquartile range with median (notched boxes) of simulated runlengths to reach f<sub><span class="roman">opt</span></sub>+&#8710;f; all values are divided by dimension and plotted as log<sub>10</sub> values versus dimension.         Shown is the <span class="roman">ERT</span>&nbsp;for targets just not reached by the artificial GECCO-BBOB-2009 best algorithm within the given budget k&times;<span class="roman">DIM</span>, where k is shown in the legend. Numbers above <span class="roman">ERT</span>-symbols indicate the number of trials reaching the respective target. The light thick line with diamonds indicates the respective best result from BBOB-2009 for the most difficult target. Slanted grid lines indicate a scaling with <span style="font-family:helvetica"><i>O</i></span>(<span class="roman">DIM</span>) compared to <span style="font-family:helvetica"><i>O</i></span>(1) when using the respective 2009 best algorithm.  <div class="p"><!----></div>
+<p/><p/><H2> ERT in number of function evaluations </H2>
+
+<p><b>5-D</b></p>
+<table>
+<thead>
+<tr>
+<th>#FEs/D</th>
+<td>0.5</td>
+<td>1.2</td>
+<td>3</td>
+<td>10</td>
+<td>50</td>
+<td>#succ</td>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th><b>f<sub>1</sub></b></th>
+<td><i>2.5e+1</i>:4.8</td>
+<td><i>1.6e+1</i>:7.6</td>
+<td><i>1.0e-8</i>:12</td>
+<td><i>1.0e-8</i>:12</td>
+<td><i>1.0e-8</i>:12</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>1.6 (2)</td>
+<td>2.6 (2)</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>2</sub></b></th>
+<td><i>1.6e+6</i>:2.9</td>
+<td><i>4.0e+5</i>:11</td>
+<td><i>4.0e+4</i>:15</td>
+<td><i>6.3e+2</i>:58</td>
+<td><i>1.0e-8</i>:95</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>2.3 (2)</td>
+<td>1.5 (1)</td>
+<td>15 (14)</td>
+<td>&infin;</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>3</sub></b></th>
+<td><i>1.6e+2</i>:4.1</td>
+<td><i>1.0e+2</i>:15</td>
+<td><i>6.3e+1</i>:23</td>
+<td><i>2.5e+1</i>:73</td>
+<td><i>1.0e+1</i>:716</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>2.5 (1)</td>
+<td>2.0 (2)</td>
+<td>10 (11)</td>
+<td>&infin;</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>4</sub></b></th>
+<td><i>2.5e+2</i>:2.6</td>
+<td><i>1.6e+2</i>:10</td>
+<td><i>1.0e+2</i>:19</td>
+<td><i>4.0e+1</i>:65</td>
+<td><i>1.6e+1</i>:434</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>2.8 (2)</td>
+<td>1.8 (2)</td>
+<td>4.9 (12)</td>
+<td>&infin;</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>5</sub></b></th>
+<td><i>6.3e+1</i>:4.0</td>
+<td><i>4.0e+1</i>:10</td>
+<td><i>1.0e-8</i>:10</td>
+<td><i>1.0e-8</i>:10</td>
+<td><i>1.0e-8</i>:10</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>2.0 (2)</td>
+<td>3.1 (3)</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>260</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>6</sub></b></th>
+<td><i>1.0e+5</i>:3.0</td>
+<td><i>2.5e+4</i>:8.4</td>
+<td><i>1.0e+2</i>:16</td>
+<td><i>2.5e+1</i>:54</td>
+<td><i>2.5e-1</i>:254</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>3.5 (4)</td>
+<td>4.2 (4)</td>
+<td>6.0 (6)</td>
+<td>36 (23)</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>7</sub></b></th>
+<td><i>1.6e+2</i>:4.2</td>
+<td><i>1.0e+2</i>:6.2</td>
+<td><i>2.5e+1</i>:20</td>
+<td><i>4.0e+0</i>:54</td>
+<td><i>1.0e+0</i>:324</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>2.2 (1)</td>
+<td>2.8 (3)</td>
+<td>5.8 (3)</td>
+<td>38 (26)</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>8</sub></b></th>
+<td><i>1.0e+4</i>:4.6</td>
+<td><i>6.3e+3</i>:6.8</td>
+<td><i>1.0e+3</i>:18</td>
+<td><i>6.3e+1</i>:54</td>
+<td><i>1.6e+0</i>:258</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>4.2 (4)</td>
+<td>3.4 (4)</td>
+<td>10 (8)</td>
+<td>&infin;</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>9</sub></b></th>
+<td><i>2.5e+1</i>:20</td>
+<td><i>1.6e+1</i>:26</td>
+<td><i>1.0e+1</i>:35</td>
+<td><i>4.0e+0</i>:62</td>
+<td><i>1.6e-2</i>:256</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>260</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>10</sub></b></th>
+<td><i>2.5e+6</i>:2.9</td>
+<td><i>6.3e+5</i>:7.0</td>
+<td><i>2.5e+5</i>:17</td>
+<td><i>6.3e+3</i>:54</td>
+<td><i>2.5e+1</i>:297</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>1.6 (2)</td>
+<td>2.0 (2)</td>
+<td>2.0 (0.9)</td>
+<td>14 (19)</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>11</sub></b></th>
+<td><i>1.0e+6</i>:3.0</td>
+<td><i>6.3e+4</i>:6.2</td>
+<td><i>6.3e+2</i>:16</td>
+<td><i>6.3e+1</i>:74</td>
+<td><i>6.3e-1</i>:298</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>2.4 (2)</td>
+<td>7.2 (3)</td>
+<td>15 (18)</td>
+<td>12 (10)</td>
+<td>&infin; <i>290</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>12</sub></b></th>
+<td><i>4.0e+7</i>:3.6</td>
+<td><i>1.6e+7</i>:7.6</td>
+<td><i>4.0e+6</i>:19</td>
+<td><i>1.6e+4</i>:52</td>
+<td><i>1.0e+0</i>:268</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>0.61 (0.7)</td>
+<td>2.8 (6)</td>
+<td>11 (19)</td>
+<td>&infin;</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>13</sub></b></th>
+<td><i>1.0e+3</i>:2.8</td>
+<td><i>6.3e+2</i>:8.4</td>
+<td><i>4.0e+2</i>:17</td>
+<td><i>6.3e+1</i>:52</td>
+<td><i>6.3e-2</i>:264</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>1.6 (1)</td>
+<td>4.2 (4)</td>
+<td>7.7 (14)</td>
+<td>&infin;</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>14</sub></b></th>
+<td><i>1.6e+1</i>:3.0</td>
+<td><i>1.0e+1</i>:10</td>
+<td><i>6.3e+0</i>:15</td>
+<td><i>2.5e-1</i>:53</td>
+<td><i>1.0e-5</i>:251</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>3.4 (4)</td>
+<td>1.8 (2)</td>
+<td>2.8 (2)</td>
+<td>&infin;</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>15</sub></b></th>
+<td><i>1.6e+2</i>:3.0</td>
+<td><i>1.0e+2</i>:13</td>
+<td><i>6.3e+1</i>:24</td>
+<td><i>4.0e+1</i>:55</td>
+<td><i>1.6e+1</i>:289</td>
+<td>5/5</td>
+</tr>
+<tr>
+<th></th>
+<td>5.0 (13)</td>
+<td>2.5 (3)</td>
+<td>12 (8)</td>
+<td>40 (75)</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>16</sub></b></th>
+<td><i>4.0e+1</i>:4.8</td>
+<td><i>2.5e+1</i>:16</td>
+<td><i>1.6e+1</i>:46</td>
+<td><i>1.0e+1</i>:120</td>
+<td><i>4.0e+0</i>:334</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>1.2 (2)</td>
+<td>1.7 (1)</td>
+<td>1.1 (1.0)</td>
+<td>2.0 (2)</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>17</sub></b></th>
+<td><i>1.0e+1</i>:5.2</td>
+<td><i>6.3e+0</i>:26</td>
+<td><i>4.0e+0</i>:57</td>
+<td><i>2.5e+0</i>:110</td>
+<td><i>6.3e-1</i>:412</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>3.2 (2)</td>
+<td>4.4 (5)</td>
+<td>7.4 (11)</td>
+<td>&infin;</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>18</sub></b></th>
+<td><i>6.3e+1</i>:3.4</td>
+<td><i>4.0e+1</i>:7.2</td>
+<td><i>2.5e+1</i>:20</td>
+<td><i>1.6e+1</i>:58</td>
+<td><i>1.6e+0</i>:318</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>1.9 (1)</td>
+<td>2.7 (0.8)</td>
+<td>4.6 (7)</td>
+<td>7.6 (6)</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>19</sub></b></th>
+<td><i>1.6e-1</i>:172</td>
+<td><i>1.0e-1</i>:242</td>
+<td><i>6.3e-2</i>:675</td>
+<td><i>4.0e-2</i>:3078</td>
+<td><i>2.5e-2</i>:4946</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>20</sub></b></th>
+<td><i>6.3e+3</i>:5.1</td>
+<td><i>4.0e+3</i>:8.4</td>
+<td><i>4.0e+1</i>:15</td>
+<td><i>2.5e+0</i>:69</td>
+<td><i>1.0e+0</i>:851</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>1.9 (1)</td>
+<td>3.1 (4)</td>
+<td>25 (26)</td>
+<td>&infin;</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>21</sub></b></th>
+<td><i>4.0e+1</i>:3.9</td>
+<td><i>2.5e+1</i>:11</td>
+<td><i>1.6e+1</i>:31</td>
+<td><i>6.3e+0</i>:73</td>
+<td><i>1.6e+0</i>:347</td>
+<td>5/5</td>
+</tr>
+<tr>
+<th></th>
+<td>0.98 (0.4)</td>
+<td>1.6 (2)</td>
+<td>2.8 (7)</td>
+<td>10 (15)</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>22</sub></b></th>
+<td><i>6.3e+1</i>:3.6</td>
+<td><i>4.0e+1</i>:15</td>
+<td><i>2.5e+1</i>:32</td>
+<td><i>1.0e+1</i>:71</td>
+<td><i>1.6e+0</i>:341</td>
+<td>5/5</td>
+</tr>
+<tr>
+<th></th>
+<td>1.9 (3)</td>
+<td>1.5 (1)</td>
+<td>3.3 (4)</td>
+<td>4.0 (5)</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>23</sub></b></th>
+<td><i>1.0e+1</i>:3.0</td>
+<td><i>6.3e+0</i>:9.0</td>
+<td><i>4.0e+0</i>:33</td>
+<td><i>2.5e+0</i>:84</td>
+<td><i>1.0e+0</i>:518</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>1.8 (4)</td>
+<td>2.8 (5)</td>
+<td>2.5 (1)</td>
+<td>7.1 (6)</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>24</sub></b></th>
+<td><i>6.3e+1</i>:15</td>
+<td><i>4.0e+1</i>:37</td>
+<td><i>4.0e+1</i>:37</td>
+<td><i>2.5e+1</i>:118</td>
+<td><i>1.6e+1</i>:692</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>7.9 (7)</td>
+<td>24 (21)</td>
+<td>24 (18)</td>
+<td>&infin;</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+</table>
+<p><b>20-D</b></p>
+<table>
+<thead>
+<tr>
+<th>#FEs/D</th>
+<td>0.5</td>
+<td>1.2</td>
+<td>3</td>
+<td>10</td>
+<td>50</td>
+<td>#succ</td>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th><b>f<sub>1</sub></b></th>
+<td><i>2.5e+1</i>:4.8</td>
+<td><i>1.6e+1</i>:7.6</td>
+<td><i>1.0e-8</i>:12</td>
+<td><i>1.0e-8</i>:12</td>
+<td><i>1.0e-8</i>:12</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>1.6 (2)</td>
+<td>2.6 (2)</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>2</sub></b></th>
+<td><i>1.6e+6</i>:2.9</td>
+<td><i>4.0e+5</i>:11</td>
+<td><i>4.0e+4</i>:15</td>
+<td><i>6.3e+2</i>:58</td>
+<td><i>1.0e-8</i>:95</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>2.3 (2)</td>
+<td>1.5 (1)</td>
+<td>15 (14)</td>
+<td>&infin;</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>3</sub></b></th>
+<td><i>1.6e+2</i>:4.1</td>
+<td><i>1.0e+2</i>:15</td>
+<td><i>6.3e+1</i>:23</td>
+<td><i>2.5e+1</i>:73</td>
+<td><i>1.0e+1</i>:716</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>2.5 (1)</td>
+<td>2.0 (2)</td>
+<td>10 (11)</td>
+<td>&infin;</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>4</sub></b></th>
+<td><i>2.5e+2</i>:2.6</td>
+<td><i>1.6e+2</i>:10</td>
+<td><i>1.0e+2</i>:19</td>
+<td><i>4.0e+1</i>:65</td>
+<td><i>1.6e+1</i>:434</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>2.8 (2)</td>
+<td>1.8 (2)</td>
+<td>4.9 (12)</td>
+<td>&infin;</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>5</sub></b></th>
+<td><i>6.3e+1</i>:4.0</td>
+<td><i>4.0e+1</i>:10</td>
+<td><i>1.0e-8</i>:10</td>
+<td><i>1.0e-8</i>:10</td>
+<td><i>1.0e-8</i>:10</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>2.0 (2)</td>
+<td>3.1 (3)</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>260</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>6</sub></b></th>
+<td><i>1.0e+5</i>:3.0</td>
+<td><i>2.5e+4</i>:8.4</td>
+<td><i>1.0e+2</i>:16</td>
+<td><i>2.5e+1</i>:54</td>
+<td><i>2.5e-1</i>:254</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>3.5 (4)</td>
+<td>4.2 (4)</td>
+<td>6.0 (6)</td>
+<td>36 (23)</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>7</sub></b></th>
+<td><i>1.6e+2</i>:4.2</td>
+<td><i>1.0e+2</i>:6.2</td>
+<td><i>2.5e+1</i>:20</td>
+<td><i>4.0e+0</i>:54</td>
+<td><i>1.0e+0</i>:324</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>2.2 (1)</td>
+<td>2.8 (3)</td>
+<td>5.8 (3)</td>
+<td>38 (26)</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>8</sub></b></th>
+<td><i>1.0e+4</i>:4.6</td>
+<td><i>6.3e+3</i>:6.8</td>
+<td><i>1.0e+3</i>:18</td>
+<td><i>6.3e+1</i>:54</td>
+<td><i>1.6e+0</i>:258</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>4.2 (4)</td>
+<td>3.4 (4)</td>
+<td>10 (8)</td>
+<td>&infin;</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>9</sub></b></th>
+<td><i>2.5e+1</i>:20</td>
+<td><i>1.6e+1</i>:26</td>
+<td><i>1.0e+1</i>:35</td>
+<td><i>4.0e+0</i>:62</td>
+<td><i>1.6e-2</i>:256</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>260</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>10</sub></b></th>
+<td><i>2.5e+6</i>:2.9</td>
+<td><i>6.3e+5</i>:7.0</td>
+<td><i>2.5e+5</i>:17</td>
+<td><i>6.3e+3</i>:54</td>
+<td><i>2.5e+1</i>:297</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>1.6 (2)</td>
+<td>2.0 (2)</td>
+<td>2.0 (0.9)</td>
+<td>14 (19)</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>11</sub></b></th>
+<td><i>1.0e+6</i>:3.0</td>
+<td><i>6.3e+4</i>:6.2</td>
+<td><i>6.3e+2</i>:16</td>
+<td><i>6.3e+1</i>:74</td>
+<td><i>6.3e-1</i>:298</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>2.4 (2)</td>
+<td>7.2 (3)</td>
+<td>15 (18)</td>
+<td>12 (10)</td>
+<td>&infin; <i>290</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>12</sub></b></th>
+<td><i>4.0e+7</i>:3.6</td>
+<td><i>1.6e+7</i>:7.6</td>
+<td><i>4.0e+6</i>:19</td>
+<td><i>1.6e+4</i>:52</td>
+<td><i>1.0e+0</i>:268</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>0.61 (0.7)</td>
+<td>2.8 (6)</td>
+<td>11 (19)</td>
+<td>&infin;</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>13</sub></b></th>
+<td><i>1.0e+3</i>:2.8</td>
+<td><i>6.3e+2</i>:8.4</td>
+<td><i>4.0e+2</i>:17</td>
+<td><i>6.3e+1</i>:52</td>
+<td><i>6.3e-2</i>:264</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>1.6 (1)</td>
+<td>4.2 (4)</td>
+<td>7.7 (14)</td>
+<td>&infin;</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>14</sub></b></th>
+<td><i>1.6e+1</i>:3.0</td>
+<td><i>1.0e+1</i>:10</td>
+<td><i>6.3e+0</i>:15</td>
+<td><i>2.5e-1</i>:53</td>
+<td><i>1.0e-5</i>:251</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>3.4 (4)</td>
+<td>1.8 (2)</td>
+<td>2.8 (2)</td>
+<td>&infin;</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>15</sub></b></th>
+<td><i>1.6e+2</i>:3.0</td>
+<td><i>1.0e+2</i>:13</td>
+<td><i>6.3e+1</i>:24</td>
+<td><i>4.0e+1</i>:55</td>
+<td><i>1.6e+1</i>:289</td>
+<td>5/5</td>
+</tr>
+<tr>
+<th></th>
+<td>5.0 (13)</td>
+<td>2.5 (3)</td>
+<td>12 (8)</td>
+<td>40 (75)</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>16</sub></b></th>
+<td><i>4.0e+1</i>:4.8</td>
+<td><i>2.5e+1</i>:16</td>
+<td><i>1.6e+1</i>:46</td>
+<td><i>1.0e+1</i>:120</td>
+<td><i>4.0e+0</i>:334</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>1.2 (2)</td>
+<td>1.7 (1)</td>
+<td>1.1 (1.0)</td>
+<td>2.0 (2)</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>17</sub></b></th>
+<td><i>1.0e+1</i>:5.2</td>
+<td><i>6.3e+0</i>:26</td>
+<td><i>4.0e+0</i>:57</td>
+<td><i>2.5e+0</i>:110</td>
+<td><i>6.3e-1</i>:412</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>3.2 (2)</td>
+<td>4.4 (5)</td>
+<td>7.4 (11)</td>
+<td>&infin;</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>18</sub></b></th>
+<td><i>6.3e+1</i>:3.4</td>
+<td><i>4.0e+1</i>:7.2</td>
+<td><i>2.5e+1</i>:20</td>
+<td><i>1.6e+1</i>:58</td>
+<td><i>1.6e+0</i>:318</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>1.9 (1)</td>
+<td>2.7 (0.8)</td>
+<td>4.6 (7)</td>
+<td>7.6 (6)</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>19</sub></b></th>
+<td><i>1.6e-1</i>:172</td>
+<td><i>1.0e-1</i>:242</td>
+<td><i>6.3e-2</i>:675</td>
+<td><i>4.0e-2</i>:3078</td>
+<td><i>2.5e-2</i>:4946</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>20</sub></b></th>
+<td><i>6.3e+3</i>:5.1</td>
+<td><i>4.0e+3</i>:8.4</td>
+<td><i>4.0e+1</i>:15</td>
+<td><i>2.5e+0</i>:69</td>
+<td><i>1.0e+0</i>:851</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>1.9 (1)</td>
+<td>3.1 (4)</td>
+<td>25 (26)</td>
+<td>&infin;</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>21</sub></b></th>
+<td><i>4.0e+1</i>:3.9</td>
+<td><i>2.5e+1</i>:11</td>
+<td><i>1.6e+1</i>:31</td>
+<td><i>6.3e+0</i>:73</td>
+<td><i>1.6e+0</i>:347</td>
+<td>5/5</td>
+</tr>
+<tr>
+<th></th>
+<td>0.98 (0.4)</td>
+<td>1.6 (2)</td>
+<td>2.8 (7)</td>
+<td>10 (15)</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>22</sub></b></th>
+<td><i>6.3e+1</i>:3.6</td>
+<td><i>4.0e+1</i>:15</td>
+<td><i>2.5e+1</i>:32</td>
+<td><i>1.0e+1</i>:71</td>
+<td><i>1.6e+0</i>:341</td>
+<td>5/5</td>
+</tr>
+<tr>
+<th></th>
+<td>1.9 (3)</td>
+<td>1.5 (1)</td>
+<td>3.3 (4)</td>
+<td>4.0 (5)</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>23</sub></b></th>
+<td><i>1.0e+1</i>:3.0</td>
+<td><i>6.3e+0</i>:9.0</td>
+<td><i>4.0e+0</i>:33</td>
+<td><i>2.5e+0</i>:84</td>
+<td><i>1.0e+0</i>:518</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>1.8 (4)</td>
+<td>2.8 (5)</td>
+<td>2.5 (1)</td>
+<td>7.1 (6)</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>24</sub></b></th>
+<td><i>6.3e+1</i>:15</td>
+<td><i>4.0e+1</i>:37</td>
+<td><i>4.0e+1</i>:37</td>
+<td><i>2.5e+1</i>:118</td>
+<td><i>1.6e+1</i>:692</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>7.9 (7)</td>
+<td>24 (21)</td>
+<td>24 (18)</td>
+<td>&infin;</td>
+<td>&infin; <i>250</i></td>
+<td>0/15</td>
+</tr>
+<tbody>
+<tr>
+<th><b>f<sub>1</sub></b></th>
+<td><i>6.3e+1</i>:24</td>
+<td><i>4.0e+1</i>:42</td>
+<td><i>1.0e-8</i>:43</td>
+<td><i>1.0e-8</i>:43</td>
+<td><i>1.0e-8</i>:43</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>179 (141)</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>1200</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>2</sub></b></th>
+<td><i>4.0e+6</i>:29</td>
+<td><i>2.5e+6</i>:42</td>
+<td><i>1.0e+5</i>:65</td>
+<td><i>1.0e+4</i>:207</td>
+<td><i>1.0e-8</i>:412</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>0.89 (1)</td>
+<td>0.93 (1)</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>1200</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>3</sub></b></th>
+<td><i>6.3e+2</i>:33</td>
+<td><i>4.0e+2</i>:44</td>
+<td><i>1.6e+2</i>:109</td>
+<td><i>1.0e+2</i>:255</td>
+<td><i>2.5e+1</i>:3277</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>13 (15)</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>1200</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>4</sub></b></th>
+<td><i>6.3e+2</i>:22</td>
+<td><i>4.0e+2</i>:91</td>
+<td><i>2.5e+2</i>:250</td>
+<td><i>1.6e+2</i>:332</td>
+<td><i>6.3e+1</i>:1927</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>75 (72)</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>1200</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>5</sub></b></th>
+<td><i>2.5e+2</i>:19</td>
+<td><i>1.6e+2</i>:34</td>
+<td><i>1.0e-8</i>:41</td>
+<td><i>1.0e-8</i>:41</td>
+<td><i>1.0e-8</i>:41</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>7.6 (14)</td>
+<td>125 (120)</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>1200</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>6</sub></b></th>
+<td><i>2.5e+5</i>:16</td>
+<td><i>6.3e+4</i>:43</td>
+<td><i>1.6e+4</i>:62</td>
+<td><i>1.6e+2</i>:353</td>
+<td><i>1.6e+1</i>:1078</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>32 (49)</td>
+<td>75 (42)</td>
+<td>287 (180)</td>
+<td>&infin;</td>
+<td>&infin; <i>1200</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>7</sub></b></th>
+<td><i>1.0e+3</i>:11</td>
+<td><i>4.0e+2</i>:39</td>
+<td><i>2.5e+2</i>:74</td>
+<td><i>6.3e+1</i>:319</td>
+<td><i>1.0e+1</i>:1351</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>7.5 (49)</td>
+<td>36 (26)</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>1200</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>8</sub></b></th>
+<td><i>4.0e+4</i>:19</td>
+<td><i>2.5e+4</i>:35</td>
+<td><i>4.0e+3</i>:67</td>
+<td><i>2.5e+2</i>:231</td>
+<td><i>1.6e+1</i>:1470</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>473 (463)</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>1200</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>9</sub></b></th>
+<td><i>1.0e+2</i>:357</td>
+<td><i>6.3e+1</i>:560</td>
+<td><i>4.0e+1</i>:684</td>
+<td><i>2.5e+1</i>:756</td>
+<td><i>1.0e+1</i>:1716</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>1200</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>10</sub></b></th>
+<td><i>1.6e+6</i>:15</td>
+<td><i>1.0e+6</i>:27</td>
+<td><i>4.0e+5</i>:70</td>
+<td><i>6.3e+4</i>:231</td>
+<td><i>4.0e+3</i>:1015</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>36 (18)</td>
+<td>54 (37)</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>1200</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>11</sub></b></th>
+<td><i>4.0e+4</i>:11</td>
+<td><i>2.5e+3</i>:27</td>
+<td><i>1.6e+2</i>:313</td>
+<td><i>1.0e+2</i>:481</td>
+<td><i>1.0e+1</i>:1002</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>3.0 (5)</td>
+<td>3.2 (5)</td>
+<td>28 (21)</td>
+<td>&infin;</td>
+<td>&infin; <i>1200</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>12</sub></b></th>
+<td><i>1.0e+8</i>:23</td>
+<td><i>6.3e+7</i>:39</td>
+<td><i>2.5e+7</i>:76</td>
+<td><i>4.0e+6</i>:209</td>
+<td><i>1.0e+1</i>:1042</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>138 (95)</td>
+<td>215 (168)</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>1200</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>13</sub></b></th>
+<td><i>1.6e+3</i>:28</td>
+<td><i>1.0e+3</i>:64</td>
+<td><i>6.3e+2</i>:79</td>
+<td><i>4.0e+1</i>:211</td>
+<td><i>2.5e+0</i>:1724</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>92 (97)</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>1200</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>14</sub></b></th>
+<td><i>2.5e+1</i>:15</td>
+<td><i>1.6e+1</i>:42</td>
+<td><i>1.0e+1</i>:75</td>
+<td><i>1.6e+0</i>:219</td>
+<td><i>6.3e-4</i>:1106</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>71 (64)</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>1200</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>15</sub></b></th>
+<td><i>6.3e+2</i>:15</td>
+<td><i>4.0e+2</i>:67</td>
+<td><i>2.5e+2</i>:292</td>
+<td><i>1.6e+2</i>:846</td>
+<td><i>1.0e+2</i>:1671</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>34 (26)</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>1200</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>16</sub></b></th>
+<td><i>4.0e+1</i>:26</td>
+<td><i>2.5e+1</i>:127</td>
+<td><i>1.6e+1</i>:540</td>
+<td><i>1.6e+1</i>:540</td>
+<td><i>1.0e+1</i>:1384</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>2.5 (1)</td>
+<td>12 (12)</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>1200</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>17</sub></b></th>
+<td><i>1.6e+1</i>:11</td>
+<td><i>1.0e+1</i>:63</td>
+<td><i>6.3e+0</i>:305</td>
+<td><i>4.0e+0</i>:468</td>
+<td><i>1.0e+0</i>:1030</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>23 (12)</td>
+<td>26 (30)</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>1200</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>18</sub></b></th>
+<td><i>4.0e+1</i>:116</td>
+<td><i>2.5e+1</i>:252</td>
+<td><i>1.6e+1</i>:430</td>
+<td><i>1.0e+1</i>:621</td>
+<td><i>4.0e+0</i>:1090</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>12 (10)</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>1200</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>19</sub></b></th>
+<td><i>1.6e-1</i>:2.5e5</td>
+<td><i>1.0e-1</i>:3.4e5</td>
+<td><i>6.3e-2</i>:3.4e5</td>
+<td><i>4.0e-2</i>:3.4e5</td>
+<td><i>2.5e-2</i>:3.4e5</td>
+<td>3/15</td>
+</tr>
+<tr>
+<th></th>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>1200</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>20</sub></b></th>
+<td><i>1.6e+4</i>:38</td>
+<td><i>1.0e+4</i>:42</td>
+<td><i>2.5e+2</i>:62</td>
+<td><i>2.5e+0</i>:250</td>
+<td><i>1.6e+0</i>:2536</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>103 (148)</td>
+<td>410 (363)</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>1200</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>21</sub></b></th>
+<td><i>6.3e+1</i>:36</td>
+<td><i>4.0e+1</i>:77</td>
+<td><i>4.0e+1</i>:77</td>
+<td><i>1.6e+1</i>:456</td>
+<td><i>4.0e+0</i>:1094</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>121 (91)</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>1200</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>22</sub></b></th>
+<td><i>6.3e+1</i>:45</td>
+<td><i>4.0e+1</i>:68</td>
+<td><i>4.0e+1</i>:68</td>
+<td><i>1.6e+1</i>:231</td>
+<td><i>6.3e+0</i>:1219</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>1200</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>23</sub></b></th>
+<td><i>6.3e+0</i>:29</td>
+<td><i>4.0e+0</i>:118</td>
+<td><i>2.5e+0</i>:306</td>
+<td><i>2.5e+0</i>:306</td>
+<td><i>1.0e+0</i>:1614</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>1.6 (0.7)</td>
+<td>7.3 (5)</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>1200</i></td>
+<td>0/15</td>
+</tr>
+<tr>
+<th><b>f<sub>24</sub></b></th>
+<td><i>2.5e+2</i>:208</td>
+<td><i>1.6e+2</i>:918</td>
+<td><i>1.0e+2</i>:6628</td>
+<td><i>6.3e+1</i>:9885</td>
+<td><i>4.0e+1</i>:31629</td>
+<td>15/15</td>
+</tr>
+<tr>
+<th></th>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin;</td>
+<td>&infin; <i>1200</i></td>
+<td>0/15</td>
+</tr>
+</table>
+<!--pptableHtml-->
+<p/>
+ Expected running time (ERT in number of function evaluations) divided by the best ERT measured during BBOB-2009. The ERT and in braces, as dispersion measure, the half difference between 90 and 10%-tile of bootstrapped run lengths appear in the second row of each cell, the best ERT in the first. The different target &#8710;f-values are shown in the top row. #succ is the number of trials that reached the (final) target f<sub><span class="roman">opt</span></sub>+ 10<sup>&#8722;8</sup>. The median number of conducted function evaluations is additionally given in <i>italics</i>, if the target in the last column was never reached. <b>Bold</b> entries are statistically significantly better (according to the rank-sum test) compared to the best algorithm in BBOB-2009, with p = 0.05 or p = 10<sup>&#8722;k</sup> when the number k  &gt;  1 is following the &#8595; symbol, with Bonferroni correction by the number of functions.  <div class="p"><!----></div>
+<p/><p/><H2>  Empirical cumulative distribution functions (ECDF) </H2>
+<p><b>Separable functions in 5-D</b></p><div><IMG SRC="pprldistr_05D_separ.svg"><IMG SRC="ppfvdistr_05D_separ.svg"></div><p><b>Misc. moderate functions in 5-D</b></p><div><IMG SRC="pprldistr_05D_lcond.svg"><IMG SRC="ppfvdistr_05D_lcond.svg"></div><p><b>Ill-conditioned functions in 5-D</b></p><div><IMG SRC="pprldistr_05D_hcond.svg"><IMG SRC="ppfvdistr_05D_hcond.svg"></div><p><b>Multi-modal functions in 5-D</b></p><div><IMG SRC="pprldistr_05D_multi.svg"><IMG SRC="ppfvdistr_05D_multi.svg"></div><p><b>Weak structure functions in 5-D</b></p><div><IMG SRC="pprldistr_05D_mult2.svg"><IMG SRC="ppfvdistr_05D_mult2.svg"></div><p><b>All functions in 5-D</b></p><div><IMG SRC="pprldistr_05D_noiselessall.svg"><IMG SRC="ppfvdistr_05D_noiselessall.svg"></div><p><b>Separable functions in 20-D</b></p><div><IMG SRC="pprldistr_20D_separ.svg"><IMG SRC="ppfvdistr_20D_separ.svg"></div><p><b>Misc. moderate functions in 20-D</b></p><div><IMG SRC="pprldistr_20D_lcond.svg"><IMG SRC="ppfvdistr_20D_lcond.svg"></div><p><b>Ill-conditioned functions in 20-D</b></p><div><IMG SRC="pprldistr_20D_hcond.svg"><IMG SRC="ppfvdistr_20D_hcond.svg"></div><p><b>Multi-modal functions in 20-D</b></p><div><IMG SRC="pprldistr_20D_multi.svg"><IMG SRC="ppfvdistr_20D_multi.svg"></div><p><b>Weak structure functions in 20-D</b></p><div><IMG SRC="pprldistr_20D_mult2.svg"><IMG SRC="ppfvdistr_20D_mult2.svg"></div><p><b>All functions in 20-D</b></p><div><IMG SRC="pprldistr_20D_noiselessall.svg"><IMG SRC="ppfvdistr_20D_noiselessall.svg"></div><p/>
+ Empirical cumulative distribution functions (ECDF), plotting the fraction of trials with an outcome not larger than the respective value on the x-axis. Left subplots: ECDF of number of function evaluations (FEvals) divided by search space dimension D, to fall below f<sub><span class="roman">opt</span></sub>+&#8710;f where &#8710;f&nbsp;is the target just not reached by the GECCO-BBOB-2009 best algorithm within a budget of k&times;<span class="roman">DIM</span> evaluations, where k is the first value in the legend.      Legends indicate for each target the number of functions that were solved in at least one trial within the displayed budget.     Right subplots: ECDF of the best achieved &#8710;f for running times of 0.5D, 1.2D, 3D, 10D, 100D, 1000D,&hellip; function evaluations (from right to left cycling cyan-magenta-black...) and final &#8710;f-value (red), where &#8710;f&nbsp;and <span style="font-family:helvetica">Df</span> denote the difference to the optimal function value. Light brown lines in the background show ECDFs for the most difficult target of all algorithms benchmarked during BBOB-2009.  <div class="p"><!----></div>
+<p/><p/><H2> ERT loss ratios </H2>
+<IMG SRC="pplogloss_05D_noiselessall.svg"><IMG SRC="pplogloss_20D_noiselessall.svg">
+<p><b><i>f</i><sub>1</sub>&ndash;<i>f</i><sub>24</sub> in 5-D</b>, maxFE/D=119</p>
+<table class="sortable">
+<thead>
+<tr>
+<th>#FEs/D</td>
+<td>best</td>
+<td>10 %</td>
+<td>25 %</td>
+<td>med</td>
+<td>75 %</td>
+<td>90 %</td>
+</tr>
+</thead>
+<tfoot>
+<tr>
+<th>RL<sub>US</sub>/D</td>
+<td>50</td>
+<td>50</td>
+<td>50</td>
+<td>50</td>
+<td>60</td>
+<td>90</td>
+</tr>
+</tfoot>
+<tbody>
+<tr>
+<th sorttable_customkey="2.000000">2</th>
+<td sorttable_customkey="0.983051">0.98</td>
+<td sorttable_customkey="1.855556">1.9</td>
+<td sorttable_customkey="2.272727">2.3</td>
+<td sorttable_customkey="3.262411">3.3</td>
+<td sorttable_customkey="4.166667">4.2</td>
+<td sorttable_customkey="6.160000">6.2</td>
+</tr>
+<tr>
+<th sorttable_customkey="10.000000">10</th>
+<td sorttable_customkey="2.622378">2.6</td>
+<td sorttable_customkey="3.238534">3.2</td>
+<td sorttable_customkey="3.983516">4.0</td>
+<td sorttable_customkey="5.084804">5.1</td>
+<td sorttable_customkey="6.761696">6.8</td>
+<td sorttable_customkey="50.000000">50</td>
+</tr>
+<tr>
+<th sorttable_customkey="100.000000">100</th>
+<td sorttable_customkey="4.155125">4.2</td>
+<td sorttable_customkey="8.409705">8.4</td>
+<td sorttable_customkey="13.575104">14</td>
+<td sorttable_customkey="22.092509">22</td>
+<td sorttable_customkey="30.868902">31</td>
+<td sorttable_customkey="95.000000">95</td>
+</tr>
+<tr>
+<th sorttable_customkey="1000.000000">1e3</th>
+<td sorttable_customkey="20.458265">20</td>
+<td sorttable_customkey="30.770200">31</td>
+<td sorttable_customkey="47.439839">47</td>
+<td sorttable_customkey="138.530730">1.4e2</td>
+<td sorttable_customkey="212.174685">2.1e2</td>
+<td sorttable_customkey="950.000000">9.5e2</td>
+</tr>
+</tbody>
+</table>
+<p><b><i>f</i><sub>1</sub>&ndash;<i>f</i><sub>24</sub> in 20-D</b>, maxFE/D=60</p>
+<table class="sortable">
+<thead>
+<tr>
+<th>#FEs/D</td>
+<td>best</td>
+<td>10 %</td>
+<td>25 %</td>
+<td>med</td>
+<td>75 %</td>
+<td>90 %</td>
+</tr>
+</thead>
+<tfoot>
+<tr>
+<th>RL<sub>US</sub>/D</td>
+<td>60</td>
+<td>60</td>
+<td>60</td>
+<td>60</td>
+<td>60</td>
+<td>60</td>
+</tr>
+</tfoot>
+<tbody>
+<tr>
+<th sorttable_customkey="2.000000">2</th>
+<td sorttable_customkey="0.925397">0.93</td>
+<td sorttable_customkey="3.295266">3.3</td>
+<td sorttable_customkey="12.500000">12</td>
+<td sorttable_customkey="30.952381">31</td>
+<td sorttable_customkey="40.000000">40</td>
+<td sorttable_customkey="40.000000">40</td>
+</tr>
+<tr>
+<th sorttable_customkey="10.000000">10</th>
+<td sorttable_customkey="4.761905">4.8</td>
+<td sorttable_customkey="7.364341">7.4</td>
+<td sorttable_customkey="23.322851">23</td>
+<td sorttable_customkey="119.047619">1.2e2</td>
+<td sorttable_customkey="200.000000">2.0e2</td>
+<td sorttable_customkey="200.000000">2.0e2</td>
+</tr>
+<tr>
+<th sorttable_customkey="100.000000">100</th>
+<td sorttable_customkey="15.806112">16</td>
+<td sorttable_customkey="17.206121">17</td>
+<td sorttable_customkey="54.376658">54</td>
+<td sorttable_customkey="117.566644">1.2e2</td>
+<td sorttable_customkey="2000.000000">2.0e3</td>
+<td sorttable_customkey="2000.000000">2.0e3</td>
+</tr>
+</tbody>
+</table>
+<!--tables-->
+<p/>
+ <span class="roman">ERT</span>&nbsp;loss ratio versus the budget in number of f-evaluations divided by dimension. For each given budget <span class="roman">FEvals</span>, the target value f<sub><span class="roman">t</span></sub>&nbsp;is computed as the best target f-value reached within the budget by the given algorithm. Shown is then the <span class="roman">ERT</span>&nbsp;to reach f<sub><span class="roman">t</span></sub>&nbsp;for the given algorithm or the budget, if the GECCO-BBOB-2009 best algorithm reached a better target within the budget, divided by the best <span class="roman">ERT</span>&nbsp;    seen in GECCO-BBOB-2009 to reach f<sub><span class="roman">t</span></sub>. Line: geometric mean. Box-Whisker error bar: 25-75%-ile with median (box), 10-90%-ile (caps), and minimum and maximum <span class="roman">ERT</span>&nbsp;loss ratio (points). The vertical line gives the maximal number of function evaluations in a single trial in this function subset. See also the following figure for results on each function subgroup.  <div class="p"><!----></div>
+<p/><p/><p><b>Separable functions in 5-D and 20-D</b></p><div><IMG SRC="pplogloss_05D_separ.svg"><IMG SRC="pplogloss_20D_separ.svg"></div><p><b>Moderate functions in 5-D and 20-D</b></p><div><IMG SRC="pplogloss_05D_lcond.svg"><IMG SRC="pplogloss_20D_lcond.svg"></div><p><b>Ill-conditioned functions in 5-D and 20-D</b></p><div><IMG SRC="pplogloss_05D_hcond.svg"><IMG SRC="pplogloss_20D_hcond.svg"></div><p><b>Multi-modal functions in 5-D and 20-D</b></p><div><IMG SRC="pplogloss_05D_multi.svg"><IMG SRC="pplogloss_20D_multi.svg"></div><p><b>Weak structure functions in 5-D and 20-D</b></p><div><IMG SRC="pplogloss_05D_mult2.svg"><IMG SRC="pplogloss_20D_mult2.svg"></div><p/>
+ <span class="roman">ERT</span>&nbsp;loss ratios (see the previous figure for details). Each cross (<span style="color:#0000FF">+</span>) represents a single function, the line is the geometric mean.  <div class="p"><!----></div>
+<p/><p/>
+</BODY>
+</HTML>

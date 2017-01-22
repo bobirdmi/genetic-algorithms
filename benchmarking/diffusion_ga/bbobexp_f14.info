@@ -1,0 +1,18 @@
+funcId = 14, DIM = 2, Precision = 1.000e-08, algId = 'Diffusion GA'
+% Diffusion genetic algorithm with 1-point mutation and crossover, mutation probability 0.05, crossover probability 0.95,             "rank" selection type and elitism=True
+data_f14/bbobexp_f14_DIM2.dat, 1:200|1.4e-01, 2:200|9.8e-01, 3:200|1.3e-02, 4:200|1.1e-01, 5:200|5.3e-01, 41:200|1.1e-01, 42:200|4.6e-01, 43:200|3.4e-01, 44:200|3.5e-01, 45:200|1.0e-01, 46:200|2.9e-01, 47:200|2.6e-01, 48:200|2.2e-01, 49:200|1.0e-01, 50:200|3.8e-01
+funcId = 14, DIM = 3, Precision = 1.000e-08, algId = 'Diffusion GA'
+% Diffusion genetic algorithm with 1-point mutation and crossover, mutation probability 0.05, crossover probability 0.95,             "rank" selection type and elitism=True
+data_f14/bbobexp_f14_DIM3.dat, 1:288|6.1e-02, 2:288|2.0e+00, 3:288|8.3e-01, 4:288|6.7e-01, 5:288|6.1e-01, 41:288|1.4e+00, 42:288|1.1e+00, 43:288|1.2e+00, 44:288|1.7e+00, 45:288|1.4e+00, 46:288|1.7e+00, 47:288|1.4e+00, 48:288|3.7e-01, 49:288|1.2e+00, 50:288|8.6e-01
+funcId = 14, DIM = 5, Precision = 1.000e-08, algId = 'Diffusion GA'
+% Diffusion genetic algorithm with 1-point mutation and crossover, mutation probability 0.05, crossover probability 0.95,             "rank" selection type and elitism=True
+data_f14/bbobexp_f14_DIM5.dat, 1:588|5.7e+00, 2:588|5.5e+00, 3:588|3.8e+00, 4:588|2.5e+00, 5:588|1.0e-01, 41:588|5.3e+00, 42:588|3.1e+00, 43:588|4.7e+00, 44:588|2.0e+00, 45:588|3.0e+00, 46:588|1.9e+00, 47:588|2.5e+00, 48:588|4.9e-01, 49:588|1.2e+00, 50:588|8.3e-01
+funcId = 14, DIM = 10, Precision = 1.000e-08, algId = 'Diffusion GA'
+% Diffusion genetic algorithm with 1-point mutation and crossover, mutation probability 0.05, crossover probability 0.95,             "rank" selection type and elitism=True
+data_f14/bbobexp_f14_DIM10.dat, 1:784|1.4e+01, 2:784|1.9e+01, 3:784|1.5e+01, 4:784|8.9e+00, 5:784|1.5e+01, 41:784|1.9e+01, 42:784|1.1e+01, 43:784|1.2e+01, 44:784|9.3e+00, 45:784|9.8e+00, 46:784|5.4e+00, 47:784|1.1e+01, 48:784|1.2e+01, 49:784|8.8e+00, 50:784|4.8e+00
+funcId = 14, DIM = 20, Precision = 1.000e-08, algId = 'Diffusion GA'
+% Diffusion genetic algorithm with 1-point mutation and crossover, mutation probability 0.05, crossover probability 0.95,             "rank" selection type and elitism=True
+data_f14/bbobexp_f14_DIM20.dat, 1:1176|2.5e+01, 2:1176|3.1e+01, 3:1176|3.0e+01, 4:1176|3.6e+01, 5:1176|1.9e+01, 41:1176|3.7e+01, 42:1176|3.1e+01, 43:1176|2.6e+01, 44:1176|4.1e+01, 45:1176|3.7e+01, 46:1176|3.3e+01, 47:1176|3.4e+01, 48:1176|3.8e+01, 49:1176|2.8e+01, 50:1176|3.1e+01
+funcId = 14, DIM = 40, Precision = 1.000e-08, algId = 'Diffusion GA'
+% Diffusion genetic algorithm with 1-point mutation and crossover, mutation probability 0.05, crossover probability 0.95,             "rank" selection type and elitism=True
+data_f14/bbobexp_f14_DIM40.dat, 1:2156|9.3e+01, 2:2156|7.9e+01, 3:2156|6.3e+01, 4:2156|6.5e+01, 5:2156|8.8e+01, 41:2156|1.2e+02, 42:2156|1.2e+02, 43:2156|1.0e+02, 44:2156|8.4e+01, 45:2156|6.5e+01, 46:2156|5.2e+01, 47:2156|6.2e+01, 48:2156|8.1e+01, 49:2156|8.3e+01, 50:2156|6.0e+01

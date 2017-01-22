@@ -1,0 +1,312 @@
+\providecommand{\bbobECDFslegend}[1]{
+Bootstrapped empirical cumulative distribution of the number of objective function evaluations divided by dimension (FEvals/DIM) for all functions and subgroups in #1-D. The targets are chosen from $10^{[-8..2]}$ such that the bestGECCO2009 artificial algorithm just not reached them within a given budget of $k$ $\times$ DIM, with $k\in \{0.5, 1.2, 3, 10, 50\}$. The ``best 2009'' line corresponds to the best \ERT\ observed during BBOB 2009 for each selected target.
+}
+\providecommand{\bbobppfigslegend}[1]{
+Expected running time (\ERT\ in number of $f$-evaluations 
+                as $\log_{10}$ value) divided by dimension versus dimension. The target function value 
+                is chosen such that the bestGECCO2009 artificial algorithm just failed to achieve 
+                an \ERT\ of $10\times\DIM$. Different symbols correspond to different algorithms given in the legend of #1. Light symbols give the maximum number of function evaluations from the longest trial divided by dimension. Black stars indicate a statistically better result compared to all other algorithms with $p<0.01$ and Bonferroni correction number of dimensions (six).  
+Legend: 
+{\color{NavyBlue}$\circ$}: \algorithmA
+, {\color{Magenta}$\diamondsuit$}: \algorithmB
+, {\color{Orange}$\star$}: \algorithmC
+}
+\providecommand{\bbobpptablesmanylegend}[1]{%
+    Expected running time (ERT in number of function 
+    evaluations) divided by the respective best ERT measured during BBOB-2009 in
+    #1.
+    The ERT and in braces, as dispersion measure, the half difference between 90 and 
+    10\%-tile of bootstrapped run lengths appear for each algorithm and 
+    %
+    target, the corresponding best ERT
+    in the first row. The different target \Df-values are shown in the top row. 
+    \#succ is the number of trials that reached the (final) target $\fopt + 10^{-8}$.
+    %
+    The median number of conducted function evaluations is additionally given in 
+    \textit{italics}, if the target in the last column was never reached. 
+    Entries, succeeded by a star, are statistically significantly better (according to
+    the rank-sum test) when compared to all other algorithms of the table, with
+    $p = 0.05$ or $p = 10^{-k}$ when the number $k$ following the star is larger
+    than 1, with Bonferroni correction by the number of instances. A $\downarrow$
+    indicates the same tested against the best algorithm of BBOB-2009. Best results
+    are printed in bold.
+    }
+\providecommand{\algorithmA}{standard ga}
+\providecommand{\algorithmB}{diffusion ga}
+\providecommand{\algorithmC}{migration ga}
+\providecommand{\algname}{migration ga{}}
+\providecommand{\algfolder}{migration_ga/}
+\providecommand{\bbobpptablecaption}[1]{
+%
+    Expected running time (ERT in number of function 
+    evaluations) divided by the best ERT measured during BBOB-2009. The ERT 
+    and in braces, as dispersion measure, the half difference between 90 and 
+    10\%-tile of bootstrapped run lengths appear in the second row of each cell,  
+    the best ERT
+    %
+    (preceded by the target \Df-value in \textit{italics}) in the first. 
+    \#succ is the number of trials that reached the target value of the last column.
+    %
+    The median number of conducted function evaluations is additionally given in 
+    \textit{italics}, if the target in the last column was never reached. 
+    \textbf{Bold} entries are statistically significantly better (according to
+    the rank-sum test) compared to the best algorithm in BBOB-2009, with
+    $p = 0.05$ or $p = 10^{-k}$ when the number $k > 1$ is following the
+    $\downarrow$ symbol, with Bonferroni correction by the number of
+    functions.
+    
+}
+\providecommand{\bbobppfigdimlegend}[1]{
+%
+    Expected number of $f$-evaluations (\ERT, lines) to reach $\fopt+\Df$;
+    median number of $f$-evaluations (+) to reach the most difficult
+    target that was reached not always but at least once; maximum number of
+    $f$-evaluations in any trial ({\color{red}$\times$}); interquartile 
+    range with median (notched boxes) of simulated runlengths
+    to reach $\fopt+\Df$; all values are divided by dimension and 
+    plotted as $\log_{10}$ values versus dimension. %
+    %
+    Shown is the \ERT\ for 
+    targets just not reached by
+%    the largest $\Df$-values $\ge10^{-8}$ for which the \ERT\ of 
+    the artificial GECCO-BBOB-2009 best algorithm  
+    within the given budget $k\times\DIM$, where $k$ is shown in the legend.
+%    was above $\{0.5, 1.2, 3, 10, 50\}\times\DIM$ evaluations. 
+    Numbers above \ERT-symbols indicate the number of trials reaching the respective target.  
+    The light thick line with diamonds indicates the respective best result from BBOB-2009 for 
+    the most difficult target. 
+    Slanted grid lines indicate a scaling with ${\cal O}(\DIM)$ compared to ${\cal O}(1)$  
+    when using the respective 2009 best algorithm. 
+    
+}
+\providecommand{\bbobpprldistrlegend}[1]{
+%
+     Empirical cumulative distribution functions (ECDF), plotting the fraction of
+     trials with an outcome not larger than the respective value on the $x$-axis.
+     #1%
+     Left subplots: ECDF of number of function evaluations (FEvals) divided by search space dimension $D$,
+     to fall below $\fopt+\Df$ where \Df\ is the
+     target just not reached by the GECCO-BBOB-2009 best algorithm within a budget of
+     % largest $\Df$-value $\ge10^{-8}$ for which the best \ERT\ seen in the GECCO-BBOB-2009 was yet above
+     $k\times\DIM$ evaluations, where $k$ is the first value in the legend. %
+     Legends indicate for each target the number of functions that were solved in at
+     least one trial within the displayed budget.%
+     Right subplots: ECDF of the
+     best achieved $\Df$
+     for running times of $0.5D, 1.2D, 3D, 10D, 100D, 1000D,\dots$
+     function evaluations
+     (from right to left cycling cyan-magenta-black\dots) and final $\Df$-value (red),
+     where \Df\ and \textsf{Df} denote the difference to the optimal function value.
+     Light brown lines in the background show ECDFs for the most difficult target of all
+     algorithms benchmarked during BBOB-2009.
+}
+\providecommand{\bbobloglossfigurecaption}[1]{
+%
+    \ERT\ loss ratios (see Figure~\ref{tab:ERTloss} for details).  
+    Each cross ({\color{blue}$+$}) represents a single function, the line
+    is the geometric mean.
+    
+}
+\providecommand{\bbobloglosstablecaption}[1]{
+% \bbobloglosstablecaption{}
+    \ERT\ loss ratio versus the budget in number of $f$-evaluations
+    divided by dimension.
+    For each given budget \FEvals, the target value \ftarget\ is computed
+    as the best target $f$-value reached within the
+    budget by the given algorithm.
+    Shown is then the \ERT\ to reach \ftarget\ for the given algorithm
+    or the budget, if the GECCO-BBOB-2009 best algorithm
+    reached a better target within the budget,
+    divided by the best \ERT\
+    seen in GECCO-BBOB-2009 to reach \ftarget.
+    Line: geometric mean. Box-Whisker error bar: 25-75\%-ile with median
+    (box), 10-90\%-ile (caps), and minimum and maximum \ERT\ loss ratio
+    (points). The vertical line gives the maximal number of function evaluations
+    in a single trial in this function subset. See also
+    Figure~\ref{fig:ERTlogloss} for results on each function subgroup.
+    
+}
+\providecommand{\algname}{diffusion ga{}}
+\providecommand{\algfolder}{diffusion_ga/}
+\providecommand{\bbobpptablecaption}[1]{
+%
+    Expected running time (ERT in number of function 
+    evaluations) divided by the best ERT measured during BBOB-2009. The ERT 
+    and in braces, as dispersion measure, the half difference between 90 and 
+    10\%-tile of bootstrapped run lengths appear in the second row of each cell,  
+    the best ERT
+    %
+    (preceded by the target \Df-value in \textit{italics}) in the first. 
+    \#succ is the number of trials that reached the target value of the last column.
+    %
+    The median number of conducted function evaluations is additionally given in 
+    \textit{italics}, if the target in the last column was never reached. 
+    \textbf{Bold} entries are statistically significantly better (according to
+    the rank-sum test) compared to the best algorithm in BBOB-2009, with
+    $p = 0.05$ or $p = 10^{-k}$ when the number $k > 1$ is following the
+    $\downarrow$ symbol, with Bonferroni correction by the number of
+    functions.
+    
+}
+\providecommand{\bbobppfigdimlegend}[1]{
+%
+    Expected number of $f$-evaluations (\ERT, lines) to reach $\fopt+\Df$;
+    median number of $f$-evaluations (+) to reach the most difficult
+    target that was reached not always but at least once; maximum number of
+    $f$-evaluations in any trial ({\color{red}$\times$}); interquartile 
+    range with median (notched boxes) of simulated runlengths
+    to reach $\fopt+\Df$; all values are divided by dimension and 
+    plotted as $\log_{10}$ values versus dimension. %
+    %
+    Shown is the \ERT\ for 
+    targets just not reached by
+%    the largest $\Df$-values $\ge10^{-8}$ for which the \ERT\ of 
+    the artificial GECCO-BBOB-2009 best algorithm  
+    within the given budget $k\times\DIM$, where $k$ is shown in the legend.
+%    was above $\{0.5, 1.2, 3, 10, 50\}\times\DIM$ evaluations. 
+    Numbers above \ERT-symbols indicate the number of trials reaching the respective target.  
+    The light thick line with diamonds indicates the respective best result from BBOB-2009 for 
+    the most difficult target. 
+    Slanted grid lines indicate a scaling with ${\cal O}(\DIM)$ compared to ${\cal O}(1)$  
+    when using the respective 2009 best algorithm. 
+    
+}
+\providecommand{\bbobpprldistrlegend}[1]{
+%
+     Empirical cumulative distribution functions (ECDF), plotting the fraction of
+     trials with an outcome not larger than the respective value on the $x$-axis.
+     #1%
+     Left subplots: ECDF of number of function evaluations (FEvals) divided by search space dimension $D$,
+     to fall below $\fopt+\Df$ where \Df\ is the
+     target just not reached by the GECCO-BBOB-2009 best algorithm within a budget of
+     % largest $\Df$-value $\ge10^{-8}$ for which the best \ERT\ seen in the GECCO-BBOB-2009 was yet above
+     $k\times\DIM$ evaluations, where $k$ is the first value in the legend. %
+     Legends indicate for each target the number of functions that were solved in at
+     least one trial within the displayed budget.%
+     Right subplots: ECDF of the
+     best achieved $\Df$
+     for running times of $0.5D, 1.2D, 3D, 10D, 100D, 1000D,\dots$
+     function evaluations
+     (from right to left cycling cyan-magenta-black\dots) and final $\Df$-value (red),
+     where \Df\ and \textsf{Df} denote the difference to the optimal function value.
+     Light brown lines in the background show ECDFs for the most difficult target of all
+     algorithms benchmarked during BBOB-2009.
+}
+\providecommand{\bbobloglossfigurecaption}[1]{
+%
+    \ERT\ loss ratios (see Figure~\ref{tab:ERTloss} for details).  
+    Each cross ({\color{blue}$+$}) represents a single function, the line
+    is the geometric mean.
+    
+}
+\providecommand{\bbobloglosstablecaption}[1]{
+% \bbobloglosstablecaption{}
+    \ERT\ loss ratio versus the budget in number of $f$-evaluations
+    divided by dimension.
+    For each given budget \FEvals, the target value \ftarget\ is computed
+    as the best target $f$-value reached within the
+    budget by the given algorithm.
+    Shown is then the \ERT\ to reach \ftarget\ for the given algorithm
+    or the budget, if the GECCO-BBOB-2009 best algorithm
+    reached a better target within the budget,
+    divided by the best \ERT\
+    seen in GECCO-BBOB-2009 to reach \ftarget.
+    Line: geometric mean. Box-Whisker error bar: 25-75\%-ile with median
+    (box), 10-90\%-ile (caps), and minimum and maximum \ERT\ loss ratio
+    (points). The vertical line gives the maximal number of function evaluations
+    in a single trial in this function subset. See also
+    Figure~\ref{fig:ERTlogloss} for results on each function subgroup.
+    
+}
+\providecommand{\algname}{standard ga{}}
+\providecommand{\algfolder}{standard_ga/}
+\providecommand{\bbobpptablecaption}[1]{
+%
+    Expected running time (ERT in number of function 
+    evaluations) divided by the best ERT measured during BBOB-2009. The ERT 
+    and in braces, as dispersion measure, the half difference between 90 and 
+    10\%-tile of bootstrapped run lengths appear in the second row of each cell,  
+    the best ERT
+    %
+    (preceded by the target \Df-value in \textit{italics}) in the first. 
+    \#succ is the number of trials that reached the target value of the last column.
+    %
+    The median number of conducted function evaluations is additionally given in 
+    \textit{italics}, if the target in the last column was never reached. 
+    \textbf{Bold} entries are statistically significantly better (according to
+    the rank-sum test) compared to the best algorithm in BBOB-2009, with
+    $p = 0.05$ or $p = 10^{-k}$ when the number $k > 1$ is following the
+    $\downarrow$ symbol, with Bonferroni correction by the number of
+    functions.
+    
+}
+\providecommand{\bbobppfigdimlegend}[1]{
+%
+    Expected number of $f$-evaluations (\ERT, lines) to reach $\fopt+\Df$;
+    median number of $f$-evaluations (+) to reach the most difficult
+    target that was reached not always but at least once; maximum number of
+    $f$-evaluations in any trial ({\color{red}$\times$}); interquartile 
+    range with median (notched boxes) of simulated runlengths
+    to reach $\fopt+\Df$; all values are divided by dimension and 
+    plotted as $\log_{10}$ values versus dimension. %
+    %
+    Shown is the \ERT\ for 
+    targets just not reached by
+%    the largest $\Df$-values $\ge10^{-8}$ for which the \ERT\ of 
+    the artificial GECCO-BBOB-2009 best algorithm  
+    within the given budget $k\times\DIM$, where $k$ is shown in the legend.
+%    was above $\{0.5, 1.2, 3, 10, 50\}\times\DIM$ evaluations. 
+    Numbers above \ERT-symbols indicate the number of trials reaching the respective target.  
+    The light thick line with diamonds indicates the respective best result from BBOB-2009 for 
+    the most difficult target. 
+    Slanted grid lines indicate a scaling with ${\cal O}(\DIM)$ compared to ${\cal O}(1)$  
+    when using the respective 2009 best algorithm. 
+    
+}
+\providecommand{\bbobpprldistrlegend}[1]{
+%
+     Empirical cumulative distribution functions (ECDF), plotting the fraction of
+     trials with an outcome not larger than the respective value on the $x$-axis.
+     #1%
+     Left subplots: ECDF of number of function evaluations (FEvals) divided by search space dimension $D$,
+     to fall below $\fopt+\Df$ where \Df\ is the
+     target just not reached by the GECCO-BBOB-2009 best algorithm within a budget of
+     % largest $\Df$-value $\ge10^{-8}$ for which the best \ERT\ seen in the GECCO-BBOB-2009 was yet above
+     $k\times\DIM$ evaluations, where $k$ is the first value in the legend. %
+     Legends indicate for each target the number of functions that were solved in at
+     least one trial within the displayed budget.%
+     Right subplots: ECDF of the
+     best achieved $\Df$
+     for running times of $0.5D, 1.2D, 3D, 10D, 100D, 1000D,\dots$
+     function evaluations
+     (from right to left cycling cyan-magenta-black\dots) and final $\Df$-value (red),
+     where \Df\ and \textsf{Df} denote the difference to the optimal function value.
+     Light brown lines in the background show ECDFs for the most difficult target of all
+     algorithms benchmarked during BBOB-2009.
+}
+\providecommand{\bbobloglossfigurecaption}[1]{
+%
+    \ERT\ loss ratios (see Figure~\ref{tab:ERTloss} for details).  
+    Each cross ({\color{blue}$+$}) represents a single function, the line
+    is the geometric mean.
+    
+}
+\providecommand{\bbobloglosstablecaption}[1]{
+% \bbobloglosstablecaption{}
+    \ERT\ loss ratio versus the budget in number of $f$-evaluations
+    divided by dimension.
+    For each given budget \FEvals, the target value \ftarget\ is computed
+    as the best target $f$-value reached within the
+    budget by the given algorithm.
+    Shown is then the \ERT\ to reach \ftarget\ for the given algorithm
+    or the budget, if the GECCO-BBOB-2009 best algorithm
+    reached a better target within the budget,
+    divided by the best \ERT\
+    seen in GECCO-BBOB-2009 to reach \ftarget.
+    Line: geometric mean. Box-Whisker error bar: 25-75\%-ile with median
+    (box), 10-90\%-ile (caps), and minimum and maximum \ERT\ loss ratio
+    (points). The vertical line gives the maximal number of function evaluations
+    in a single trial in this function subset. See also
+    Figure~\ref{fig:ERTlogloss} for results on each function subgroup.
+    
+}
