@@ -9,8 +9,7 @@ The folders **standard_ga**, **diffusion_ga** and **migration_ga** contains expe
 * for each algorithm itself
 * and comparison between the implemented algorithms (standard, diffusion, migration)
 
-The files **ppdata/templateBBOBmany.html** for comparison and **ppdata/*_ga/templateBBOBarticle.html** for each algorithm itself 
-contain summary of plots with descriptions.
+The files **ppdata/templateBBOBmany.html** for comparison of algorithms and **ppdata/*_ga/templateBBOBarticle.html** for each algorithm itself contain summary of plots with descriptions.
 
 ## Settings
 
@@ -32,8 +31,8 @@ The following parameters of genetic algorithms were used:
 
 A migration model of GA has a little more parameters:
 * total amount of populations: 2
-* size of populations: *given_size / 2*
+* size of populations: `given_size / 2`
 * performing migration every five generations
 * amount of migrants: 3
 * the migrants are cloned so they still remain in the original population
-* the arrived migrants replaces the three worst individuals of a current population
+* the arrived migrants replace the three worst individuals of a current population
