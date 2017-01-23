@@ -1,0 +1,32 @@
+
+Dimensions:            2  
+      runs:            1  
+ times [s]:      6.0e-04  
+
+Dimensions:            2             3  
+      runs:            1             1  
+ times [s]:      6.0e-04       6.7e-04  
+
+Dimensions:            2             3             5  
+      runs:            1             1             2  
+ times [s]:      6.0e-04       6.7e-04       8.7e-04  
+
+Dimensions:            2             3             5            10  
+      runs:            1             1             2             2  
+ times [s]:      6.0e-04       6.7e-04       8.7e-04       1.3e-03  
+
+Dimensions:            2             3             5            10            20  
+      runs:            1             1             2             2             2  
+ times [s]:      6.0e-04       6.7e-04       8.7e-04       1.3e-03       2.3e-03  
+
+Dimensions:            2             3             5            10            20            40  
+      runs:            1             1             2             2             2             2  
+ times [s]:      6.0e-04       6.7e-04       8.7e-04       1.3e-03       2.3e-03       4.1e-03  
+
+Dimensions:            2             3             5            10            20            40            80  
+      runs:            1             1             2             2             2             2             2  
+ times [s]:      6.0e-04       6.7e-04       8.7e-04       1.3e-03       2.3e-03       4.1e-03       7.7e-03  
+
+Dimensions:            2             3             5            10            20            40            80           160  
+      runs:            1             1             2             2             2             2             2             2  
+ times [s]:      6.0e-04       6.7e-04       8.7e-04       1.3e-03       2.3e-03       4.1e-03       7.7e-03       1.5e-02  

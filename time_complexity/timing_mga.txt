@@ -1,0 +1,32 @@
+
+Dimensions:            2  
+      runs:            1  
+ times [s]:      5.0e-01  
+
+Dimensions:            2             3  
+      runs:            1             1  
+ times [s]:      5.0e-01       2.8e-01  
+
+Dimensions:            2             3             5  
+      runs:            1             1             1  
+ times [s]:      5.0e-01       2.8e-01       1.7e-01  
+
+Dimensions:            2             3             5            10  
+      runs:            1             1             1             2  
+ times [s]:      5.0e-01       2.8e-01       1.7e-01       1.1e-01  
+
+Dimensions:            2             3             5            10            20  
+      runs:            1             1             1             2             2  
+ times [s]:      5.0e-01       2.8e-01       1.7e-01       1.1e-01       8.6e-02  
+
+Dimensions:            2             3             5            10            20            40  
+      runs:            1             1             1             2             2             2  
+ times [s]:      5.0e-01       2.8e-01       1.7e-01       1.1e-01       8.6e-02       8.8e-02  
+
+Dimensions:            2             3             5            10            20            40            80  
+      runs:            1             1             1             2             2             2             2  
+ times [s]:      5.0e-01       2.8e-01       1.7e-01       1.1e-01       8.6e-02       8.8e-02       1.1e-01  
+
+Dimensions:            2             3             5            10            20            40            80           160  
+      runs:            1             1             1             2             2             2             2             1  
+ times [s]:      5.0e-01       2.8e-01       1.7e-01       1.1e-01       8.6e-02       8.8e-02       1.1e-01       1.5e-01  

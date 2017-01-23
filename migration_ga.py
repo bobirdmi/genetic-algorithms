@@ -84,7 +84,7 @@ class MigrationGA:
                 value of each generation for each specified GA instance. *best_solution* is the best solution
                 across all GA instances as in form (best individual, best fitness value).
         """
-        if max_generation < 1 or period >= max_generation or \
+        if max_generation < 1 or period > max_generation or \
                         migrant_num < 1 or cloning not in [True, False]:
             print('Wrong value of input parameter.')
             raise ValueError
