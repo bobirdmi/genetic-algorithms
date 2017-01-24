@@ -73,7 +73,7 @@ class MigrationGA:
 
         Args:
             max_generation (int): Maximum number of GA generations.
-            period (int): How often performs migration. Must be less than *max_generation*.
+            period (int): How often performs migration. Must be less than or equal to *max_generation*.
             migrant_num (int): How many best migrants will travel to all another populations.
             cloning (True, False): Can migrants clone? If False, an original population will not have
                 its migrants after a migration. Otherwise, clones of migrants will remain
@@ -100,7 +100,7 @@ class MigrationGA:
                 fit_prog = ga_inst.run(period)
                 fitness_progress[index].extend(fit_prog)
 
-		if migrate:
+                if migrate:
                     for m in range(-migrant_num, 0, 1):
                         migrant_list[index].append(ga_inst.population[m])
 
@@ -109,11 +109,11 @@ class MigrationGA:
                         del ga_inst.population[-migrant_num:]
 
             # perform migration
-	    if migrate:
+            if migrate:
                 for ga_inst, index in zip(self.population_list, range(self._population_size)):
-		    # TODO
-		    # del ga_inst.population[:migrant_num]  # uncomment for benchmarking on 2 populations
-
+                    # TODO
+                    # del ga_inst.population[:migrant_num]  # uncomment for benchmarking on 2 populations
+                    
                     for idx in range(self._population_size):
                         if idx != index:
                             ga_inst.extend_population(migrant_list[idx])
