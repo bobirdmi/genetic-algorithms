@@ -36,7 +36,7 @@ class RealGA(StandardGA):
         super().__init__(fitness_func, optim, selection,
                          mut_prob, mut_type, cross_prob, cross_type,
                          elitism, tournament_size)
-        self._bin_length = 64
+        self._bin_length = 64  # may be only 32 or 64
 
         self._check_parameters()
 
@@ -45,9 +45,9 @@ class RealGA(StandardGA):
 
     def _get_mut_bit_offset(self):
         """
-        Returns bit number (from left to the right) in 32- or 64-bit big-endian floating point 
+        Returns bit number (from left (index 0) to the right) in 32- or 64-bit big-endian floating point
         binary representation (IEEE 754) from which a mantissa begins. It is necessary because this real GA implementation 
-        mutate only mantissa bits (mutation of exponent changes a float number the undesired fast and unexpected way).
+        mutates only mantissa bits (mutation of exponent changes a float number the undesired fast and unexpected way).
         """
         # IEEE 754
         # big-endian floating point binary representation
@@ -73,7 +73,8 @@ class RealGA(StandardGA):
         otherwise False.
 
         Args:
-            chromosome (float, list): A chromosome of GA population. May be float or a list of floats.
+            chromosome (float, list): A chromosome of GA population. May be float or a list of floats
+                in case of multiple dimensions.
 
         Returns:
             True iff the given chromosome is a list (even a list of just 1 element), otherwise False.
@@ -90,21 +91,29 @@ class RealGA(StandardGA):
         depending on number of elements in the given chromosome.
 
         Args:
-            chromosome (list): This list contains a single float or represents a vector of floats.
+            chromosome (list): This list contains a single float or represents a vector of floats
+                in case of multiple dimensions.
 
         Returns:
-            chromosome[0] iff there is only 1 element in the list, otherwise chromosome
+            *chromosome[0]* iff there is only 1 element in the list, otherwise *chromosome*
         """
-        if len(chromosome) > 1:
-            return chromosome
-        else:
-            return chromosome[0]
+        try:
+            length = len(chromosome)
+
+            if length < 1:
+                raise ValueError('The given chromosome is empty!')
+            elif length > 1:
+                return chromosome
+            else:
+                return chromosome[0]
+        except TypeError:
+            raise ValueError('The given chromosome is not a list!')
 
     def _adjust_to_interval(self, var):
         """
-        This function checks if *var* is NaN, inf, -inf by numpy.nan_to_num() and then
+        This function replaces NaN, inf, -inf in *var* by numpy.nan_to_num() and then
         returns *var* if it is within the specified interval. Otherwise returns lower bound of the interval
-        if *var* < lower bound or upper bound of the interval if *var* > upper bound.
+        if (*var* < lower bound) or upper bound of the interval if (*var* > upper bound).
 
         Args:
             var (list, float): A float or a list of floats to adjust to the specified interval.
@@ -126,7 +135,7 @@ class RealGA(StandardGA):
 
     def _invert_bit(self, chromosome, bit_num):
         """
-        This function mutates the appropriate bits from bit_num of the chromosome
+        This function mutates the appropriate bits of the chromosome from *bit_num*
         with the specified mutation probability. The function mutates bit_num's bits of all floats
         in a list represented chromosome in case of multiple dimensions.
 
@@ -146,8 +155,8 @@ class RealGA(StandardGA):
             # it is a single float, not a list
             origin_chromosome = [chromosome]
 
-        for ind in origin_chromosome:
-            bstr = BitArray(floatbe=ind, length=self._bin_length)
+        for chrom in origin_chromosome:
+            bstr = BitArray(floatbe=chrom, length=self._bin_length)
 
             for bit in bit_num:
                 if random.uniform(0, 1) <= self.mutation_prob:
@@ -160,13 +169,13 @@ class RealGA(StandardGA):
 
     def _replace_bits(self, source, target, start, stop):
         """
-        Replace target bits with source bits in interval (start, stop) (both included)
+        Replaces target bits with source bits in interval (start, stop) (both included)
         with the specified crossover probability.
 
         Args:
-            source (float, list): Values in source are used as replacement for target. May be float or list of floats
+            source (float, list): Values in source are used as replacement for target. May be a float or a list of floats
                 in case of multiple dimensions.
-            target (float, list): Values in target are replaced with values in source. May be float or list of floats
+            target (float, list): Values in target are replaced with values in source. May be a float or a list of floats
                 in case of multiple dimensions.
             start (int): Start point of an interval (included).
             stop (int): End point of an interval (included).
