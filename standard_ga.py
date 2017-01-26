@@ -6,18 +6,18 @@ class IndividualGA:
     """
     The class represents an individual of population in GA.
     """
-    def __init__(self, individ, fitness_val):
+    def __init__(self, chromosome, fitness_val):
         """
         A constructor.
 
         Args:
-            individ (float, list): A chromosome represented a solution. The solution
+            chromosome (float, list): A chromosome represented a solution. The solution
                 may be binary encoded in chromosome or be a float or a list of floats
                 in case of dealing with real value solutions. The list contains
                 only positions of bit 1 (according to self.data list) in case of binary encoded solution.
             fitness_val (int): Fitness value of the given chromosome.
         """
-        self.individ = individ
+        self.chromosome = chromosome
         self.fitness_val = fitness_val
 
 
@@ -31,21 +31,21 @@ class StandardGA:
                  cross_prob=0.95, cross_type=1, elitism=True, tournament_size=None):
         """
         Args:
-            fitness_func (function): This function must compute fitness value of a single individual.
-                Function parameters must be: see subclasses.
-            optim (str): What an algorithm must do with fitness value: maximize or minimize. May be 'min' or 'max'.
-                Default is "max".
+            fitness_func (function): This function must compute fitness value of a single chromosome.
+                Function parameters depend on the implemented subclasses of this class.
+            optim (str): What this genetic algorithm must do with fitness value: maximize or minimize.
+                May be 'min' or 'max'. Default is "max".
             selection (str): Parent selection type. May be "rank" (Rank Wheel Selection),
                 "roulette" (Roulette Wheel Selection) or "tournament". Default is "rank".
             tournament_size (int): Defines the size of tournament in case of 'selection' == 'tournament'.
                 Default is None.
-            mut_prob (float): Probability of mutation. Recommended values are 0.5-1%. Default is 0.05.
-            mut_type (int): This parameter defines how many random bits of individual are inverted (mutated).
-                Default is 1.
-            cross_prob (float): Probability of crossover. Recommended values are 80-95%. Default is 0.95.
+            mut_prob (float): Probability of mutation. Recommended values are 0.5-1%. Default is 0.5% (0.05).
+            mut_type (int): This parameter defines mutation type. May be 1 (single-point), 2 (two-point),
+                3 or more (multiple point). Default is 1.
+            cross_prob (float): Probability of crossover. Recommended values are 80-95%. Default is 95% (0.95).
             cross_type (int): This parameter defines crossover type. The following types are allowed:
-                single point (1), two point (2) and multiple point (2 < cross_type <= len(data)).
-                The extreme case of multiple point crossover is uniform one (cross_type == len(data)).
+                single point (1), two point (2) and multiple point (2 < cross_type).
+                The extreme case of multiple point crossover is uniform one (cross_type == all_bits).
                 The specified number of bits (cross_type) are crossed in case of multiple point crossover.
                 Default is 1.
             elitism (True, False): Elitism on/off. Default is True.
@@ -69,18 +69,21 @@ class StandardGA:
         # default is 0
         self._mut_bit_offset = 0
 
-        self.best_individ = None
-        self.best_fitness = numpy.inf
+        self.best_chromosome = None
+        if optim == 'min':
+            self.best_fitness = numpy.inf
+        else:
+            self.best_fitness = -numpy.inf
 
     @property
     def best_solution(self):
         """
-        Returns tuple in the following form: (best individual, best fitness value).
+        Returns tuple in the following form: (best chromosome, its fitness value).
 
         Returns:
-            tuple with the currently best found individual and its fitness value.
+            tuple with the currently best found chromosome and its fitness value.
         """
-        return self.best_individ, self.best_fitness
+        return self.best_chromosome, self.best_fitness
 
     def _check_common_parameters(self):
         """
@@ -88,15 +91,14 @@ class StandardGA:
         """
         if self.fitness_func is None or \
                 self.optim not in ['min', 'max'] or \
-                self.mutation_prob < 0 or self.mutation_prob > 100 or \
+                self.mutation_prob < 0 or self.mutation_prob > 1 or \
                 self.mut_type < 1 or \
-                self.crossover_prob < 0 or self.crossover_prob > 100 or \
+                self.crossover_prob < 0 or self.crossover_prob > 1 or \
                 self.cross_type < 1 or \
                 self.selection not in ["rank", "roulette", "tournament"] or \
                 (self.selection == 'tournament' and self.tournament_size is None) or \
                 self.elitism not in [True, False]:
-            print('Wrong value of input parameter.')
-            raise ValueError
+            raise ValueError('Wrong value of input parameter.')
 
     def _random_diff(self, stop, n, start=0):
         """
@@ -111,14 +113,13 @@ class StandardGA:
              list of different random integer values from the given interval ('start' included)
         """
         if stop - start < n:
-            # there is not enough numbers in the given interval
-            print('There is not enough numbers in the given interval')
-            raise ValueError
+            # there are not enough numbers in the given interval
+            raise ValueError('There is not enough numbers in the given interval.')
         elif stop - start == n:
             # interval size == requested amount of numbers
             return list(range(start, stop))
         else:
-            # requested amount of numbers is lower than the interval size
+            # requested amount of numbers is less than the interval size
             random_number = random.randrange(start, stop)
             used_values = [random_number]
 
@@ -130,41 +131,42 @@ class StandardGA:
 
             return used_values
 
-    def _invert_bit(self, individ, bit_num):
+    def _invert_bit(self, chromosome, bit_num):
         """
         TO BE REIMPLEMENTED IN SUBCLASSES.
-        This function mutates the appropriate bits from bit_num of the individual
+        This function mutates the appropriate bits from *bit_num* of the chromosome
         with the specified mutation probability.
 
         Args:
-            individ (list): An individual of population.
+            chromosome (list, float): An individual of population (chromosome without its fitness value).
             bit_num (list): List of bits' numbers to invert.
 
         Returns:
-            mutated individual
+            mutated chromosome
         """
-        raise NotImplementedError
+        raise NotImplementedError('This function must be reimplemented in subclasses.')
 
-    def _mutate(self, individ):
+    def _mutate(self, chromosome):
         """
-        This function mutates (inverse bits) the given population individual.
+        This function mutates (inverse bits) the given population chromosome.
 
         Args:
-            individ (float, list): float or a list of floats, or a binary encoded combination
+            chromosome (float, list): float or a list of floats, or a binary encoded combination
                 of the original data list (it contains positions of bit 1 according to self.data).
 
         Returns:
-             mutated individual as float, list of floats or binary representation (all with inverted bits)
+             mutated chromosome as float, list of floats or binary representation (any of the mentioned
+                representations with inverted bits)
         """
         if self._bin_length == self.mut_type:
             # it is necessary to mutate all bits with the specified mutation probability
-            individ = self._invert_bit(individ, list(range(self._bin_length)))
+            chromosome = self._invert_bit(chromosome, list(range(self._bin_length)))
         else:
             # mutate some bits (not all)
             inverted_bits = self._random_diff(self._bin_length, self.mut_type, start=self._mut_bit_offset)
-            individ = self._invert_bit(individ, inverted_bits)
+            chromosome = self._invert_bit(chromosome, inverted_bits)
 
-        return individ
+        return chromosome
 
     def _replace_bits(self, source, target, start, stop):
         """
@@ -181,11 +183,11 @@ class StandardGA:
         Returns:
              target with replaced bits with source one in the interval (start, stop) (both included)
         """
-        raise NotImplementedError
+        raise NotImplementedError('This function must be reimplemented in subclasses.')
 
     def _cross(self, parent1, parent2):
         """
-        This function crosses the two given population individuals (parents).
+        This function crosses the two given population chromosomes (parents).
 
         Args:
             parent1 (float, list): float or a list of floats, or a binary encoded combination
@@ -194,23 +196,24 @@ class StandardGA:
                 of the original data list (self.data) of the second parent.
 
         Returns:
-             list: an individual (binary representation, float or a list of floats) created by crossover of two parents
+             child (list, float): a chromosome (binary representation, float or a list of floats) created by the
+                crossover of two parents
         """
         try:
             # a list of floats or binary encoded combination
-            new_individ = list(parent1)
+            new_chromosome = list(parent1)
         except TypeError:
             # a single float
-            new_individ = parent1
+            new_chromosome = parent1
 
         if self.cross_type == self._bin_length:
             # it is necessary to replace all bits with the specified crossover probability
             for bit in range(self._bin_length):
-                new_individ = self._replace_bits(parent2, new_individ, bit, bit)
+                new_chromosome = self._replace_bits(parent2, new_chromosome, bit, bit)
         elif self.cross_type == 1:
             # combine two parts of parents
             random_bit = random.randrange(1, self._bin_length - 1)  # we want to do useful replacements
-            new_individ = self._replace_bits(parent2, new_individ, random_bit + 1, self._bin_length - 1)
+            new_chromosome = self._replace_bits(parent2, new_chromosome, random_bit + 1, self._bin_length - 1)
         elif self.cross_type == 2:
             # replace bits within  an interval of two random generated points
             random_bit1 = random.randrange(self._bin_length)  # we want to do useful replacements
@@ -220,17 +223,17 @@ class StandardGA:
                 random_bit2 = random.randrange(self._bin_length)
 
             if random_bit1 < random_bit2:
-                new_individ = self._replace_bits(parent2, new_individ, random_bit1, random_bit2)
+                new_chromosome = self._replace_bits(parent2, new_chromosome, random_bit1, random_bit2)
             else:
-                new_individ = self._replace_bits(parent2, new_individ, random_bit2, random_bit1)
+                new_chromosome = self._replace_bits(parent2, new_chromosome, random_bit2, random_bit1)
         else:
             # cross some bits exactly (not replacement within an interval)
             cross_bits = self._random_diff(self._bin_length, self.cross_type)
 
             for bit in cross_bits:
-                new_individ = self._replace_bits(parent2, new_individ, bit, bit)
+                new_chromosome = self._replace_bits(parent2, new_chromosome, bit, bit)
 
-        return new_individ
+        return new_chromosome
 
     def _conduct_tournament(self, population, size):
         """
@@ -241,13 +244,13 @@ class StandardGA:
             size (int): Size of a tournament.
 
         Returns:
-            winners (tuple of IndividualGA): winner of current tournament and the second best participant
+            winners (IndividualGA, IndividualGA): winner of current tournament and the second best participant
         """
         population_size = len(population)
 
         if size > population_size or size < 1:
             print('Wrong tournament size:', size)
-            raise ValueError
+            raise ValueError('Wrong tournament size.')
 
         if size == population_size:
             # sort by fitness value in the ascending order (maximization) or descending order (minimization)
@@ -270,20 +273,20 @@ class StandardGA:
 
     def _select_parents(self, population, wheel_sum=None):
         """
-        Selects parents from the given population (sorted in ascending or descending order).
+        Selects parents from the given population.
 
         Args:
-            population (list): Current population, sorted in ascending or descending order,
-                from which parents will be selected. Population element is an IndividualGA object.
+            population (list): Current population from which parents will be selected.
+                Population element is an IndividualGA object.
             wheel_sum (int): Sum of values on a wheel (different for "roulette" and "rank").
 
         Returns:
-            parents (tuple of IndividualGA): selected parents
+            parents (IndividualGA, IndividualGA): selected parents
         """
         if self.selection in ['roulette', 'rank']:
             if wheel_sum is None or wheel_sum < 0:
                 print('Wrong value of wheel sum:', wheel_sum)
-                raise ValueError
+                raise ValueError('Wrong value of wheel sum')
 
             parent1 = None
             parent2 = None
@@ -316,7 +319,7 @@ class StandardGA:
                 return population[best1], population[best2]
         else:
             print('Unknown selection type:', self.selection)
-            raise ValueError
+            raise ValueError('Unknown selection type')
 
     def _sort_population(self):
         """
@@ -332,16 +335,16 @@ class StandardGA:
             # descending order
             self.population.sort(key=lambda x: x.fitness_val, reverse=True)
 
-    def _update_solution(self, individ, fitness_val):
+    def _update_solution(self, chromosome, fitness_val):
         """
         Updates current best solution if the given one is better.
 
         Args:
-            individ (float, list): Individual of a population (binary encoded, float or list of floats).
-            fitness_val (float, int): Fitness value of the given individual.
+            chromosome (float, list): Chromosome of a population (binary encoded, float or list of floats).
+            fitness_val (float, int): Fitness value of the given chromosome.
         """
         if fitness_val < self.best_fitness:
-            self.best_individ = individ
+            self.best_chromosome = chromosome
             self.best_fitness = fitness_val
 
     def _compute_rank_wheel_sum(self, population_size):
@@ -357,19 +360,19 @@ class StandardGA:
         """
         return numpy.cumsum(range(1, population_size + 1))[-1]
 
-    def _compute_fitness(self, individ):
+    def _compute_fitness(self, chromosome):
         """
         TO BE REIMPLEMENTED IN SUBCLASSES.
-        This function computes fitness value of the given individual.
+        This function computes fitness value of the given chromosome.
 
         Args:
-            individ (float, list): An individual of genetic algorithm.
-                Defined fitness function (self.fitness_func) must deal with this individual.
+            chromosome (float, list): A chromosome of genetic algorithm.
+                Defined fitness function (self.fitness_func) must deal with such chromosomes.
 
         Returns:
-            fitness value of the given individual
+            fitness value of the given chromosome
         """
-        raise NotImplementedError
+        raise NotImplementedError('This function must be reimplemented in subclasses.')
 
     def _check_init_random_population(self, *args):
         """
@@ -377,7 +380,7 @@ class StandardGA:
 
         This function verifies the input parameters of a random initialization.
         """
-        raise NotImplementedError
+        raise NotImplementedError('This function must be reimplemented in subclasses.')
 
     def _generate_random_population(self, *args):
         """
@@ -385,64 +388,66 @@ class StandardGA:
 
         This function generates new random population by the given input parameters.
         """
-        raise NotImplementedError
+        raise NotImplementedError('This function must be reimplemented in subclasses.')
 
     def init_population(self, new_population):
         """
-        Initializes population with the given individuals (individual as binary encoded, float or a list of floats)
-        of 'new_population'. The fitness values of these individuals will be computed by a specified fitness function.
+        Initializes population with the given chromosomes (binary encoded, float or a list of floats)
+        of *new_population*. The fitness values of these chromosomes will be computed by a specified fitness function.
 
         It is recommended to have new_population size equal to some squared number (9, 16, 100, 625 etc.)
-        in case of diffusion model of GA. Otherwise some last individuals in the given population will be lost
+        in case of diffusion model of GA. Otherwise some last chromosomes in the specified population will be lost
         as the current implementation works only with square arrays of diffusion model.
 
         Args:
-            new_population (list): New initial population of individuals. A single individual in case of binary GA
+            new_population (list): New initial population of chromosomes. A single chromosome in case of binary GA
                 is represented as a list of bits' positions with value 1 in the following way:
                 LSB (least significant bit) has position (len(self.data) - 1) and
-                MSB (most significant bit) has position 0. If it is a GA on real values, an individual is represented
+                MSB (most significant bit) has position 0. If it is a GA on real values, a chromosome is represented
                 as a float or a list of floats in case of multiple dimensions.
         """
         if not new_population or len(new_population) < 4:
-            print('New population is too few.')
-            raise ValueError
+            raise ValueError('New population is too small.')
 
         self.population = []
-        for individ in new_population:
-            fit_val = self._compute_fitness(individ)
-            self.population.append(IndividualGA(individ, fit_val))
+        for chromosome in new_population:
+            fit_val = self._compute_fitness(chromosome)
+            self.population.append(IndividualGA(chromosome, fit_val))
 
         self._sort_population()
-        self._update_solution(self.population[-1].individ, self.population[-1].fitness_val)
+        self._update_solution(self.population[-1].chromosome, self.population[-1].fitness_val)
 
     def extend_population(self, elem_list):
         """
-        Extends a current population with new elements. Be careful with type of elements
-        in *elem_list*: they must have the same type as elements
-        of a current population (IndividualGA for BinaryGA, a float or a list of floats for RealGA).
+        DOES NOT WORK WITH DIFFUSION GENETIC ALGORITHM.
+
+        Extends a current population with the new elements. Be careful with type of elements
+        in *elem_list*: they must have the same type as elements of a current population,
+        e.g. IndividualGA objects with the *appropriate* chromosome representation
+        (binary encoded for BinaryGA, a float or a list of floats for RealGA).
 
         Args:
-            elem_list (list): New elements of the same type as in the population to be extended.
+            elem_list (list): New elements of the same type (including chromosome representation)
+                as in the current population.
         """
         self.population.extend(elem_list)
 
         self._sort_population()
-        self._update_solution(self.population[-1].individ, self.population[-1].fitness_val)
+        self._update_solution(self.population[-1].chromosome, self.population[-1].fitness_val)
 
     def run(self, max_generation):
         """
-        Starts a standard GA. The algorithm does 'max_generation' generations and then stops.
-        Old population is completely replaced with new one.
+        Starts a standard GA. The algorithm performs 'max_generation' generations and then stops.
+        Old population is completely replaced with a new one.
 
         Args:
             max_generation (int): Maximum number of GA generations.
 
         Returns:
-            list of average fitness values for each generation (including original population)
+            fitness_progress (list): List of average fitness values for each generation (including original population)
         """
         if max_generation < 1:
-            print('Too few generations...')
-            raise ValueError
+            raise ValueError('Too few generations...')
 
         fitness_progress = []
         fitness_sum = -1
@@ -466,11 +471,11 @@ class StandardGA:
                     parent1, parent2 = self._select_parents(self.population)
 
                 # cross parents and mutate a child
-                new_individ = self._mutate(self._cross(parent1.individ, parent2.individ))
+                new_chromosome = self._mutate(self._cross(parent1.chromosome, parent2.chromosome))
                 # compute fitness value of the child
-                fit_val = self._compute_fitness(new_individ)
+                fit_val = self._compute_fitness(new_chromosome)
 
-                next_population.append(IndividualGA(new_individ, fit_val))
+                next_population.append(IndividualGA(new_chromosome, fit_val))
 
             if self.elitism:
                 # copy the best individual to a new generation
@@ -478,7 +483,7 @@ class StandardGA:
 
             self.population = next_population
             self._sort_population()
-            self._update_solution(self.population[-1].individ, self.population[-1].fitness_val)
+            self._update_solution(self.population[-1].chromosome, self.population[-1].fitness_val)
 
         fitness_progress.append(fitness_sum / population_size)
 

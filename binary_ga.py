@@ -14,21 +14,21 @@ class BinaryGA(StandardGA):
         Args:
             data (list): A list with elements whose combination will be binary encoded and
                 evaluated by a fitness function. Minimum amount of elements is 4.
-            fitness_func (function): This function must compute fitness value of an input combination of the given data.
-                Function parameters must be: list of used indices of the given data (from 0), list of data itself.
-            optim (str): What an algorithm must do with fitness value: maximize or minimize. May be 'min' or 'max'.
-                Default is "max".
+            fitness_func (function): This function must compute fitness value of a single chromosome.
+                Function parameters depend on the implemented subclasses of this class.
+            optim (str): What this genetic algorithm must do with fitness value: maximize or minimize.
+                May be 'min' or 'max'. Default is "max".
             selection (str): Parent selection type. May be "rank" (Rank Wheel Selection),
                 "roulette" (Roulette Wheel Selection) or "tournament". Default is "rank".
             tournament_size (int): Defines the size of tournament in case of 'selection' == 'tournament'.
                 Default is None.
-            mut_prob (float): Probability of mutation. Recommended values are 0.5-1%. Default is 0.05.
-            mut_type (int): This parameter defines how many random bits of individual are inverted (mutated).
-                Default is 1.
-            cross_prob (float): Probability of crossover. Recommended values are 80-95%. Default is 0.95.
+            mut_prob (float): Probability of mutation. Recommended values are 0.5-1%. Default is 0.5% (0.05).
+            mut_type (int): This parameter defines mutation type. May be 1 (single-point), 2 (two-point),
+                3 or more (multiple point). Default is 1.
+            cross_prob (float): Probability of crossover. Recommended values are 80-95%. Default is 95% (0.95).
             cross_type (int): This parameter defines crossover type. The following types are allowed:
-                single point (1), two point (2) and multiple point (2 < cross_type <= len(data)).
-                The extreme case of multiple point crossover is uniform one (cross_type == len(data)).
+                single point (1), two point (2) and multiple point (2 < cross_type).
+                The extreme case of multiple point crossover is uniform one (cross_type == all_bits).
                 The specified number of bits (cross_type) are crossed in case of multiple point crossover.
                 Default is 1.
             elitism (True, False): Elitism on/off. Default is True.
@@ -47,32 +47,31 @@ class BinaryGA(StandardGA):
         if self._data is None or self._bin_length < 4 or \
                 self.mut_type > self._bin_length or \
                 self.cross_type > self._bin_length:
-            print('Wrong value of input parameter.')
-            raise ValueError
+            raise ValueError('Wrong value of input parameter.')
 
-    def _invert_bit(self, individ, bit_num):
+    def _invert_bit(self, chromosome, bit_num):
         """
-        This function mutates the appropriate bits from bit_num of the individual
+        This function mutates the appropriate bits from bit_num of the given chromosome
         with the specified mutation probability.
 
         Args:
-            individ (list): Binary encoded individual (it contains positions of bit 1 according to self.data).
+            chromosome (list): Binary encoded chromosome (it contains positions of bit 1 according to self.data).
             bit_num (list): List of bits' numbers to invert.
 
         Returns:
-            mutated individual as binary representation (list)
+            mutated chromosome as binary representation (list)
         """
         for bit in bit_num:
             if random.uniform(0, 1) <= self.mutation_prob:
                 # mutate
-                if bit in individ:
+                if bit in chromosome:
                     # 1 -> 0
-                    individ.remove(bit)
+                    chromosome.remove(bit)
                 else:
                     # 0 -> 1
-                    individ.append(bit)
+                    chromosome.append(bit)
 
-        return individ
+        return chromosome
 
     def _replace_bits(self, source, target, start, stop):
         """
@@ -125,18 +124,18 @@ class BinaryGA(StandardGA):
 
         return target
 
-    def _compute_fitness(self, individ):
+    def _compute_fitness(self, chromosome):
         """
-        This function computes fitness value of the given individual.
+        This function computes fitness value of the given chromosome.
 
         Args:
-            individ (list): A binary encoded individual of genetic algorithm.
-                Defined fitness function (self.fitness_func) must deal with this individual.
+            chromosome (list): A binary encoded chromosome of genetic algorithm.
+                Defined fitness function (self.fitness_func) must deal with this chromosome representation.
 
         Returns:
-            fitness value of the given individual
+            fitness value of the given chromosome
         """
-        return self.fitness_func(individ, self._data)
+        return self.fitness_func(chromosome, self._data)
 
     def _get_bit_positions(self, number):
         """
@@ -175,13 +174,13 @@ class BinaryGA(StandardGA):
 
         if size is None or size < 2 or size >= max_num:
             print('Wrong size of population:', size)
-            raise ValueError
+            raise ValueError('Wrong size of population')
 
         return max_num
 
     def _generate_random_population(self, max_num, size):
         """
-        This function generates new random population by the given input parameters.
+        This function generates a new random population by the given input parameters.
 
         Args:
             max_num (int): Maximum amount of input data combinations.
@@ -208,12 +207,12 @@ class BinaryGA(StandardGA):
 
         self.population = []
         for num in number_list:
-            individ = self._get_bit_positions(num)
-            fit_val = self._compute_fitness(individ)
+            chromosome = self._get_bit_positions(num)
+            fit_val = self._compute_fitness(chromosome)
 
-            self.population.append(IndividualGA(individ, fit_val))
+            self.population.append(IndividualGA(chromosome, fit_val))
 
         self._sort_population()
-        self._update_solution(self.population[-1].individ, self.population[-1].fitness_val)
+        self._update_solution(self.population[-1].chromosome, self.population[-1].fitness_val)
 
 

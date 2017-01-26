@@ -14,21 +14,21 @@ class RealGA(StandardGA):
                  cross_prob=0.95, cross_type=1, elitism=True, tournament_size=None):
         """
         Args:
-            fitness_func (function): This function must compute fitness value of a single individual.
-                Function parameter must be: a single individual.
-            optim (str): What an algorithm must do with fitness value: maximize or minimize. May be 'min' or 'max'.
-                Default is "max".
+            fitness_func (function): This function must compute fitness value of a single chromosome.
+                Function parameters depend on the implemented subclasses of this class.
+            optim (str): What this genetic algorithm must do with fitness value: maximize or minimize.
+                May be 'min' or 'max'. Default is "max".
             selection (str): Parent selection type. May be "rank" (Rank Wheel Selection),
                 "roulette" (Roulette Wheel Selection) or "tournament". Default is "rank".
             tournament_size (int): Defines the size of tournament in case of 'selection' == 'tournament'.
                 Default is None.
-            mut_prob (float): Probability of mutation. Recommended values are 0.5-1%. Default is 0.05.
-            mut_type (int): This parameter defines how many random bits of individual are inverted (mutated).
-                Default is 1.
-            cross_prob (float): Probability of crossover. Recommended values are 80-95%. Default is 0.95.
+            mut_prob (float): Probability of mutation. Recommended values are 0.5-1%. Default is 0.5% (0.05).
+            mut_type (int): This parameter defines mutation type. May be 1 (single-point), 2 (two-point),
+                3 or more (multiple point). Default is 1.
+            cross_prob (float): Probability of crossover. Recommended values are 80-95%. Default is 95% (0.95).
             cross_type (int): This parameter defines crossover type. The following types are allowed:
-                single point (1), two point (2) and multiple point (2 < cross_type <= len(data)).
-                The extreme case of multiple point crossover is uniform one (cross_type == len(data)).
+                single point (1), two point (2) and multiple point (2 < cross_type).
+                The extreme case of multiple point crossover is uniform one (cross_type == all_bits).
                 The specified number of bits (cross_type) are crossed in case of multiple point crossover.
                 Default is 1.
             elitism (True, False): Elitism on/off. Default is True.
@@ -59,57 +59,55 @@ class RealGA(StandardGA):
         elif self._bin_length == 64:
             return 1 + 11
         else:
-            print('Wrong floating point binary length: may be only 32 or 64.')
-            raise ValueError
+            raise ValueError('Wrong floating point binary length: may be only 32 or 64.')
 
     def _check_parameters(self):
         if self._bin_length not in [32, 64] or \
                 self.mut_type > self._bin_length or \
                 self.cross_type > self._bin_length:
-            print('Wrong value of input parameter.')
-            raise ValueError
+            raise ValueError('Wrong value of input parameter.')
 
-    def _is_individ_list(self, individ):
+    def _is_chromosome_list(self, chromosome):
         """
-        This function returns True iff individ is a list (even list of just 1 element),
+        This function returns True iff chromosome is a list (even list of just 1 element),
         otherwise False.
 
         Args:
-            individ (float, list): An individual of GA population. May be float or a list of floats.
+            chromosome (float, list): A chromosome of GA population. May be float or a list of floats.
 
         Returns:
-            True iff the given individual is a list (even a list of just 1 element), otherwise False.
+            True iff the given chromosome is a list (even a list of just 1 element), otherwise False.
         """
         try:
-            list(individ)
+            list(chromosome)
             return True  # it is a list
         except TypeError:
             return False  # it is a single number
 
-    def _get_individ_return_value(self, individ):
+    def _get_chromosome_return_value(self, chromosome):
         """
-        This function returns a vector (individual as list of floats) or a single float
-        depending on number of elements in the given individual.
+        This function returns a vector (chromosome as a list of floats) or a single float
+        depending on number of elements in the given chromosome.
 
         Args:
-            individ (list): This list contains a single float or represents a vector of floats.
+            chromosome (list): This list contains a single float or represents a vector of floats.
 
         Returns:
-            individ[0] iff there is only 1 element in the list, otherwise individ
+            chromosome[0] iff there is only 1 element in the list, otherwise chromosome
         """
-        if len(individ) > 1:
-            return individ
+        if len(chromosome) > 1:
+            return chromosome
         else:
-            return individ[0]
+            return chromosome[0]
 
     def _adjust_to_interval(self, var):
         """
         This function checks if *var* is NaN, inf, -inf by numpy.nan_to_num() and then
-        returns *var* if it is within the interval. Otherwise returns lower bound of the interval
+        returns *var* if it is within the specified interval. Otherwise returns lower bound of the interval
         if *var* < lower bound or upper bound of the interval if *var* > upper bound.
 
         Args:
-            var (list, float): Float or list of floats to adjust to the specified interval.
+            var (list, float): A float or a list of floats to adjust to the specified interval.
 
         Returns:
             adjusted input parameter
@@ -126,29 +124,29 @@ class RealGA(StandardGA):
 
         return var
 
-    def _invert_bit(self, individ, bit_num):
+    def _invert_bit(self, chromosome, bit_num):
         """
-        This function mutates the appropriate bits from bit_num of the individual
+        This function mutates the appropriate bits from bit_num of the chromosome
         with the specified mutation probability. The function mutates bit_num's bits of all floats
-        in a list represented individual in case of multiple dimensions.
+        in a list represented chromosome in case of multiple dimensions.
 
         Args:
-            individ (float, list): A single float or a list of floats in case of multiple dimensions.
+            chromosome (float, list): A single float or a list of floats in case of multiple dimensions.
             bit_num (list): List of bits' numbers to invert.
 
         Returns:
-            mutated individual (float, list)
+            mutated chromosome (float, list)
         """
-        mutated_individ = []
+        mutated_chromosome = []
 
-        is_vector = self._is_individ_list(individ)
+        is_vector = self._is_chromosome_list(chromosome)
         if is_vector:
-            origin_individ = individ
+            origin_chromosome = chromosome
         else:
             # it is a single float, not a list
-            origin_individ = [individ]
+            origin_chromosome = [chromosome]
 
-        for ind in origin_individ:
+        for ind in origin_chromosome:
             bstr = BitArray(floatbe=ind, length=self._bin_length)
 
             for bit in bit_num:
@@ -156,9 +154,9 @@ class RealGA(StandardGA):
                     # mutate
                     bstr[bit] = not bstr[bit]
 
-            mutated_individ.append(bstr.floatbe)
+            mutated_chromosome.append(bstr.floatbe)
 
-        return self._adjust_to_interval(self._get_individ_return_value(mutated_individ))
+        return self._adjust_to_interval(self._get_chromosome_return_value(mutated_chromosome))
 
     def _replace_bits(self, source, target, start, stop):
         """
@@ -174,14 +172,14 @@ class RealGA(StandardGA):
             stop (int): End point of an interval (included).
 
         Returns:
-             target (float, list) with replaced bits with source one in the interval (start, stop) (both included)
+             target (float, list): Target with replaced bits with source one in the interval (start, stop) (both included).
         """
         if start < 0 or start >= self._bin_length or \
                 stop < 0 or stop < start or stop >= self._bin_length:
             print('Interval error:', '(' + str(start) + ', ' + str(stop) + ')')
-            raise ValueError
+            raise ValueError('Interval error')
 
-        is_vector = self._is_individ_list(source)
+        is_vector = self._is_chromosome_list(source)
         if is_vector:
             origin_source = source
             origin_target = target
@@ -204,28 +202,28 @@ class RealGA(StandardGA):
 
             child.append(bstr_target.floatbe)
 
-        return self._adjust_to_interval(self._get_individ_return_value(child))
+        return self._adjust_to_interval(self._get_chromosome_return_value(child))
 
-    def _compute_fitness(self, individ):
+    def _compute_fitness(self, chromosome):
         """
-        This function computes fitness value of the given individual.
+        This function computes fitness value of the given chromosome.
 
         Args:
-            individ (float, list): An individual of genetic algorithm. May be a single float
+            chromosome (float, list): A chromosome of genetic algorithm. May be a single float
                 or a list of floats in case of multiple dimensions. Defined fitness function (self.fitness_func)
-                must deal with this individual.
+                must deal with this chromosome representation.
 
         Returns:
-            fitness value of the given individual
+            fitness value of the given chromosome
         """
-        return self.fitness_func(individ)
+        return self.fitness_func(chromosome)
 
     def _check_init_random_population(self, size, dim, interval):
         """
         This function verifies the input parameters of a random initialization.
 
         Args:
-            size (int): Size of a new population to verify.
+            size (int): Size of a new population.
             dim (int): Amount of space dimensions.
             interval (tuple): The generated numbers of each dimension will be
                 within this interval (start point included, end point excluded).
@@ -233,12 +231,11 @@ class RealGA(StandardGA):
         """
         if size is None or dim is None or interval is None or \
                         size < 2 or dim < 1 or interval[0] >= interval[1]:
-            print('Wrong value of input parameter.')
-            raise ValueError
+            raise ValueError('Wrong value of input parameter.')
 
     def _generate_random_population(self, size, dim, interval):
         """
-        This function generates new random population by the given input parameters.
+        This function generates a new random population by the given input parameters.
 
         Args:
             size (int): Size of a new population.
@@ -247,7 +244,7 @@ class RealGA(StandardGA):
                 within this interval (start point included, end point excluded).
 
         Returns:
-            array (numpy.array): Array rows represents individuals. Number of columns is specified
+            array (numpy.array): Array rows represent chromosomes. Number of columns is specified
                 with *dim* parameter.
         """
         self.interval = interval
@@ -255,9 +252,9 @@ class RealGA(StandardGA):
 
     def init_random_population(self, size, dim, interval):
         """
-        Initializes a new random population of the given size with individual's values
+        Initializes a new random population of the given size with chromosomes' values
         within the given interval (start point included, end point excluded)
-        with the given amount of dimensions.
+        with the specified amount of dimensions.
 
         Args:
             size (int): Size of a new random population.
@@ -268,18 +265,18 @@ class RealGA(StandardGA):
         self._check_init_random_population(size, dim, interval)
 
         # generate population
-        individs = self._generate_random_population(size, dim, interval)
+        chromosomes = self._generate_random_population(size, dim, interval)
 
         self.population = []
-        for ind in individs:
+        for chrom in chromosomes:
             if dim == 1:
-                individ = ind[0]
+                chromosome = chrom[0]
             else:
-                individ = ind
+                chromosome = chrom
 
-            fit_val = self._compute_fitness(individ)
+            fit_val = self._compute_fitness(chromosome)
 
-            self.population.append(IndividualGA(individ, fit_val))
+            self.population.append(IndividualGA(chromosome, fit_val))
 
         self._sort_population()
-        self._update_solution(self.population[-1].individ, self.population[-1].fitness_val)
+        self._update_solution(self.population[-1].chromosome, self.population[-1].fitness_val)

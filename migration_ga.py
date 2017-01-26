@@ -50,7 +50,7 @@ class MigrationGA:
 
         Returns:
             best_solution (tuple): Best solution across all GA instances
-                as (best individual, best fitness value).
+                as (best chromosome, its fitness value).
         """
         if self._optim == 'min':
             # minimization
@@ -68,21 +68,26 @@ class MigrationGA:
         return best_solution
 
     def run(self, max_generation, period=1, migrant_num=1, cloning=True, migrate=True):
+        # TODO doctest examples
         """
         Runs a migration model of GA.
 
         Args:
             max_generation (int): Maximum number of GA generations.
-            period (int): How often performs migration. Must be less than or equal to *max_generation*.
+            period (int): How often migration must be performed. Must be less than or equal to *max_generation*.
             migrant_num (int): How many best migrants will travel to all another populations.
             cloning (True, False): Can migrants clone? If False, an original population will not have
                 its migrants after a migration. Otherwise, clones of migrants will remain
                 in their original population after the migration of originals.
+            migrate (True, False): Turns on/off migration process. It is useful in case of running GA by
+                only *one* generation so *period* must be also set to 1, but you want to perform migration with period
+                greater than 1 and thus, set migrate initially to False and set it to True when you actually want
+                the algorithm to perform migration. This was used in benchmarking by COCO BBOB platform.
 
         Returns:
              fitness_progress, best_solution (tuple): *fitness_progress* contains lists of average fitness
                 value of each generation for each specified GA instance. *best_solution* is the best solution
-                across all GA instances as in form (best individual, best fitness value).
+                across all GA instances as in form (best chromosome, its fitness value).
         """
         if max_generation < 1 or period > max_generation or \
                         migrant_num < 1 or cloning not in [True, False]:
