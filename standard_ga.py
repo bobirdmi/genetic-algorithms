@@ -15,7 +15,7 @@ class IndividualGA:
                 may be binary encoded in chromosome or be a float or a list of floats
                 in case of dealing with real value solutions. The list contains
                 only positions of bit 1 (according to self.data list) in case of binary encoded solution.
-            fitness_val (int): Fitness value of the given chromosome.
+            fitness_val (float, int): Fitness value of the given chromosome.
         """
         self.chromosome = chromosome
         self.fitness_val = fitness_val
@@ -156,7 +156,7 @@ class StandardGA:
 
         Returns:
              mutated chromosome as float, list of floats or binary representation (any of the mentioned
-                representations with inverted bits)
+                representations with inverted bits depending on subclass)
         """
         if self._bin_length == self.mut_type:
             # it is necessary to mutate all bits with the specified mutation probability
@@ -237,27 +237,35 @@ class StandardGA:
 
     def _conduct_tournament(self, population, size):
         """
-        Conducts a tournament of the given size within the specified population.
+        Conducts a tournament of the given size within the specified population. The population must be
+        sorted by chromosome's fitness value the following way: the last population elements are the best.
 
         Args:
-            population (list): All possible competitors. Population element is an IndividualGA object.
-            size (int): Size of a tournament.
+            population (list): All possible competitors. Size of the population must be at least 2.
+                Population element is an IndividualGA object.
+            size (int): Size of a tournament. It will be set to the whole population,
+                if it is greater than the given population size.
 
         Returns:
-            winners (IndividualGA, IndividualGA): winner of current tournament and the second best participant
+            winners (int, int): indices of a winner of the current tournament and the second best participant
         """
-        population_size = len(population)
+        if size < 1 or population is None:
+            raise ValueError('Wrong input parameter.')
 
-        if size > population_size or size < 1:
-            print('Wrong tournament size:', size)
-            raise ValueError('Wrong tournament size.')
+        try:
+            population_size = len(population)
+        except TypeError:
+            raise ValueError('Population must be a list.')
+
+        if population_size < 1:
+            raise ValueError('Too small population.')
+
+        if size > population_size:
+            size = population_size
 
         if size == population_size:
-            # sort by fitness value in the ascending order (maximization) or descending order (minimization)
-            if self.optim == 'max':
-                competitors = list(range(population_size))
-            else:
-                competitors = list(range(population_size - 1, 0, -1))
+            # the population is already sorted and tournament is conducted across the whole population
+            competitors = list(range(population_size))
         else:
             competitors = self._random_diff(population_size, size)
             # sort by fitness value in the ascending order (maximization) or descending order (minimization)
@@ -278,13 +286,13 @@ class StandardGA:
         Args:
             population (list): Current population from which parents will be selected.
                 Population element is an IndividualGA object.
-            wheel_sum (int): Sum of values on a wheel (different for "roulette" and "rank").
+            wheel_sum (float): Sum of values on a wheel (different for "roulette" and "rank").
 
         Returns:
             parents (IndividualGA, IndividualGA): selected parents
         """
         if self.selection in ['roulette', 'rank']:
-            if wheel_sum is None or wheel_sum < 0:
+            if wheel_sum is None or wheel_sum <= 0:
                 print('Wrong value of wheel sum:', wheel_sum)
                 raise ValueError('Wrong value of wheel sum')
 
@@ -313,7 +321,7 @@ class StandardGA:
             best1, second1 = self._conduct_tournament(population, self.tournament_size)
             best2, second2 = self._conduct_tournament(population, self.tournament_size)
 
-            if population[best1].individ == population[best2].individ:
+            if population[best1].chromosome == population[best2].chromosome:
                 return population[best1], population[second2]
             else:
                 return population[best1], population[best2]
@@ -323,8 +331,8 @@ class StandardGA:
 
     def _sort_population(self):
         """
-        Sorts self.population according to self.optim ("min" or "max") in such way
-        that the last element of the population in both cases is an individual with the best fitness value.
+        Sorts self.population according to *self.optim* ("min" or "max") in such way
+        that the last element of the population in both cases is the chromosome with the best fitness value.
         """
         if self.optim == 'max':
             # an algorithm maximizes a fitness value
@@ -343,7 +351,8 @@ class StandardGA:
             chromosome (float, list): Chromosome of a population (binary encoded, float or list of floats).
             fitness_val (float, int): Fitness value of the given chromosome.
         """
-        if fitness_val < self.best_fitness:
+        if self.optim == 'min' and fitness_val < self.best_fitness\
+                or self.optim == 'max' and fitness_val > self.best_fitness:
             self.best_chromosome = chromosome
             self.best_fitness = fitness_val
 
@@ -356,7 +365,7 @@ class StandardGA:
             population_size (int): Size of a population.
 
         Returns:
-            sum of a wheel for the given population size
+            sum of the wheel for the given population size
         """
         return numpy.cumsum(range(1, population_size + 1))[-1]
 
@@ -390,27 +399,28 @@ class StandardGA:
         """
         raise NotImplementedError('This function must be reimplemented in subclasses.')
 
-    def init_population(self, new_population):
+    def init_population(self, chromosomes):
         """
-        Initializes population with the given chromosomes (binary encoded, float or a list of floats)
-        of *new_population*. The fitness values of these chromosomes will be computed by a specified fitness function.
+        Initializes a population with the given chromosomes (binary encoded, float or a list of floats).
+        The fitness values of these chromosomes will be computed by a specified fitness function.
 
-        It is recommended to have new_population size equal to some squared number (9, 16, 100, 625 etc.)
-        in case of diffusion model of GA. Otherwise some last chromosomes in the specified population will be lost
-        as the current implementation works only with square arrays of diffusion model.
+        It is recommended to have an amount of chromosomes equal to some squared number (9, 16, 100, 625 etc.)
+        in case of diffusion model of GA. Otherwise some last chromosomes will be lost
+        as the current implementation supports only square arrays of diffusion model.
 
         Args:
-            new_population (list): New initial population of chromosomes. A single chromosome in case of binary GA
+            chromosomes (list): Chromosomes of a new population. A single chromosome in case of binary GA
                 is represented as a list of bits' positions with value 1 in the following way:
                 LSB (least significant bit) has position (len(self.data) - 1) and
                 MSB (most significant bit) has position 0. If it is a GA on real values, a chromosome is represented
-                as a float or a list of floats in case of multiple dimensions.
+                as a float or a list of floats in case of multiple dimensions. Size of *chromosomes* list must be
+                at least 4.
         """
-        if not new_population or len(new_population) < 4:
+        if not chromosomes or len(chromosomes) < 4:
             raise ValueError('New population is too small.')
 
         self.population = []
-        for chromosome in new_population:
+        for chromosome in chromosomes:
             fit_val = self._compute_fitness(chromosome)
             self.population.append(IndividualGA(chromosome, fit_val))
 
