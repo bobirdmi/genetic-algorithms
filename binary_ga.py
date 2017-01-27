@@ -18,7 +18,7 @@ class BinaryGA(StandardGA):
                 Function template is the following: *compute_fitness(chromosome, data) -> float*. Parameter *chromosome*
                 is binary encoded the following way: it contains only positions of bit 1 according to *self.data*.
                 Positions are indexed from left to right so the leftmost position is 0. Parameter *data* is
-                the input data parameter from this constructor. The returned value of the this fitness function
+                the input *data* parameter from this constructor. The returned value of the fitness function
                 must be a single number.
             optim (str): What this genetic algorithm must do with fitness value: maximize or minimize.
                 May be 'min' or 'max'. Default is "max".
@@ -27,8 +27,8 @@ class BinaryGA(StandardGA):
             tournament_size (int): Defines the size of tournament in case of 'selection' == 'tournament'.
                 Default is None.
             mut_prob (float): Probability of mutation. Recommended values are 0.5-1%. Default is 0.5% (0.05).
-            mut_type (int): This parameter defines mutation type. May be 1 (single-point), 2 (two-point),
-                3 or more (multiple point). Default is 1.
+            mut_type (int): This parameter defines how many chromosome bits will be mutated.
+                May be 1 (single-point), 2 (two-point), 3 or more (multiple point). Default is 1.
             cross_prob (float): Probability of crossover. Recommended values are 80-95%. Default is 95% (0.95).
             cross_type (int): This parameter defines crossover type. The following types are allowed:
                 single point (1), two point (2) and multiple point (2 < cross_type).
@@ -40,10 +40,11 @@ class BinaryGA(StandardGA):
         super().__init__(fitness_func, optim, selection,
                          mut_prob, mut_type, cross_prob, cross_type,
                          elitism, tournament_size)
-        self._data = data
-
-        if self._data is not None:
+        if data is not None:
+            self._data = list(data)
             self._bin_length = len(self._data)
+        else:
+            self._data = None
 
         self._check_parameters()
 
@@ -55,7 +56,7 @@ class BinaryGA(StandardGA):
 
     def _invert_bit(self, chromosome, bit_num):
         """
-        This function mutates the appropriate bits from bit_num of the given chromosome
+        This function mutates the appropriate bits of the given chromosome from *bit_num*
         with the specified mutation probability.
 
         Args:
@@ -63,7 +64,8 @@ class BinaryGA(StandardGA):
             bit_num (list): List of bits' numbers to invert.
 
         Returns:
-            mutated chromosome as binary representation (list)
+            mutant (list): mutated chromosome as binary representation of *self.data* (it contains positions
+                of bit 1)
         """
         for bit in bit_num:
             if random.uniform(0, 1) <= self.mutation_prob:
@@ -79,17 +81,17 @@ class BinaryGA(StandardGA):
 
     def _replace_bits(self, source, target, start, stop):
         """
-        Replace target bits with source bits in interval (start, stop) (both included)
+        Replaces target bits with source bits in interval (start, stop) (both included)
         with the specified crossover probability.
 
         Args:
             source (list): Values in source are used as replacement for target.
             target (list): Values in target are replaced with values in source.
-            start (int): Start point of an interval (included).
-            stop (int): End point of an interval (included).
+            start (int): Start point of interval (included).
+            stop (int): End point of interval (included).
 
         Returns:
-             target with replaced bits with source one in the interval (start, stop) (both included)
+             target with replaced bits in the interval (start, stop) (both included)
         """
         if start < 0 or start >= self._bin_length or \
                 stop < 0 or stop < start or stop >= self._bin_length:
@@ -143,7 +145,7 @@ class BinaryGA(StandardGA):
 
     def _get_bit_positions(self, number):
         """
-        This function gets a decimal integer number and returns positions of bit 1 in
+        This function receives a positive decimal integer number and returns positions of bit 1 in
         its binary representation. However, these positions are transformed the following way: they
         are mapped on the data list (*self.data*) "as is". It means that LSB (least significant bit) is
         mapped on the last position of the data list (e.g. *self._bin_length* - 1), MSB is mapped on
@@ -154,8 +156,11 @@ class BinaryGA(StandardGA):
 
         Returns:
              list of positions with bit 1 (these positions are mapped on the input data list "as is" and thus,
-             LSB is equal to index (self._bin_length - 1) of the input data list).
+             LSB is equal to index (*self._bin_length* - 1) of the input data list).
         """
+        if number < 0:
+            raise ValueError('The input number must be positive (0+)!')
+
         binary_list = []
 
         for i in range(self._bin_length):
@@ -166,17 +171,17 @@ class BinaryGA(StandardGA):
 
     def _check_init_random_population(self, size):
         """
-        This function verifies the input parameters of a random initialization.
+        This function verifies the input parameter of a random initialization.
 
         Args:
-            size (int): Size of a new population to verify.
+            size (int): Size of a new population to check.
 
         Returns:
             max_num (int): Maximum amount of the input data combinations.
         """
         max_num = 2 ** self._bin_length
 
-        if size is None or size < 2 or size >= max_num:
+        if size is None or size < 4 or size >= max_num:
             print('Wrong size of population:', size)
             raise ValueError('Wrong size of population')
 
@@ -187,11 +192,11 @@ class BinaryGA(StandardGA):
         This function generates a new random population by the given input parameters.
 
         Args:
-            max_num (int): Maximum amount of input data combinations.
+            max_num (int): Maximum amount of the input data combinations.
             size (int): Size of a new population.
 
         Returns:
-            population (list): list if integers in interval [1, maxnum) that represents binary encoded
+            population (list): list if integers in interval [1, maxnum) that represents a binary encoded
                 combination.
         """
         return self._random_diff(max_num, size, start=1)
@@ -201,8 +206,8 @@ class BinaryGA(StandardGA):
         Initializes a new random population of the given size.
 
         Args:
-            size (int): Size of a new random population. Must be greater than 2 and less than the amount
-                of all possible combinations of input data.
+            size (int): Size of a new random population. Must be greater than 3 and less than the amount
+                of all possible combinations of the input data.
         """
         max_num = self._check_init_random_population(size)
 

@@ -1,10 +1,10 @@
 import pytest
-import math
 import numpy
 from bitstring import BitArray
 
 from real_ga import RealGA
 from standard_ga import IndividualGA
+from helper_functions import *
 
 
 test_chromosomes = [0.0, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
@@ -14,28 +14,8 @@ test_best_max_ind = (1.5, 0.9974949866040544)
 unsorted_population = [IndividualGA(1, 3), IndividualGA(1, 1), IndividualGA(1, 2), IndividualGA(1, 7), IndividualGA(1, 6)]
 
 
-def fitness_test_sin_func(chromosome):
-    return math.sin(chromosome)
-
-
 def fitness_test_linear_func(chromosome):
     return chromosome*2
-
-
-def sort_population(optim, population):
-    """
-    Sorts population if IndividualGA objects.
-    """
-    if optim == 'max':
-        # an algorithm maximizes a fitness value
-        # ascending order
-        population.sort(key=lambda x: x.fitness_val)
-    else:
-        # an algorithm minimizes a fitness value
-        # descending order
-        population.sort(key=lambda x: x.fitness_val, reverse=True)
-
-    return population
 
 
 def test_invalid_bin_length():
@@ -117,29 +97,6 @@ def test_adjust_to_interval(var, expected):
     except ValueError:
         result_arr = ga._adjust_to_interval(var) == expected
         assert result_arr.all()
-
-
-@pytest.mark.parametrize('optim', ('min', 'max'))
-def test_init_population(optim):
-    chromosomes = list(test_chromosomes)
-    expected_population = []
-    for chromosome in chromosomes:
-        expected_population.append(IndividualGA(chromosome, fitness_test_sin_func(chromosome)))
-
-    expected_population = sort_population(optim, expected_population)
-
-    ga = RealGA(fitness_test_sin_func, optim=optim)
-    ga.init_population(test_chromosomes)
-
-    best_solution = ga.best_solution
-
-    if optim == 'min':
-        assert test_best_min_ind[0] == best_solution[0]
-    else:
-        assert test_best_max_ind[0] == best_solution[0]
-
-    for actual, expected in zip(ga.population, expected_population):
-        assert actual.chromosome == expected.chromosome
 
 
 @pytest.mark.parametrize(['num', 'bit_num'],

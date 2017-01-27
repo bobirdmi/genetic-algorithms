@@ -350,8 +350,8 @@ class StandardGA:
             chromosome (float, list): Chromosome of a population (binary encoded, float or list of floats).
             fitness_val (float, int): Fitness value of the given chromosome.
         """
-        if self.optim == 'min' and fitness_val < self.best_fitness\
-                or self.optim == 'max' and fitness_val > self.best_fitness:
+        if (self.optim == 'min' and fitness_val < self.best_fitness)\
+                or (self.optim == 'max' and fitness_val > self.best_fitness):
             self.best_chromosome = chromosome
             self.best_fitness = fitness_val
 
@@ -446,8 +446,8 @@ class StandardGA:
 
     def run(self, max_generation):
         """
-        Starts a standard GA. The algorithm performs 'max_generation' generations and then stops.
-        Old population is completely replaced with a new one.
+        Starts a standard GA. The algorithm performs *max_generation* generations and then stops.
+        Old population is completely replaced with a new computed one in each generation.
 
         Args:
             max_generation (int): Maximum number of GA generations.

@@ -23,8 +23,8 @@ class RealGA(StandardGA):
             tournament_size (int): Defines the size of tournament in case of 'selection' == 'tournament'.
                 Default is None.
             mut_prob (float): Probability of mutation. Recommended values are 0.5-1%. Default is 0.5% (0.05).
-            mut_type (int): This parameter defines mutation type. May be 1 (single-point), 2 (two-point),
-                3 or more (multiple point). Default is 1.
+            mut_type (int): This parameter defines how many chromosome bits will be mutated.
+                May be 1 (single-point), 2 (two-point), 3 or more (multiple point). Default is 1.
             cross_prob (float): Probability of crossover. Recommended values are 80-95%. Default is 95% (0.95).
             cross_type (int): This parameter defines crossover type. The following types are allowed:
                 single point (1), two point (2) and multiple point (2 < cross_type).
