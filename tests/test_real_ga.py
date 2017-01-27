@@ -14,10 +14,6 @@ test_best_max_ind = (1.5, 0.9974949866040544)
 unsorted_population = [IndividualGA(1, 3), IndividualGA(1, 1), IndividualGA(1, 2), IndividualGA(1, 7), IndividualGA(1, 6)]
 
 
-def fitness_test_linear_func(chromosome):
-    return chromosome*2
-
-
 def test_invalid_bin_length():
     ga = RealGA(fitness_test_sin_func)
     ga._bin_length = 128
@@ -224,7 +220,45 @@ def test_init_random_population(optim):
             assert ga.population[0].fitness_val >= ga.population[i].fitness_val
 
 
+@pytest.mark.parametrize('optim', ('min', 'max'))
+def test_valid_init_population(optim):
+    chromosomes = list(test_chromosomes)
+    expected_population = []
+    for chromosome in chromosomes:
+        expected_population.append(IndividualGA(chromosome, fitness_test_sin_func(chromosome)))
+
+    expected_population = sort_population(optim, expected_population)
+
+    ga = RealGA(fitness_test_sin_func, optim=optim)
+    interval = (-10, 10)
+    ga.init_population(test_chromosomes, interval)
+
+    assert ga.interval == interval
+
+    best_solution = ga.best_solution
+    if optim == 'min':
+        assert test_best_min_ind[0] == best_solution[0]
+    else:
+        assert test_best_max_ind[0] == best_solution[0]
+
+    for actual, expected in zip(ga.population, expected_population):
+        assert actual.chromosome == expected.chromosome
 
 
+def test_invalid_init_population():
+    optim = 'min'
+
+    chromosomes = list(test_chromosomes)
+    expected_population = []
+    for chromosome in chromosomes:
+        expected_population.append(IndividualGA(chromosome, fitness_test_sin_func(chromosome)))
+
+    expected_population = sort_population(optim, expected_population)
+
+    ga = RealGA(fitness_test_sin_func, optim=optim)
+    interval = (10, 4)
+
+    with pytest.raises(ValueError):
+        ga.init_population(test_chromosomes, interval)
 
 

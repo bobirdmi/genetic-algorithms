@@ -5,44 +5,49 @@ import copy
 class MigrationGA:
     """
     This class implements migration model of GA, namely island model (not stepping-stone).
-    It can work with binary or real GA.
+    It works with binary or real GA.
     """
     def __init__(self, type='binary'):
         """
         A constructor.
 
         Args:
-            type (str): Type of genetic algorithm: may be 'binary' or 'real'.
+            type (str): Type of genetic algorithm: may be 'binary' or 'real'. Default is 'binary'.
         """
         self.type = type
-        self.population_list = None
-        self._population_size = None
+        self.ga_list = None
+        self._ga_list_size = None
         self._optim = None
+        self._min_elements = numpy.inf
 
         self._check_parameters()
 
     def _check_parameters(self):
         if self.type not in ['binary', 'real']:
-            print('Wrong value of input parameter.')
-            raise ValueError
+            raise ValueError('Wrong value of input parameter.')
 
-    def init_populations(self, population_list):
+    def init_populations(self, ga_list):
         # TODO doctest examples
         """
-        This function initializes migration model of GA.
+        This function initializes migration model of GA. Type of optimization ('min' or 'max')
+        will be set to the same value of the first given GA instance. Valid GA instances are
+        RealGA and BinaryGA.
 
         Args:
-            population_list (list): List of BinaryGA (or RealGA) instances with already initialized
+            ga_list (list): List of BinaryGA (or RealGA) instances with already initialized
                 populations.
         """
-        self._population_size = len(population_list)
+        self._ga_list_size = len(ga_list)
 
-        if self._population_size < 2:
-            print('Too few populations.')
-            raise ValueError
+        if self._ga_list_size < 2:
+            raise ValueError('Too few populations.')
 
-        self.population_list = copy.deepcopy(population_list)
-        self._optim = population_list[0].optim
+        for ga_inst in ga_list:
+            if len(ga_inst.population) < self._min_elements:
+                self._min_elements = len(ga_inst.population)
+
+        self.ga_list = copy.deepcopy(ga_list)
+        self._optim = ga_list[0].optim
 
     def _compare_solutions(self):
         """
@@ -55,13 +60,13 @@ class MigrationGA:
         if self._optim == 'min':
             # minimization
             best_solution = (None, numpy.inf)
-            for ga_inst in self.population_list:
+            for ga_inst in self.ga_list:
                 if ga_inst.best_solution[1] < best_solution[1]:
                     best_solution = ga_inst.best_solution
         else:
             # maximization
             best_solution = (None, -numpy.inf)
-            for ga_inst in self.population_list:
+            for ga_inst in self.ga_list:
                 if ga_inst.best_solution[1] > best_solution[1]:
                     best_solution = ga_inst.best_solution
 
@@ -89,21 +94,27 @@ class MigrationGA:
                 value of each generation for each specified GA instance. *best_solution* is the best solution
                 across all GA instances as in form (best chromosome, its fitness value).
         """
-        if max_generation < 1 or period > max_generation or \
-                        migrant_num < 1 or cloning not in [True, False]:
-            print('Wrong value of input parameter.')
-            raise ValueError
+        if max_generation < 1 or period > max_generation or period < 1 or\
+                        migrant_num < 1 or migrant_num > self._min_elements or\
+                        cloning not in [True, False] or migrate not in [True, False]:
+            raise ValueError('Wrong value of the input parameter.')
 
         cycle = max_generation // period
-        fitness_progress = [[] for i in range(self._population_size)]
+        fitness_progress = [[] for i in range(self._ga_list_size)]
 
         for c in range(cycle):
-            migrant_list = [[] for i in range(self._population_size)]
+            migrant_list = [[] for i in range(self._ga_list_size)]
 
-            for ga_inst, index in zip(self.population_list, range(self._population_size)):
+            for ga_inst, index in zip(self.ga_list, range(self._ga_list_size)):
                 # run standard GA and store average fitness progress
                 fit_prog = ga_inst.run(period)
-                fitness_progress[index].extend(fit_prog)
+
+                if c < cycle - 1:
+                    # the current fitness progress has the last value of the previous one
+                    # we don't need the last fitness value twice
+                    fitness_progress[index].extend(fit_prog[:-1])
+                else:
+                    fitness_progress[index].extend(fit_prog)
 
                 if migrate:
                     for m in range(-migrant_num, 0, 1):
@@ -115,11 +126,11 @@ class MigrationGA:
 
             # perform migration
             if migrate:
-                for ga_inst, index in zip(self.population_list, range(self._population_size)):
+                for ga_inst, index in zip(self.ga_list, range(self._ga_list_size)):
                     # TODO
                     # del ga_inst.population[:migrant_num]  # uncomment for benchmarking on 2 populations
                     
-                    for idx in range(self._population_size):
+                    for idx in range(self._ga_list_size):
                         if idx != index:
                             ga_inst.extend_population(migrant_list[idx])
 

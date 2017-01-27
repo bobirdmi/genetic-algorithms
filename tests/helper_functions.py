@@ -5,6 +5,10 @@ def fitness_test_sin_func(chromosome):
     return math.sin(chromosome)
 
 
+def fitness_test_linear_func(chromosome):
+    return chromosome*2
+
+
 def sort_population(optim, population):
     """
     Sorts population if IndividualGA objects.

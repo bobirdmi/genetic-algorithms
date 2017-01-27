@@ -398,7 +398,7 @@ class StandardGA:
         """
         raise NotImplementedError('This function must be reimplemented in subclasses.')
 
-    def init_population(self, chromosomes):
+    def init_population(self, chromosomes, interval=None):
         """
         Initializes a population with the given chromosomes (binary encoded, float or a list of floats).
         The fitness values of these chromosomes will be computed by a specified fitness function.
@@ -414,9 +414,17 @@ class StandardGA:
                 MSB (most significant bit) has position 0. If it is a GA on real values, a chromosome is represented
                 as a float or a list of floats in case of multiple dimensions. Size of *chromosomes* list must be
                 at least 4.
+            interval (tuple): An interval in which we are searching the best solution.
+                Must be specified in case of RealGA.
         """
         if not chromosomes or len(chromosomes) < 4:
             raise ValueError('New population is too small.')
+
+        if not hasattr(self, '_data'):
+            if interval is None or interval[0] >= interval[1]:
+                raise ValueError('You must specify a correct interval for RealGA.')
+
+            self.interval = interval
 
         self.population = []
         for chromosome in chromosomes:

@@ -230,14 +230,6 @@ def test_select_parents_unknown_type():
         ga._select_parents([])
 
 
-@pytest.mark.parametrize('chromosomes', (None, [], [1,2]))
-def test_invalid_init_population(chromosomes):
-    ga = StandardGA(fitness_test_sin_func)
-
-    with pytest.raises(ValueError):
-        ga.init_population(chromosomes)
-
-
 @pytest.mark.parametrize('optim', ('min', 'max'))
 def test_sort_population(optim):
     ga = StandardGA(fitness_test_sin_func, optim=optim)
@@ -288,31 +280,12 @@ def test_extend_population():
     assert result == [(3, 150), (1, 100), (2, 50)]
 
 
-@pytest.mark.parametrize('optim', ('min', 'max'))
-def test_init_population(optim):
-    """
-    "Init population" function is the same for both types of GA: RealGA and Binary GA and thus,
-    it is not necessary to test it twice.
-    """
-    chromosomes = list(test_chromosomes)
-    expected_population = []
-    for chromosome in chromosomes:
-        expected_population.append(IndividualGA(chromosome, fitness_test_sin_func(chromosome)))
+@pytest.mark.parametrize('chromosomes', (None, [], [1,2]))
+def test_invalid_init_population(chromosomes):
+    ga = StandardGA(fitness_test_sin_func)
 
-    expected_population = sort_population(optim, expected_population)
-
-    ga = RealGA(fitness_test_sin_func, optim=optim)
-    ga.init_population(test_chromosomes)
-
-    best_solution = ga.best_solution
-
-    if optim == 'min':
-        assert test_best_min_ind[0] == best_solution[0]
-    else:
-        assert test_best_max_ind[0] == best_solution[0]
-
-    for actual, expected in zip(ga.population, expected_population):
-        assert actual.chromosome == expected.chromosome
+    with pytest.raises(ValueError):
+        ga.init_population(chromosomes)
 
 
 @pytest.mark.parametrize('generations', (0, -1))
@@ -343,27 +316,5 @@ def test_valid_run(optim):
         assert init_best[1] >= ga.best_solution[1]
     else:
         assert init_best[1] <= ga.best_solution[1]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
