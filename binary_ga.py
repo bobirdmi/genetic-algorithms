@@ -14,8 +14,12 @@ class BinaryGA(StandardGA):
         Args:
             data (list): A list with elements whose combination will be binary encoded and
                 evaluated by a fitness function. Minimum amount of elements is 4.
-            fitness_func (function): This function must compute fitness value of a single chromosome.
-                Function parameters depend on the implemented subclasses of this class.
+            fitness_func (function): This function must compute fitness value of a single binary encoded chromosome.
+                Function template is the following: *compute_fitness(chromosome, data) -> float*. Parameter *chromosome*
+                is binary encoded the following way: it contains only positions of bit 1 according to *self.data*.
+                Positions are indexed from left to right so the leftmost position is 0. Parameter *data* is
+                the input data parameter from this constructor. The returned value of the this fitness function
+                must be a single number.
             optim (str): What this genetic algorithm must do with fitness value: maximize or minimize.
                 May be 'min' or 'max'. Default is "max".
             selection (str): Parent selection type. May be "rank" (Rank Wheel Selection),
@@ -55,7 +59,7 @@ class BinaryGA(StandardGA):
         with the specified mutation probability.
 
         Args:
-            chromosome (list): Binary encoded chromosome (it contains positions of bit 1 according to self.data).
+            chromosome (list): Binary encoded chromosome (it contains positions of bit 1 according to *self.data*).
             bit_num (list): List of bits' numbers to invert.
 
         Returns:
@@ -130,7 +134,7 @@ class BinaryGA(StandardGA):
 
         Args:
             chromosome (list): A binary encoded chromosome of genetic algorithm.
-                Defined fitness function (self.fitness_func) must deal with this chromosome representation.
+                Defined fitness function (*self.fitness_func*) must deal with this chromosome representation.
 
         Returns:
             fitness value of the given chromosome
@@ -141,12 +145,12 @@ class BinaryGA(StandardGA):
         """
         This function gets a decimal integer number and returns positions of bit 1 in
         its binary representation. However, these positions are transformed the following way: they
-        are mapped on the data list (self.data) "as is". It means that LSB (least significant bit) is
-        mapped on the last position of the data list (e.g. self._bin_length - 1), MSB is mapped on
+        are mapped on the data list (*self.data*) "as is". It means that LSB (least significant bit) is
+        mapped on the last position of the data list (e.g. *self._bin_length* - 1), MSB is mapped on
         the first position of the data list (e.g. 0) and so on.
 
         Args:
-            number (int): This decimal number represents binary encoded combination of the input data (self.data).
+            number (int): This decimal number represents binary encoded combination of the input data (*self.data*).
 
         Returns:
              list of positions with bit 1 (these positions are mapped on the input data list "as is" and thus,

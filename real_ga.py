@@ -14,8 +14,8 @@ class RealGA(StandardGA):
                  cross_prob=0.95, cross_type=1, elitism=True, tournament_size=None):
         """
         Args:
-            fitness_func (function): This function must compute fitness value of a single chromosome.
-                Function parameters depend on the implemented subclasses of this class.
+            fitness_func (function): This function must compute fitness value of a single real value chromosome.
+                The returned value of the this fitness function must be a single number.
             optim (str): What this genetic algorithm must do with fitness value: maximize or minimize.
                 May be 'min' or 'max'. Default is "max".
             selection (str): Parent selection type. May be "rank" (Rank Wheel Selection),
