@@ -186,7 +186,7 @@ class RealGA(StandardGA):
         if start < 0 or start >= self._bin_length or \
                 stop < 0 or stop < start or stop >= self._bin_length:
             print('Interval error:', '(' + str(start) + ', ' + str(stop) + ')')
-            raise ValueError('Interval error')
+            raise ValueError('Replacement interval error')
 
         is_vector = self._is_chromosome_list(source)
         if is_vector:
@@ -266,7 +266,7 @@ class RealGA(StandardGA):
         with the specified amount of dimensions.
 
         Args:
-            size (int): Size of a new random population.
+            size (int): Size of a new random population. Must be at least 2.
             dim (int): Amount of space dimensions.
             interval (tuple): The generated numbers of each dimension will be 
                 within this interval (start point included, end point excluded).
