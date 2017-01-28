@@ -11,7 +11,7 @@ TYPE_REAL = 1
 class DiffusionGA:
     """
     This class implements diffusion model of genetic algorithms. The current implementation supports
-    four neighbours (up, down, left, right) of an evaluated cell. Supports the standard selection types
+    four neighbours (up, down, left, right) of a currently processed cell. Supports the standard selection types
     (e.g. "rank", "roulette", "tournament"). It's evident that the maximum tournament size is 4 in this case.
     """
     def __init__(self, instance):
@@ -20,7 +20,7 @@ class DiffusionGA:
 
         Args:
             instance (BinaryGA, RealGA): An instance of Binary Genetic Algorithm or of Real GA.
-                Type of this instance (binary or real GA) determines behaviour of diffusion model.
+                Type of this instance (binary or real GA) determines behaviour of a diffusion model.
         """
         self._ga = instance
 
@@ -55,15 +55,16 @@ class DiffusionGA:
 
     def _get_neighbour(self, row, column):
         """
-        The function returns a chromosome selected from the neighbours of the cell (specified with
-        the given row and column) according to the selection type ("rank", "roulette" or "tournament").
+        The function returns a chromosome selected from the four neighbours (up, down, left, right)
+        of the currently processed cell (specified with the given row and column)
+        according to the selection type ("rank", "roulette" or "tournament").
 
         Args:
             row (int): Row of a current cell.
             column (int): Column of a current cell.
 
         Returns:
-            chromosome (float, list of floats): A chromosome selected from neighbours
+            chromosome (binary encoded, float, list of floats): A chromosome selected from neighbours
                 according to the specified selection type ("rank", "roulette", "tournament").
         """
         shape = self._chrom_arr.shape
@@ -94,7 +95,7 @@ class DiffusionGA:
 
     def _compute_diffusion_generation(self, chrom_arr):
         """
-        This function computes a new generation of the diffusion model of GA.
+        This function computes a new generation of a diffusion model of GA.
 
         Args:
             chrom_arr (numpy.array): Diffusion array of chromosomes (binary encoded, float or a list of floats)
@@ -151,15 +152,14 @@ class DiffusionGA:
         # actually indices of ALL solutions with the best and the worst fitness values
         indices_max = numpy.where(fitness_arr == fitness_arr.max())
         indices_min = numpy.where(fitness_arr == fitness_arr.min())
-        dim = len(fitness_arr.shape)
+        arr_dim = len(fitness_arr.shape)
 
-        if dim > 2:
-            print('Only 1D or 2D arrays are supported.')
-            raise ValueError
+        if arr_dim > 2:
+            raise ValueError('Only 1D or 2D arrays are supported.')
 
         if self._ga.optim == 'min':
             # fitness minimization
-            if dim == 1:
+            if arr_dim == 1:
                 coords_worst = indices_max[0][0]
                 coords_best = indices_min[0][0]
             else:
@@ -167,7 +167,7 @@ class DiffusionGA:
                 coords_best = (indices_min[0][0], indices_min[1][0])
         else:
             # fitness maximization
-            if dim == 1:
+            if arr_dim == 1:
                 coords_worst = indices_min[0][0]
                 coords_best = indices_max[0][0]
             else:
@@ -179,13 +179,13 @@ class DiffusionGA:
     def _construct_diffusion_model(self, population):
         """
         Constructs two arrays: first for chromosomes of GA, second for their fitness values.
-        The current implementation supports construction of only square arrays. Thus, an array side is
+        The current implementation supports construction of only 2D square arrays. Thus, an array side is
         a square root of the given population length. If the calculated square root is a fractional number,
-        it will be truncated. That means the last chromosomes in population may not be
+        it will be truncated that means the last chromosomes in population may not be
         presented in the constructed arrays.
 
         Args:
-            population (list): A chromosome of GA. Same as in self.init_population(new_population).
+            population (list): List of GA chromosomes. Same as in *self.init_population(new_population)*.
         """
         size = int(math.sqrt(len(population)))
 
@@ -216,27 +216,38 @@ class DiffusionGA:
     def init_population(self, new_population):
         """
         Initializes population with the given chromosomes (binary encoded, float or a list of floats)
-        of 'new_population'. The fitness values of these chromosomes will be computed by a specified fitness function.
+        in *new_population*. The fitness values of these chromosomes will be computed by a specified fitness function.
 
         It is recommended to have new_population size equal to some squared number (9, 16, 100, 625 etc.)
         in case of diffusion model of GA. Otherwise some last chromosomes in the given population will be lost
-        as the current implementation works only with square arrays of diffusion model.
+        as the current implementation supports only square arrays of diffusion model.
 
         Args:
-            new_population (list): New initial population of chromosomes. A single chromosome in case of binary GA
-                is represented as a list of bits' positions with value 1 in the following way:
-                LSB (least significant bit) has position (len(self.data) - 1) and
-                MSB (most significant bit) has position 0. If it is a GA on real values, an individual is represented
-                as a float or a list of floats in case of multiple dimensions.
+            new_population (list): A new population of chromosomes of size at least 4.
+                A single chromosome in case of binary GA is represented as a list of bits' positions
+                with value 1 in the following way: LSB (least significant bit) has position (*len(self.data)* - 1)
+                and MSB (most significant bit) has position 0. If it is a GA on real values,
+                an individual is represented as a float or a list of floats in case of multiple dimensions.
         """
         if not new_population or len(new_population) < 4:
-            print('New population is too few.')
-            raise ValueError
+            raise ValueError('New population is too small.')
 
         self._init_diffusion_model(new_population)
 
-    def init_random_population(self, size=None, dim=None, interval=None):
+    def init_random_population(self, size, dim=None, interval=None):
+        """
+        Initializes a new random population with the given parameters.
+
+        Args:
+            size (int): A size of new generated population. Must be at least 2 in case of RealGA and
+                at least 4 in case of BinaryGA.
+            dim (int, None): Amount of space dimensions in case of RealGA.
+            interval (tuple, None): The generated numbers of each dimension will be
+                within this interval (start point included, end point excluded).
+                Must be specified in case of RealGA.
+        """
         if self.type == TYPE_BINARY:
+            # there is a binary GA
             max_num = self._ga._check_init_random_population(size)
 
             number_list = self._ga._generate_random_population(max_num, size)
@@ -256,8 +267,8 @@ class DiffusionGA:
 
     def run(self, max_generation):
         """
-        Starts a diffusion GA. The algorithm performs 'max_generation' generations and then stops.
-        Old population is completely replaced with new one.
+        Starts a diffusion GA. The algorithm performs *max_generation* generations and then stops.
+        Old population is completely replaced with a new computed one at the end of each generation.
 
         Args:
             max_generation (int): Maximum number of GA generations.
@@ -266,8 +277,7 @@ class DiffusionGA:
             fitness_progress (list): List of average fitness values for each generation (including original population).
         """
         if max_generation < 1:
-            print('Too few generations...')
-            raise ValueError
+            raise ValueError('Too few generations...')
 
         fitness_progress = []
         # we works with numpy arrays in case of diffusion model

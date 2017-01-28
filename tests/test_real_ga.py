@@ -7,13 +7,6 @@ from standard_ga import IndividualGA
 from helper_functions import *
 
 
-test_chromosomes = [0.0, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
-test_best_min_ind = (4.0, -0.7568024953079282)
-test_best_max_ind = (1.5, 0.9974949866040544)
-
-unsorted_population = [IndividualGA(1, 3), IndividualGA(1, 1), IndividualGA(1, 2), IndividualGA(1, 7), IndividualGA(1, 6)]
-
-
 def test_invalid_bin_length():
     ga = RealGA(fitness_test_sin_func)
     ga._bin_length = 128
@@ -222,7 +215,7 @@ def test_init_random_population(optim):
 
 @pytest.mark.parametrize('optim', ('min', 'max'))
 def test_valid_init_population(optim):
-    chromosomes = list(test_chromosomes)
+    chromosomes = list(test_real_chromosomes)
     expected_population = []
     for chromosome in chromosomes:
         expected_population.append(IndividualGA(chromosome, fitness_test_sin_func(chromosome)))
@@ -231,15 +224,15 @@ def test_valid_init_population(optim):
 
     ga = RealGA(fitness_test_sin_func, optim=optim)
     interval = (-10, 10)
-    ga.init_population(test_chromosomes, interval)
+    ga.init_population(test_real_chromosomes, interval)
 
     assert ga.interval == interval
 
     best_solution = ga.best_solution
     if optim == 'min':
-        assert test_best_min_ind[0] == best_solution[0]
+        assert test_real_best_min_ind[0] == best_solution[0]
     else:
-        assert test_best_max_ind[0] == best_solution[0]
+        assert test_real_best_max_ind[0] == best_solution[0]
 
     for actual, expected in zip(ga.population, expected_population):
         assert actual.chromosome == expected.chromosome
@@ -248,7 +241,7 @@ def test_valid_init_population(optim):
 def test_invalid_init_population():
     optim = 'min'
 
-    chromosomes = list(test_chromosomes)
+    chromosomes = list(test_real_chromosomes)
     expected_population = []
     for chromosome in chromosomes:
         expected_population.append(IndividualGA(chromosome, fitness_test_sin_func(chromosome)))
@@ -259,6 +252,6 @@ def test_invalid_init_population():
     interval = (10, 4)
 
     with pytest.raises(ValueError):
-        ga.init_population(test_chromosomes, interval)
+        ga.init_population(test_real_chromosomes, interval)
 
 

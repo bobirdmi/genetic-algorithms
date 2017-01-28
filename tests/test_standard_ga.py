@@ -4,12 +4,6 @@ from standard_ga import IndividualGA, StandardGA
 from real_ga import RealGA
 from helper_functions import *
 
-test_chromosomes = [0.0, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
-test_best_min_ind = (4.0, -0.7568024953079282)
-test_best_max_ind = (1.5, 0.9974949866040544)
-
-unsorted_population = [IndividualGA(1, 3), IndividualGA(1, 1), IndividualGA(1, 2), IndividualGA(1, 7), IndividualGA(1, 6)]
-
 
 def test_individual_ga():
     chromosome = [1,2,3]

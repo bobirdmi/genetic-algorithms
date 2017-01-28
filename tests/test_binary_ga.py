@@ -4,23 +4,6 @@ from binary_ga import BinaryGA, IndividualGA
 from helper_functions import *
 
 
-test_data = [-5, -4, -3, 3, 4, 5, 10]
-test_best_min_ind = ([0, 1, 2], -12)
-test_best_max_ind = ([3, 4, 5, 6], 12)
-test_population = [[0, 3], [1, 4, 5], [2, 4, 0], [3, 4, 5, 6]]
-test_population_best_min = ([2, 4, 0], -4)
-test_population_best_max = ([3, 4, 5, 6], 22)
-
-
-def fitness_test_func(chromosome, data):
-    result_sum = 0
-
-    for bit in chromosome:
-        result_sum += data[bit]
-
-    return result_sum
-
-
 @pytest.mark.parametrize('data', (None, [], [1, 2, 3]))
 def test_invalid_init_data(data):
     with pytest.raises(ValueError):
@@ -38,7 +21,7 @@ def test_invalid_cross_type():
 
 
 def test_invert_bit():
-    ga = BinaryGA(test_data, fitness_test_func, mut_prob=1)
+    ga = BinaryGA(test_bin_data, fitness_test_func, mut_prob=1)
 
     chromosome = [10, 5, 20]
     bit_to_invert = [10, 7, 9]
@@ -88,7 +71,7 @@ def test_invalid_replace_bits(start, stop):
                           ([6], 10),
                           ])
 def test_compute_fitness(chromosome, expected):
-    ga = BinaryGA(test_data, fitness_test_func)
+    ga = BinaryGA(test_bin_data, fitness_test_func)
 
     assert ga._compute_fitness(chromosome) == expected
 
@@ -148,7 +131,7 @@ def test_generate_random_population(size):
 
 @pytest.mark.parametrize('optim', ('min', 'max'))
 def test_init_random_population(optim):
-    ga = BinaryGA(test_data, fitness_test_func, optim=optim)
+    ga = BinaryGA(test_bin_data, fitness_test_func, optim=optim)
 
     pop_size = 5
     ga.init_random_population(pop_size)
@@ -169,21 +152,21 @@ def test_init_random_population(optim):
 
 @pytest.mark.parametrize('optim', ('min', 'max'))
 def test_valid_init_population(optim):
-    chromosomes = list(test_population)
+    chromosomes = list(test_bin_population)
     expected_population = []
     for chromosome in chromosomes:
-        expected_population.append(IndividualGA(chromosome, fitness_test_func(chromosome, test_data)))
+        expected_population.append(IndividualGA(chromosome, fitness_test_func(chromosome, test_bin_data)))
 
     expected_population = sort_population(optim, expected_population)
 
-    ga = BinaryGA(test_data, fitness_test_func, optim=optim)
-    ga.init_population(test_population)
+    ga = BinaryGA(test_bin_data, fitness_test_func, optim=optim)
+    ga.init_population(test_bin_population)
 
     best_solution = ga.best_solution
     if optim == 'min':
-        assert test_population_best_min[0] == best_solution[0]
+        assert test_bin_population_best_min[0] == best_solution[0]
     else:
-        assert test_population_best_max[0] == best_solution[0]
+        assert test_bin_population_best_max[0] == best_solution[0]
 
     for actual, expected in zip(ga.population, expected_population):
         assert actual.chromosome == expected.chromosome

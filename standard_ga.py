@@ -455,7 +455,7 @@ class StandardGA:
     def run(self, max_generation):
         """
         Starts a standard GA. The algorithm performs *max_generation* generations and then stops.
-        Old population is completely replaced with a new computed one in each generation.
+        Old population is completely replaced with a new computed one at the end of each generation.
 
         Args:
             max_generation (int): Maximum number of GA generations.
