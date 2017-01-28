@@ -82,7 +82,8 @@ class BinaryGA(StandardGA):
     def _replace_bits(self, source, target, start, stop):
         """
         Replaces target bits with source bits in interval (start, stop) (both included)
-        with the specified crossover probability.
+        with the specified crossover probability and returns target. This interval represents
+        positions of bits to replace (minimum start point is 0 and maximum end point is *self._bin_length - 1*).
 
         Args:
             source (list): Values in source are used as replacement for target.
@@ -96,7 +97,7 @@ class BinaryGA(StandardGA):
         if start < 0 or start >= self._bin_length or \
                 stop < 0 or stop < start or stop >= self._bin_length:
             print('Interval error:', '(' + str(start) + ', ' + str(stop) + ')')
-            raise ValueError
+            raise ValueError('Replacement interval error')
 
         if start == stop:
             if random.uniform(0, 1) <= self.crossover_prob:

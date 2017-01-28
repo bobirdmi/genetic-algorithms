@@ -170,15 +170,16 @@ class RealGA(StandardGA):
     def _replace_bits(self, source, target, start, stop):
         """
         Replaces target bits with source bits in interval (start, stop) (both included)
-        with the specified crossover probability.
+        with the specified crossover probability. This interval represents
+        positions of bits to replace (minimum start point is 0 and maximum end point is *self._bin_length - 1*).
 
         Args:
             source (float, list): Values in source are used as replacement for target. May be a float or a list of floats
                 in case of multiple dimensions.
             target (float, list): Values in target are replaced with values in source. May be a float or a list of floats
                 in case of multiple dimensions.
-            start (int): Start point of an interval (included).
-            stop (int): End point of an interval (included).
+            start (int): Start point of interval (included).
+            stop (int): End point of interval (included).
 
         Returns:
              target (float, list): Target with replaced bits with source one in the interval (start, stop) (both included).

@@ -43,9 +43,9 @@ class StandardGA:
             mut_type (int): This parameter defines how many chromosome bits will be mutated. Default is 1.
             cross_prob (float): Probability of crossover. Recommended values are 80-95%. Default is 95% (0.95).
             cross_type (int): This parameter defines crossover type. The following types are allowed:
-                single point (1), two point (2) and multiple point (2 < cross_type).
-                The extreme case of multiple point crossover is uniform one (cross_type == all_bits).
-                The specified number of bits (cross_type) are crossed in case of multiple point crossover.
+                single point (1), two point (2) and multiple point (2 < *cross_type*).
+                The extreme case of multiple point crossover is uniform one (*cross_type* == all_bits).
+                The specified number of bits (*cross_type*) are crossed in case of multiple point crossover.
                 Default is 1.
             elitism (True, False): Elitism on/off. Default is True.
         """
@@ -147,11 +147,11 @@ class StandardGA:
 
     def _mutate(self, chromosome):
         """
-        This function mutates (inverse bits) the given population chromosome.
+        This function mutates (inverses bits) the given chromosome.
 
         Args:
-            chromosome (float, list): float or a list of floats, or a binary encoded combination
-                of the original data list (it contains positions of bit 1 according to self.data).
+            chromosome (float, list): a float or a list of floats, or a binary encoded combination
+                of the original data list (it contains positions of bit 1 according to *self.data*).
 
         Returns:
              mutated chromosome as float, list of floats or binary representation (any of the mentioned
@@ -171,7 +171,8 @@ class StandardGA:
         """
         TO BE REIMPLEMENTED IN SUBCLASSES.
         Replace target bits with source bits in interval (start, stop) (both included)
-        with the specified crossover probability.
+        with the specified crossover probability. This interval represents
+        positions of bits to replace (minimum start point is 0 and maximum end point is *self._bin_length - 1*).
 
         Args:
             source (list): Values in source are used as replacement for target.
@@ -186,17 +187,19 @@ class StandardGA:
 
     def _cross(self, parent1, parent2):
         """
-        This function crosses the two given population chromosomes (parents).
+        This function crosses over the two given chromosomes (parents). The first parent is a target chromosome
+        that means its bits will be replaced with bits of the second parent (source chromosome) with
+        the specified crossover probability.
 
         Args:
-            parent1 (float, list): float or a list of floats, or a binary encoded combination
-                of the original data list (self.data) of the first parent.
-            parent2 (float, list): float or a list of floats, or a binary encoded combination
-                of the original data list (self.data) of the second parent.
+            parent1 (float, list): Target chromosome. May be a float or a list of floats, or a binary encoded combination
+                of the original data list (*self.data*) of the first parent.
+            parent2 (float, list): Source chromosome. May be a float or a list of floats, or a binary encoded combination
+                of the original data list (*self.data*) of the second parent.
 
         Returns:
-             child (list, float): a chromosome (binary representation, float or a list of floats) created by the
-                crossover of two parents
+             child (list, float): a chromosome (a binary representation, a float or a list of floats) created by the
+                crossover of the two given parents
         """
         try:
             # a list of floats or binary encoded combination
@@ -207,8 +210,7 @@ class StandardGA:
 
         if self.cross_type == self._bin_length:
             # it is necessary to replace all bits with the specified crossover probability
-            for bit in range(self._bin_length):
-                new_chromosome = self._replace_bits(parent2, new_chromosome, bit, bit)
+            new_chromosome = self._replace_bits(parent2, new_chromosome, 0, self._bin_length - 1)
         elif self.cross_type == 1:
             # combine two parts of parents
             random_bit = random.randrange(1, self._bin_length - 1)  # we want to do useful replacements
@@ -454,7 +456,7 @@ class StandardGA:
 
     def run(self, max_generation):
         """
-        Starts a standard GA. The algorithm performs *max_generation* generations and then stops.
+        Starts a standard GA (RealGA or BinaryGA). The algorithm performs *max_generation* generations and then stops.
         Old population is completely replaced with a new computed one at the end of each generation.
 
         Args:

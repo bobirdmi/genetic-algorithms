@@ -1,7 +1,8 @@
 import pytest
 
-from standard_ga import IndividualGA, StandardGA
+from standard_ga import StandardGA
 from real_ga import RealGA
+from binary_ga import BinaryGA
 from helper_functions import *
 
 
@@ -106,6 +107,44 @@ def test_init_invalid_cross_type(cross_type):
     """
     with pytest.raises(ValueError):
         StandardGA(fitness_test_sin_func, cross_type=cross_type)
+
+
+@pytest.mark.parametrize('mut_type', (1, 2, 4, len(test_bin_data)))
+def test_mutate(mut_type):
+    """
+    *_mutate()* method is the same (but bit inversion process itself is not)
+    for both types of GA: RealGA and Binary GA and thus,
+    it is not necessary to test it twice.
+    """
+    ga = BinaryGA(list(range(10)), fitness_test_func, mut_type=mut_type, mut_prob=1)
+
+    chromosome = []
+    mutant = ga._mutate(chromosome)
+
+    assert len(mutant) == mut_type
+
+
+@pytest.mark.parametrize('cross_type', (1, 2, 4, len(test_bin_data)))
+def test_cross(cross_type):
+    """
+    *_cross()* method is the same (but bit replacement process itself is not)
+    for both types of GA: RealGA and Binary GA and thus,
+    it is not necessary to test it twice.
+    """
+    ga = BinaryGA(test_bin_data, fitness_test_func, cross_type=cross_type, cross_prob=1)
+
+    source_chrom = list(range(len(test_bin_data)))
+    child = ga._cross([], source_chrom)
+
+    print(child)
+
+    if cross_type > 2:
+        assert len(child) == cross_type
+    else:
+        # single- and two-point crossover differs from other types
+        # we don't know the exact replacement interval as its end points are random numbers
+        # but this interval must be at least 1
+        assert len(child) >= 1
 
 
 @pytest.mark.parametrize('elitism', (True, False, 1, 0))
