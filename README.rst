@@ -95,7 +95,7 @@ Installation
 
 Install package by typing the command
 
-``python -m pip install --extra-index-url https://pypi.python.org/pypi geneticalgs``
+``python -m pip install geneticalgs``
 
 If you have problems installing NumPy it is **strongly** recommended to use `Anaconda <https://docs.continuum.io/>`__.
 
