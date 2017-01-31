@@ -1,6 +1,6 @@
 import pytest
 
-from binary_ga import BinaryGA, IndividualGA
+from geneticalgs import BinaryGA, IndividualGA
 from helper_functions import *
 
 

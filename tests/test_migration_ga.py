@@ -1,7 +1,6 @@
 import pytest
 
-from migration_ga import MigrationGA
-from real_ga import RealGA
+from geneticalgs import MigrationGA, RealGA
 from helper_functions import *
 
 

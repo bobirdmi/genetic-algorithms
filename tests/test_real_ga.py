@@ -2,8 +2,7 @@ import pytest
 import numpy
 from bitstring import BitArray
 
-from real_ga import RealGA
-from standard_ga import IndividualGA
+from geneticalgs import RealGA, IndividualGA
 from helper_functions import *
 
 

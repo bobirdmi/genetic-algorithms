@@ -2,9 +2,7 @@ import pytest
 import numpy
 import random
 
-from diffusion_ga import DiffusionGA
-from real_ga import RealGA
-from binary_ga import BinaryGA
+from geneticalgs import DiffusionGA, RealGA, BinaryGA
 from helper_functions import *
 
 

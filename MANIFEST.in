@@ -1,0 +1,9 @@
+include LICENSE
+include 2.7/*
+include 2.7/benchmark/*
+include examples/*
+include examples/data/*
+include benchmarking/**
+include time_complexity/*.txt
+include time_complexity/*.png
+include tests/*.py

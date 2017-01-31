@@ -14,9 +14,7 @@ import numpy as np
 import fgeneric
 import bbobbenchmarks as bn
 
-from real_ga import RealGA
-from diffusion_ga import DiffusionGA
-from migration_ga import MigrationGA
+from geneticalgs import RealGA, DiffusionGA, MigrationGA
 
 
 # MAX_FUN_EVALS = '1e3 + 1e6/dim' # per run, adjust to default but prevent very long runs (>>30s)

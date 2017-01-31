@@ -1,5 +1,5 @@
 import math
-from standard_ga import IndividualGA
+from geneticalgs import IndividualGA
 
 
 # BinaryGA

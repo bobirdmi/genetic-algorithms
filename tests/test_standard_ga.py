@@ -1,8 +1,6 @@
 import pytest
 
-from standard_ga import StandardGA
-from real_ga import RealGA
-from binary_ga import BinaryGA
+from geneticalgs import StandardGA, RealGA, BinaryGA
 from helper_functions import *
 
 

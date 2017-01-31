@@ -17,9 +17,7 @@ import numpy as np
 import fgeneric
 import bbobbenchmarks
 
-from real_ga import RealGA
-from diffusion_ga import DiffusionGA
-from migration_ga import MigrationGA
+from geneticalgs import RealGA, DiffusionGA, MigrationGA
 
 
 argv = sys.argv[1:] # shortcut for input arguments
