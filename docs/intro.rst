@@ -7,6 +7,8 @@ Benchmarking was conducted by `COCO platform <http://coco.gforge.inria.fr/>`__ `
 
 The project summary may be found in ``project_summary.pdf``.
 
+Link to `GitHub <https://github.com/bobirdmi/genetic-algorithms>`__
+
 Link to `PyPI <https://pypi.python.org/pypi/geneticalgs>`__.
 
 Link to `Read The Docs <https://readthedocs.org/projects/genetic-algorithms/>`__.
@@ -120,4 +122,9 @@ Then type the following command in order to generate documentation in HTML
 And run doctest
 
 ``make doctest``
+
+License
+=======
+
+Licensed under `Apache License Version 2.0 <http://www.apache.org/licenses/LICENSE-2.0>`__.
 
