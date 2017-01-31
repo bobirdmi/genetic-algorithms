@@ -1,18 +1,16 @@
-"""
-   Copyright 2017 Dmitriy Bobir <bobirdima@gmail.com>
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-"""
+# Copyright 2017 Dmitriy Bobir <bobirdima@gmail.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 
 import numpy
@@ -23,16 +21,46 @@ class MigrationGA:
     """
     This class implements migration model of GA, namely island model (not stepping-stone).
     It works with binary or real GA.
+
+    Attributes:
+        type (str): Type of used genetic algorithms: may be 'binary' or 'real'.
+
+    You may initialize instance of this class the following way
+
+    .. testcode::
+
+       from geneticalgs import RealGA, MigrationGA
+       import math
+
+       # define some function whose global minimum or maximum we are searching for
+       # this function takes as input one-dimensional number
+       def fitness_function(x):
+           # the same function is used in examples
+           return abs(x*(math.sin(x/11)/5 + math.sin(x/110)))
+
+       # initialize two or more standard real GAs with fitness maximization by default
+       gen_alg1 = RealGA(fitness_function)
+       gen_alg2 = RealGA(fitness_function)
+
+       # initialize random one-dimensional populations of size 10 and 15 within interval (0, 1000)
+       gen_alg1.init_random_population(10, 1, (0, 1000))
+       gen_alg2.init_random_population(15, 1, (0, 1000))
+
+       # then initialize migration GA using the already initialized standard GA instances
+       mga = MigrationGA(type='real')  # set type of used instances
+       mga.init_populations([gen_alg1, gen_alg2])
+
+    Migration model with BinaryGA is used the same way. You may start computation by *mga.run(*args)*.
     """
     def __init__(self, type='binary'):
         """
         A constructor.
 
         Args:
-            type (str): Type of genetic algorithm: may be 'binary' or 'real'. Default is 'binary'.
+            type (str): Type of used genetic algorithms: may be 'binary' or 'real'. Default is 'binary'.
         """
         self.type = type
-        self.ga_list = None
+        self._ga_list = None
         self._ga_list_size = None
         self._optim = None
         self._min_elements = numpy.inf
@@ -44,9 +72,8 @@ class MigrationGA:
             raise ValueError('Wrong value of input parameter.')
 
     def init_populations(self, ga_list):
-        # TODO doctest examples
         """
-        This function initializes migration model of GA. Type of optimization ('min' or 'max')
+        This method initializes migration model of GA. Type of optimization ('min' or 'max')
         will be set to the same value of the first given GA instance. Valid GA instances are
         RealGA and BinaryGA.
 
@@ -63,7 +90,7 @@ class MigrationGA:
             if len(ga_inst.population) < self._min_elements:
                 self._min_elements = len(ga_inst.population)
 
-        self.ga_list = copy.deepcopy(ga_list)
+        self._ga_list = copy.deepcopy(ga_list)
         self._optim = ga_list[0].optim
 
     def _compare_solutions(self):
@@ -72,25 +99,24 @@ class MigrationGA:
 
         Returns:
             best_solution (tuple): Best solution across all GA instances
-                as (best chromosome, its fitness value).
+            as (best chromosome, its fitness value).
         """
         if self._optim == 'min':
             # minimization
             best_solution = (None, numpy.inf)
-            for ga_inst in self.ga_list:
+            for ga_inst in self._ga_list:
                 if ga_inst.best_solution[1] < best_solution[1]:
                     best_solution = ga_inst.best_solution
         else:
             # maximization
             best_solution = (None, -numpy.inf)
-            for ga_inst in self.ga_list:
+            for ga_inst in self._ga_list:
                 if ga_inst.best_solution[1] > best_solution[1]:
                     best_solution = ga_inst.best_solution
 
         return best_solution
 
     def run(self, max_generation, period=1, migrant_num=1, cloning=True, migrate=True):
-        # TODO doctest examples
         """
         Runs a migration model of GA.
 
@@ -107,9 +133,53 @@ class MigrationGA:
                 the algorithm to perform migration. This was used in benchmarking by COCO BBOB platform.
 
         Returns:
-             fitness_progress, best_solution (tuple): *fitness_progress* contains lists of average fitness
-                value of each generation for each specified GA instance. *best_solution* is the best solution
-                across all GA instances as in form (best chromosome, its fitness value).
+            fitness_progress, best_solution (tuple): *fitness_progress* contains lists of average fitness
+            value of each generation for each specified GA instance. *best_solution* is the best solution
+            across all GA instances as in form (best chromosome, its fitness value).
+
+        You may use this method the standard way
+
+        .. testsetup::
+
+           from geneticalgs import RealGA, MigrationGA
+           import math
+
+           # define some function whose global minimum or maximum we are searching for
+           # this function takes as input one-dimensional number
+           def fitness_function(x):
+               # the same function is used in examples
+               return abs(x*(math.sin(x/11)/5 + math.sin(x/110)))
+
+           # initialize two or more standard real GAs with fitness maximization by default
+           gen_alg1 = RealGA(fitness_function)
+           gen_alg2 = RealGA(fitness_function)
+
+           # initialize random one-dimensional populations of size 10 and 15 within interval (0, 1000)
+           gen_alg1.init_random_population(10, 1, (0, 1000))
+           gen_alg2.init_random_population(15, 1, (0, 1000))
+
+           # then initialize migration GA using the already initialized standard GA instances
+           mga = MigrationGA(type='real')  # set type of used instances
+           mga.init_populations([gen_alg1, gen_alg2])
+
+        .. testcode::
+
+           avg_fitness_progress, best_solution = mga.run(50, 10, 2)
+
+        or in more unusual way if you want to get the best found solution for each generation
+
+        .. testcode::
+
+           max_generation = 10
+           for i in range(max_generation):
+               # perform migration every four generations
+               if i > 0 and i % 3 == 0:
+                   migrate = True
+               else:
+                   migrate = False
+
+               _, best_solution = mga.run(1, 1, 2, cloning=True, migrate=migrate)
+
         """
         if max_generation < 1 or period > max_generation or period < 1 or\
                         migrant_num < 1 or migrant_num > self._min_elements or\
@@ -122,7 +192,7 @@ class MigrationGA:
         for c in range(cycle):
             migrant_list = [[] for i in range(self._ga_list_size)]
 
-            for ga_inst, index in zip(self.ga_list, range(self._ga_list_size)):
+            for ga_inst, index in zip(self._ga_list, range(self._ga_list_size)):
                 # run standard GA and store average fitness progress
                 fit_prog = ga_inst.run(period)
 
@@ -143,8 +213,8 @@ class MigrationGA:
 
             # perform migration
             if migrate:
-                for ga_inst, index in zip(self.ga_list, range(self._ga_list_size)):
-                    # TODO
+                for ga_inst, index in zip(self._ga_list, range(self._ga_list_size)):
+                    # TODO uncomment in case of benchmarking using *my_experiment.py*
                     # del ga_inst.population[:migrant_num]  # uncomment for benchmarking on 2 populations
                     
                     for idx in range(self._ga_list_size):

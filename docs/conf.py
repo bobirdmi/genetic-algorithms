@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# genetic-algorithms documentation build configuration file, created by
-# sphinx-quickstart on Tue Jan 31 11:59:40 2017.
+# geneticalgs documentation build configuration file, created by
+# sphinx-quickstart on Tue Jan 31 14:54:46 2017.
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.abspath('..'))
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('.'))
+# sys.path.insert(0, os.path.abspath('.'))
 
 # -- General configuration ------------------------------------------------
 
@@ -34,6 +34,7 @@ sys.path.insert(0, os.path.abspath('..'))
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
+    'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.ifconfig',
@@ -56,7 +57,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'genetic-algorithms'
+project = 'geneticalgs'
 copyright = '2017, Dmitriy Bobir'
 author = 'Dmitriy Bobir'
 
@@ -210,7 +211,7 @@ html_static_path = ['_static']
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'genetic-algorithmsdoc'
+htmlhelp_basename = 'geneticalgsdoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -232,7 +233,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  (master_doc, 'genetic-algorithms.tex', 'genetic-algorithms Documentation',
+  (master_doc, 'geneticalgs.tex', 'geneticalgs Documentation',
    'Dmitriy Bobir', 'manual'),
 ]
 
@@ -262,7 +263,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'genetic-algorithms', 'genetic-algorithms Documentation',
+    (master_doc, 'geneticalgs', 'geneticalgs Documentation',
      [author], 1)
 ]
 
@@ -276,8 +277,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  (master_doc, 'genetic-algorithms', 'genetic-algorithms Documentation',
-   author, 'genetic-algorithms', 'One line description of project.',
+  (master_doc, 'geneticalgs', 'geneticalgs Documentation',
+   author, 'geneticalgs', 'One line description of project.',
    'Miscellaneous'),
 ]
 
@@ -292,6 +293,10 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
+
+
+# Example configuration for intersphinx: refer to the Python standard library.
+intersphinx_mapping = {'https://docs.python.org/': None}
 
 # Napoleon settings
 napoleon_google_docstring = True

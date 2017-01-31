@@ -1,18 +1,16 @@
-"""
-   Copyright 2017 Dmitriy Bobir <bobirdima@gmail.com>
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-"""
+# Copyright 2017 Dmitriy Bobir <bobirdima@gmail.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 
 import numpy
@@ -30,6 +28,29 @@ class DiffusionGA:
     This class implements diffusion model of genetic algorithms. The current implementation supports
     four neighbours (up, down, left, right) of a currently processed cell. Supports the standard selection types
     (e.g. "rank", "roulette", "tournament"). It's evident that the maximum tournament size is 4 in this case.
+
+    You may initialize instance of this class the following way
+
+    .. testcode::
+
+       from geneticalgs import RealGA, DiffusionGA
+       import math
+
+       # define some function whose global minimum or maximum we are searching for
+       # this function takes as input one-dimensional number
+       def fitness_function(x):
+           # the same function is used in examples
+           return abs(x*(math.sin(x/11)/5 + math.sin(x/110)))
+
+       # initialize standard real GA with fitness maximization by default
+       gen_alg = RealGA(fitness_function)
+       # then initialize diffusion GA using the already initialized real GA instance
+       dga = DiffusionGA(gen_alg)
+       # initialize random one-dimensional population of size 20 within interval (0, 1000)
+       dga.init_random_population(20, 1, (0, 1000))
+
+    BinaryGA is used the same way. You may start computation by *dga.run(number_of_generations)* and obtain
+    the currently best found solution by *dga.best_solution*.
     """
     def __init__(self, instance):
         """
@@ -42,9 +63,9 @@ class DiffusionGA:
         self._ga = instance
 
         if hasattr(self._ga, '_data'):
-            self.type = TYPE_BINARY
+            self._type = TYPE_BINARY
         else:
-            self.type = TYPE_REAL
+            self._type = TYPE_REAL
 
         self._fitness_arr = None
         self._chrom_arr = None
@@ -55,8 +76,8 @@ class DiffusionGA:
         Returns the following tuple: (array of chromosomes, array of their fitness values).
 
         Returns:
-           array of chromosomes, array fitness values (tuple): Array of chromosomes and another array with
-                their fitness values.
+            array of chromosomes, array of fitness values (tuple): Array of chromosomes and another array with
+            their fitness values.
         """
         return self._chrom_arr, self._fitness_arr
 
@@ -72,7 +93,7 @@ class DiffusionGA:
 
     def _get_neighbour(self, row, column):
         """
-        The function returns a chromosome selected from the four neighbours (up, down, left, right)
+        The method returns a chromosome selected from the four neighbours (up, down, left, right)
         of the currently processed cell (specified with the given row and column)
         according to the selection type ("rank", "roulette" or "tournament").
 
@@ -82,7 +103,7 @@ class DiffusionGA:
 
         Returns:
             chromosome (binary encoded, float, list of floats): A chromosome selected from neighbours
-                according to the specified selection type ("rank", "roulette", "tournament").
+            according to the specified selection type ("rank", "roulette", "tournament").
         """
         shape = self._chrom_arr.shape
         up, down, left, right = (0, 1, 2, 3)
@@ -112,7 +133,7 @@ class DiffusionGA:
 
     def _compute_diffusion_generation(self, chrom_arr):
         """
-        This function computes a new generation of a diffusion model of GA.
+        This method computes a new generation of a diffusion model of GA.
 
         Args:
             chrom_arr (numpy.array): Diffusion array of chromosomes (binary encoded, float or a list of floats)
@@ -120,7 +141,7 @@ class DiffusionGA:
 
         Returns:
             new_chrom_array, new_fitness_arr (numpy.array, numpy.array): New diffusion arrays of chromosomes
-                and their fitness values of the next generation.
+            and their fitness values of the next generation.
         """
         shape = chrom_arr.shape
         new_chrom_arr = numpy.empty(shape, dtype=object)
@@ -163,7 +184,7 @@ class DiffusionGA:
 
         Returns:
             coords_best, coords_worst (tuple): Coordinates of the best and the worst
-                fitness values as (index_best, index_worst) in 1D or ((row, column), (row, column)) in 2D.
+            fitness values as (index_best, index_worst) in 1D or ((row, column), (row, column)) in 2D.
         """
         # get indices of the best and the worst solutions in new generation
         # actually indices of ALL solutions with the best and the worst fitness values
@@ -219,7 +240,7 @@ class DiffusionGA:
 
     def _init_diffusion_model(self, population):
         """
-        This function constructs diffusion model from the given population
+        This method constructs diffusion model from the given population
         and then updates the currently best found solution.
 
         Args:
@@ -263,7 +284,7 @@ class DiffusionGA:
                 within this interval (start point included, end point excluded).
                 Must be specified in case of RealGA.
         """
-        if self.type == TYPE_BINARY:
+        if self._type == TYPE_BINARY:
             # there is a binary GA
             max_num = self._ga._check_init_random_population(size)
 
@@ -300,12 +321,13 @@ class DiffusionGA:
         # we works with numpy arrays in case of diffusion model
         population_size = self._chrom_arr.size
 
+        fitness_sum = numpy.sum(self._fitness_arr)
         for generation_num in range(max_generation):
-            fitness_sum = numpy.sum(self._fitness_arr)
-
             fitness_progress.append(fitness_sum / population_size)
 
             self._chrom_arr, self._fitness_arr = self._compute_diffusion_generation(self._chrom_arr)
+
+            fitness_sum = numpy.sum(self._fitness_arr)
 
         fitness_progress.append(fitness_sum / population_size)
 

@@ -1,4 +1,5 @@
 include LICENSE
+include docs/*
 include 2.7/*
 include 2.7/benchmark/*
 include examples/*

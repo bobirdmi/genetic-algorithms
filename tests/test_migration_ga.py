@@ -42,15 +42,15 @@ def test_valid_init_populations(optim):
     mga.init_populations([rga1, rga2])
 
     assert mga._ga_list_size == 2
-    assert len(mga.ga_list) == 2
+    assert len(mga._ga_list) == 2
     assert mga._optim == optim
     assert mga._min_elements == size2
 
-    assert len(mga.ga_list[0].population) == size1
-    assert len(mga.ga_list[1].population) == size2
+    assert len(mga._ga_list[0].population) == size1
+    assert len(mga._ga_list[1].population) == size2
 
     for rind1, rind2, mind1, mind2 in \
-            zip(rga1.population, rga2.population, mga.ga_list[0].population, mga.ga_list[1].population):
+            zip(rga1.population, rga2.population, mga._ga_list[0].population, mga._ga_list[1].population):
         assert rind1.chromosome == mind1.chromosome
         assert rind2.chromosome == mind2.chromosome
         assert rind1.fitness_val == mind1.fitness_val

@@ -1,18 +1,16 @@
-"""
-   Copyright 2017 Dmitriy Bobir <bobirdima@gmail.com>
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-"""
+# Copyright 2017 Dmitriy Bobir <bobirdima@gmail.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 
 import random
@@ -22,6 +20,13 @@ import numpy
 class IndividualGA:
     """
     The class represents an individual of population in GA.
+
+    Attributes:
+        chromosome (float, list): A chromosome represented a solution. The solution
+            may be binary encoded in chromosome or be a float or a list of floats
+            in case of dealing with real value solutions. The list contains
+            only positions of bit 1 (according to input data list) in case of binary encoded solution.
+        fitness_val (float, int): Fitness value of the given chromosome.
     """
     def __init__(self, chromosome, fitness_val):
         """
@@ -31,7 +36,7 @@ class IndividualGA:
             chromosome (float, list): A chromosome represented a solution. The solution
                 may be binary encoded in chromosome or be a float or a list of floats
                 in case of dealing with real value solutions. The list contains
-                only positions of bit 1 (according to self.data list) in case of binary encoded solution.
+                only positions of bit 1 (according to input data list) in case of binary encoded solution.
             fitness_val (float, int): Fitness value of the given chromosome.
         """
         self.chromosome = chromosome
@@ -43,6 +48,25 @@ class StandardGA:
     This class implements the base functionality of genetic algorithms and must be inherited.
     In other words, the class doesn't provide functionality of genetic algorithms by itself.
     This class is inherited by RealGA and BinaryGA classes in the current implementation.
+
+    Attributes:
+        fitness_func (function): This function must compute fitness value of a single chromosome.
+            Function parameters depend on the implemented subclasses of this class.
+        optim (str): What this genetic algorithm must do with fitness value: maximize or minimize.
+            May be 'min' or 'max'. Default is "max".
+        selection (str): Parent selection type. May be "rank" (Rank Wheel Selection),
+            "roulette" (Roulette Wheel Selection) or "tournament". Default is "rank".
+        tournament_size (int): Defines the size of tournament in case of 'selection' == 'tournament'.
+            Default is None.
+        mut_prob (float): Probability of mutation. Recommended values are 0.5-1%. Default is 0.5% (0.05).
+        mut_type (int): This parameter defines how many chromosome bits will be mutated. Default is 1.
+        cross_prob (float): Probability of crossover. Recommended values are 80-95%. Default is 95% (0.95).
+        cross_type (int): This parameter defines crossover type. The following types are allowed:
+            single point (1), two point (2) and multiple point (2 < *cross_type*).
+            The extreme case of multiple point crossover is uniform one (*cross_type* == all_bits).
+            The specified number of bits (*cross_type*) are crossed in case of multiple point crossover.
+            Default is 1.
+        elitism (True, False): Elitism on/off. Default is True.
     """
     def __init__(self, fitness_func=None, optim='max', selection="rank", mut_prob=0.05, mut_type=1,
                  cross_prob=0.95, cross_type=1, elitism=True, tournament_size=None):
@@ -103,7 +127,7 @@ class StandardGA:
 
     def _check_common_parameters(self):
         """
-        This function verifies common input parameters of a genetic algorithm.
+        This method verifies common input parameters of a genetic algorithm.
         """
         if self.fitness_func is None or \
                 self.optim not in ['min', 'max'] or \
@@ -150,7 +174,7 @@ class StandardGA:
     def _invert_bit(self, chromosome, bit_num):
         """
         TO BE REIMPLEMENTED IN SUBCLASSES.
-        This function mutates the appropriate bits of the chromosome from *bit_num*
+        This method mutates the appropriate bits of the chromosome from *bit_num*
         with the specified mutation probability.
 
         Args:
@@ -160,11 +184,11 @@ class StandardGA:
         Returns:
             mutated chromosome
         """
-        raise NotImplementedError('This function must be reimplemented in subclasses.')
+        raise NotImplementedError('This method must be reimplemented in subclasses.')
 
     def _mutate(self, chromosome):
         """
-        This function mutates (inverses bits) the given chromosome.
+        This method mutates (inverses bits) the given chromosome.
 
         Args:
             chromosome (float, list): a float or a list of floats, or a binary encoded combination
@@ -200,11 +224,11 @@ class StandardGA:
         Returns:
              target with replaced bits with source one in the interval (start, stop) (both included)
         """
-        raise NotImplementedError('This function must be reimplemented in subclasses.')
+        raise NotImplementedError('This method must be reimplemented in subclasses.')
 
     def _cross(self, parent1, parent2):
         """
-        This function crosses over the two given chromosomes (parents). The first parent is a target chromosome
+        This method crosses over the two given chromosomes (parents). The first parent is a target chromosome
         that means its bits will be replaced with bits of the second parent (source chromosome) with
         the specified crossover probability.
 
@@ -215,8 +239,8 @@ class StandardGA:
                 of the original data list (*self.data*) of the second parent.
 
         Returns:
-             child (list, float): a chromosome (a binary representation, a float or a list of floats) created by the
-                crossover of the two given parents
+            child (list, float): a chromosome (a binary representation, a float or a list of floats) created by the
+            crossover of the two given parents
         """
         try:
             # a list of floats or binary encoded combination
@@ -376,7 +400,7 @@ class StandardGA:
 
     def _compute_rank_wheel_sum(self, population_size):
         """
-        The function returns sum of a wheel that is necessary in parent selection process
+        The method returns sum of a wheel that is necessary in parent selection process
         in case of "rank" selection type.
 
         Args:
@@ -390,7 +414,8 @@ class StandardGA:
     def _compute_fitness(self, chromosome):
         """
         TO BE REIMPLEMENTED IN SUBCLASSES.
-        This function computes fitness value of the given chromosome.
+
+        This method computes fitness value of the given chromosome.
 
         Args:
             chromosome (float, list): A chromosome of genetic algorithm.
@@ -399,23 +424,23 @@ class StandardGA:
         Returns:
             fitness value of the given chromosome
         """
-        raise NotImplementedError('This function must be reimplemented in subclasses.')
+        raise NotImplementedError('This method must be reimplemented in subclasses.')
 
     def _check_init_random_population(self, *args):
         """
         TO BE REIMPLEMENTED IN SUBCLASSES.
 
-        This function verifies the input parameters of a random initialization.
+        This method verifies the input parameters of a random initialization.
         """
-        raise NotImplementedError('This function must be reimplemented in subclasses.')
+        raise NotImplementedError('This method must be reimplemented in subclasses.')
 
     def _generate_random_population(self, *args):
         """
         TO BE REIMPLEMENTED IN SUBCLASSES.
 
-        This function generates new random population by the given input parameters.
+        This method generates new random population by the given input parameters.
         """
-        raise NotImplementedError('This function must be reimplemented in subclasses.')
+        raise NotImplementedError('This method must be reimplemented in subclasses.')
 
     def init_population(self, chromosomes, interval=None):
         """

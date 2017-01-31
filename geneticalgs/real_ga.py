@@ -1,18 +1,16 @@
-"""
-   Copyright 2017 Dmitriy Bobir <bobirdima@gmail.com>
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-"""
+# Copyright 2017 Dmitriy Bobir <bobirdima@gmail.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 
 from bitstring import BitArray
@@ -26,6 +24,46 @@ class RealGA(StandardGA):
     """
     This class realizes GA over the real values. In other words, it tries to find global minimum or
     global maximum (depends on the settings) of a given fitness function.
+
+    Attributes:
+        fitness_func (function): This function must compute fitness value of a single chromosome.
+            Function parameters depend on the implemented subclasses of this class.
+        optim (str): What this genetic algorithm must do with fitness value: maximize or minimize.
+            May be 'min' or 'max'. Default is "max".
+        selection (str): Parent selection type. May be "rank" (Rank Wheel Selection),
+            "roulette" (Roulette Wheel Selection) or "tournament". Default is "rank".
+        tournament_size (int): Defines the size of tournament in case of 'selection' == 'tournament'.
+            Default is None.
+        mut_prob (float): Probability of mutation. Recommended values are 0.5-1%. Default is 0.5% (0.05).
+        mut_type (int): This parameter defines how many chromosome bits will be mutated. Default is 1.
+        cross_prob (float): Probability of crossover. Recommended values are 80-95%. Default is 95% (0.95).
+        cross_type (int): This parameter defines crossover type. The following types are allowed:
+            single point (1), two point (2) and multiple point (2 < *cross_type*).
+            The extreme case of multiple point crossover is uniform one (*cross_type* == all_bits).
+            The specified number of bits (*cross_type*) are crossed in case of multiple point crossover.
+            Default is 1.
+        elitism (True, False): Elitism on/off. Default is True.
+
+    You may initialize instance of this class the following way
+
+    .. testcode::
+
+       from geneticalgs import RealGA
+       import math
+
+       # define some function whose global minimum or maximum we are searching for
+       # this function takes as input one-dimensional number
+       def fitness_function(x):
+           # the same function is used in examples
+           return abs(x*(math.sin(x/11)/5 + math.sin(x/110)))
+
+       # initialize standard real GA with fitness maximization by default
+       gen_alg = RealGA(fitness_function)
+       # initialize random one-dimensional population of size 20 within interval (0, 1000)
+       gen_alg.init_random_population(20, 1, (0, 1000))
+
+    Then you may start computation by *gen_alg.run(number_of_generations)* and obtain
+    the currently best found solution by *gen_alg.best_solution*.
     """
     def __init__(self, fitness_func=None, optim='max', selection="rank", mut_prob=0.05, mut_type=1,
                  cross_prob=0.95, cross_type=1, elitism=True, tournament_size=None):
@@ -86,7 +124,7 @@ class RealGA(StandardGA):
 
     def _is_chromosome_list(self, chromosome):
         """
-        This function returns True iff chromosome is a list (even list of just 1 element),
+        This method returns True iff chromosome is a list (even list of just 1 element),
         otherwise False.
 
         Args:
@@ -104,7 +142,7 @@ class RealGA(StandardGA):
 
     def _get_chromosome_return_value(self, chromosome):
         """
-        This function returns a vector (chromosome as a list of floats) or a single float
+        This method returns a vector (chromosome as a list of floats) or a single float
         depending on number of elements in the given chromosome.
 
         Args:
@@ -128,7 +166,7 @@ class RealGA(StandardGA):
 
     def _adjust_to_interval(self, var):
         """
-        This function replaces NaN, inf, -inf in *var* by numpy.nan_to_num() and then
+        This method replaces NaN, inf, -inf in *var* by numpy.nan_to_num() and then
         returns *var* if it is within the specified interval. Otherwise returns lower bound of the interval
         if (*var* < lower bound) or upper bound of the interval if (*var* > upper bound).
 
@@ -152,8 +190,8 @@ class RealGA(StandardGA):
 
     def _invert_bit(self, chromosome, bit_num):
         """
-        This function mutates the appropriate bits of the chromosome from *bit_num*
-        with the specified mutation probability. The function mutates bit_num's bits of all floats
+        This method mutates the appropriate bits of the chromosome from *bit_num*
+        with the specified mutation probability. The method mutates bit_num's bits of all floats
         in a list represented chromosome in case of multiple dimensions.
 
         Args:
@@ -233,11 +271,11 @@ class RealGA(StandardGA):
 
     def _compute_fitness(self, chromosome):
         """
-        This function computes fitness value of the given chromosome.
+        This method computes fitness value of the given chromosome.
 
         Args:
             chromosome (float, list): A chromosome of genetic algorithm. May be a single float
-                or a list of floats in case of multiple dimensions. Defined fitness function (self.fitness_func)
+                or a list of floats in case of multiple dimensions. Defined fitness function (*self.fitness_func*)
                 must deal with this chromosome representation.
 
         Returns:
@@ -247,7 +285,7 @@ class RealGA(StandardGA):
 
     def _check_init_random_population(self, size, dim, interval):
         """
-        This function verifies the input parameters of a random initialization.
+        This method verifies the input parameters of a random initialization.
 
         Args:
             size (int): Size of a new population.
@@ -262,7 +300,7 @@ class RealGA(StandardGA):
 
     def _generate_random_population(self, size, dim, interval):
         """
-        This function generates a new random population by the given input parameters.
+        This method generates a new random population by the given input parameters.
 
         Args:
             size (int): Size of a new population.
@@ -272,7 +310,7 @@ class RealGA(StandardGA):
 
         Returns:
             array (numpy.array): Array rows represent chromosomes. Number of columns is specified
-                with *dim* parameter.
+            with *dim* parameter.
         """
         self.interval = interval
         return numpy.random.uniform(interval[0], interval[1], (int(size), int(dim)))

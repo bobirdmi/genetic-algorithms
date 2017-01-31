@@ -1,18 +1,16 @@
-"""
-   Copyright 2017 Dmitriy Bobir <bobirdima@gmail.com>
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-"""
+# Copyright 2017 Dmitriy Bobir <bobirdima@gmail.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 
 import random
@@ -24,6 +22,33 @@ class BinaryGA(StandardGA):
     """
     This class realizes GA over a binary encoded input data. In other words,
     the algorithm tries to find a combination of the input data with the best fitness value.
+
+    You may initialize instance of this class the following way
+
+    .. testcode::
+
+       from geneticalgs import BinaryGA
+
+       # define data whose best combination we are searching for
+       input_data = [1,2,3,7,-1,-20]
+
+       # define a simple fitness function
+       def fitness_function(chromosome, data):
+           # this function searches for the greatest sum of numbers in data
+           # chromosome contains positions (from left 0 to right *len(data)-1) of bits 1
+           sum = 0
+           for bit in chromosome:
+               sum += data[bit]
+
+           return sum
+
+       # initialize standard binary GA
+       gen_alg = BinaryGA(input_data, fitness_function)
+       # initialize random population of size 6
+       gen_alg.init_random_population(6)
+
+    Then you may start computation by *gen_alg.run(number_of_generations)* and obtain
+    the currently best found solution by *gen_alg.best_solution*.
     """
     def __init__(self, data=None, fitness_func=None, optim='max', selection="rank", mut_prob=0.05, mut_type=1,
                  cross_prob=0.95, cross_type=1, elitism=True, tournament_size=None):
@@ -73,7 +98,7 @@ class BinaryGA(StandardGA):
 
     def _invert_bit(self, chromosome, bit_num):
         """
-        This function mutates the appropriate bits of the given chromosome from *bit_num*
+        This method mutates the appropriate bits of the given chromosome from *bit_num*
         with the specified mutation probability.
 
         Args:
@@ -82,7 +107,7 @@ class BinaryGA(StandardGA):
 
         Returns:
             mutant (list): mutated chromosome as binary representation of *self.data* (it contains positions
-                of bit 1)
+            of bit 1)
         """
         for bit in bit_num:
             if random.uniform(0, 1) <= self.mutation_prob:
@@ -150,7 +175,7 @@ class BinaryGA(StandardGA):
 
     def _compute_fitness(self, chromosome):
         """
-        This function computes fitness value of the given chromosome.
+        This method computes fitness value of the given chromosome.
 
         Args:
             chromosome (list): A binary encoded chromosome of genetic algorithm.
@@ -163,7 +188,7 @@ class BinaryGA(StandardGA):
 
     def _get_bit_positions(self, number):
         """
-        This function receives a positive decimal integer number and returns positions of bit 1 in
+        This method receives a positive decimal integer number and returns positions of bit 1 in
         its binary representation. However, these positions are transformed the following way: they
         are mapped on the data list (*self.data*) "as is". It means that LSB (least significant bit) is
         mapped on the last position of the data list (e.g. *self._bin_length* - 1), MSB is mapped on
@@ -189,7 +214,7 @@ class BinaryGA(StandardGA):
 
     def _check_init_random_population(self, size):
         """
-        This function verifies the input parameter of a random initialization.
+        This method verifies the input parameter of a random initialization.
 
         Args:
             size (int): Size of a new population to check.
@@ -207,7 +232,7 @@ class BinaryGA(StandardGA):
 
     def _generate_random_population(self, max_num, size):
         """
-        This function generates a new random population by the given input parameters.
+        This method generates a new random population by the given input parameters.
 
         Args:
             max_num (int): Maximum amount of the input data combinations.
@@ -215,7 +240,7 @@ class BinaryGA(StandardGA):
 
         Returns:
             population (list): list if integers in interval [1, maxnum) that represents a binary encoded
-                combination.
+            combination.
         """
         return self._random_diff(max_num, size, start=1)
 
