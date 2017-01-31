@@ -9,8 +9,6 @@ The project summary may be found in ``project_summary.pdf``.
 
 Link to `PyPI <https://pypi.python.org/pypi/geneticalgs>`__.
 
-Link to `Read The Docs <https://readthedocs.org/projects/geneticalgs/>`__.
-
 Implemented features
 ====================
 
@@ -19,6 +17,9 @@ Implemented features
   - with real values (searching for global minimum or maximum of the specified function)
 
   - with binary encoding combination of some input data
+
+- old population is completely replaced with a new computed one at the end of each generation
+(generational population model)
 
 - two types of fitness value optimalization
 
@@ -48,7 +49,7 @@ Implemented features
 
   - multiple point up to uniform crossover
 
-- elitism may be turned on/off
+- elitism may be turned on/off (the best individual may migrate to the next generation)
 
 Content description
 ===================

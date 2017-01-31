@@ -99,3 +99,5 @@ tests/ga_test.ipynb
 
 # IDE folders
 .idea/
+
+*.docx
