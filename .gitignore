@@ -101,3 +101,4 @@ tests/ga_test.ipynb
 .idea/
 
 *.docx
+*.*~

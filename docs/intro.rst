@@ -9,7 +9,7 @@ The project summary may be found in ``project_summary.pdf``.
 
 Link to `PyPI <https://pypi.python.org/pypi/geneticalgs>`__.
 
-Link to `Read The Docs <https://readthedocs.org/projects/geneticalgs/>`__.
+Link to `Read The Docs <https://readthedocs.org/projects/genetic-algorithms/>`__.
 
 Implemented features
 ====================
@@ -19,6 +19,8 @@ Implemented features
   - with real values (searching for global minimum or maximum of the specified function)
 
   - with binary encoding combination of some input data
+
+- old population is completely replaced with a new computed one at the end of each generation (generational population model)
 
 - two types of fitness value optimalization
 
@@ -48,7 +50,7 @@ Implemented features
 
   - multiple point up to uniform crossover
 
-- elitism may be turned on/off
+- elitism may be turned on/off (the best individual may migrate to the next generation)
 
 Content description
 ===================
@@ -57,7 +59,7 @@ Content description
 
 - **/docs/** contains `sphinx <http://www.sphinx-doc.org/en/stable/>`__ source codes
 
-- **/2.7/** contains files converted from ``python 3.5`` to ``python 2.7`` using `3to2 module <https://pypi.python.org/pypi/3to2>`__ as `COCO platform <http://coco.gforge.inria.fr/>`__ used in benchmarking supports only this version of python.
+- **/2.7/** contains files converted from ``python 3.5`` to ``python 2.7`` using `3to2 module <https://pypi.python.org/pypi/3to2>`__ as `COCO platform <http://coco.gforge.inria.fr/>`__ used in benchmarking supports only this version of python. These files (not installed package ``geneticalgs``) are used in benchmarking. Must be copied in the directory with ``my_experiment.py`` or ``my_timing.py``.
 
 - **/2.7/benchmark/** contains the following files:
 
@@ -94,6 +96,8 @@ Installation
 Install package by typing the command
 
 ``python -m pip install --extra-index-url https://pypi.python.org/pypi geneticalgs``
+
+If you have problems installing NumPy it is **strongly** recommended to use `Anaconda <https://docs.continuum.io/>`__.
 
 Running tests
 =============
